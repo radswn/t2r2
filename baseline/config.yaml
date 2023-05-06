@@ -1,0 +1,44 @@
+# custom configuration
+
+model:
+  max_length: '256'
+  model_name: bert-base-cased
+  num_labels: '12'
+  output_attentions: 'True'
+  output_hidden_states: 'True'
+  padding: max_length
+  return_tensors: pt
+  truncation: 'True'
+
+training:
+  dataset:
+    path: ./data/thedeep.subset.train.txt
+    transformations:
+      - args: { }
+        name: DUMMY
+  batch_size: '2'
+  epochs: '1'
+  learning_rate: 1e-3
+  output_dir: ClassificationBERT
+
+validation:
+  dataset:
+    path: ./data/thedeep.subset.validation.txt
+  batch_size: '2'
+  metrics:
+    - name: accuracy
+  metric_for_best_model: accuracy
+
+testing:
+  dataset:
+    path: ./data/thedeep.subset.test.txt
+  metrics:
+    - name: accuracy
+  results_file: ./file_test_results.pickle
+
+control:
+  dataset:
+    path: ./data/thedeep.subset.control.txt
+  metrics:
+    - name: accuracy
+  results_file: ./file_control_results.pickle
