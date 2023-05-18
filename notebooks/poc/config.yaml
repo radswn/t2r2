@@ -12,8 +12,8 @@ model:
 
 training:
   dataset:
-    path: ./data/thedeep.subset.train.txt
-    transformations:
+    path: ../../data/thedeep.subset.train.txt
+    selectors:
       - args: { }
         name: DUMMY
   batch_size: '2'
@@ -23,7 +23,7 @@ training:
 
 validation:
   dataset:
-    path: ./data/thedeep.subset.validation.txt
+    path: ../../data/thedeep.subset.validation.txt
   batch_size: '2'
   metrics:
     - name: accuracy
@@ -31,14 +31,14 @@ validation:
 
 testing:
   dataset:
-    path: ./data/thedeep.subset.test.txt
+    path: ../../data/thedeep.subset.test.txt
   metrics:
     - name: accuracy
   results_file: ./file_test_results.pickle
 
 control:
   dataset:
-    path: ./data/thedeep.subset.control.txt
+    path: ../../data/thedeep.subset.control.txt
   metrics:
     - name: accuracy
   results_file: ./file_control_results.pickle
