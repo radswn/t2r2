@@ -55,3 +55,10 @@ class DatasetConfigWithMetrics(DatasetConfig):
                 get_metric(metric.name)(true_labels, predictions)
             for metric in self.metrics
         }
+
+@dataclass
+class DatasetConfigComplex(DatasetConfigWithSelectors, DatasetConfigWithMetrics):
+    
+    def load_dataset(self, path) -> pd.DataFrame:
+        # TODO: what columns should be accept as text/target (?)
+        return pd.read_csv(path, header=None, names=['id', 'text', 'label'])
