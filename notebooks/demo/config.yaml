@@ -17,7 +17,7 @@ training:
   dataset_path: ../../data/thedeep.subset.train.txt
   selectors:
     - args: { }
-      name: DUMMY
+      name: dummy
   batch_size: 2
   epochs: 1
   learning_rate: 1e-3
