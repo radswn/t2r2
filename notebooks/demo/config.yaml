@@ -8,21 +8,15 @@ model:
   return_tensors: pt
   truncation: 'True'
 
-training-validation:
-  dataset_path:
-    - training_path: ../../data/thedeep.subset.train.txt
-    - validation_path: ../../data/thedeep.subset.validation.txt
+training:
+  dataset_path: ../../data/thedeep.subset.train.txt
   selectors:
     - args: { }
       name: DUMMY
-  results_file: ./file_train_results.pickle
   batch_size: '2'
   epochs: '1'
   learning_rate: 1e-3
   output_dir: ClassificationBERT
-  metrics:
-    - name: accuracy
-  metric_for_best_model: accuracy
 
 testing:
   dataset_path: ../../data/thedeep.subset.test.txt
