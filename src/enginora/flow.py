@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, Tuple
 
 import torch
 import yaml
@@ -15,8 +15,8 @@ def loop(config_path='./config.yaml') -> Dict:
     tokenizer = model_config.create_tokenizer()
     model = model_config.create_model()
 
-    datasets = get_datasets(control_config, test_config, tokenizer, training_config)
-    trainer = get_trainer(datasets, model, training_config)
+    datasets = get_datasets(training_config, control_config, test_config, tokenizer)
+    trainer = get_trainer(training_config, datasets, model)
 
     train_results = trainer.train()
 
@@ -35,7 +35,7 @@ def loop(config_path='./config.yaml') -> Dict:
     }
 
 
-def get_configurations(path: str):
+def get_configurations(path: str) -> Tuple[ModelConfig, TrainingConfig, TestConfig, ControlConfig]:
     with open(path, 'r') as stream:
         configuration = yaml.safe_load(stream)
 
@@ -66,7 +66,8 @@ class TextDataset(Dataset):
         }
 
 
-def get_datasets(control_config, test_config, tokenizer, training_config):
+def get_datasets(training_config: TrainingConfig, control_config: ControlConfig, test_config: TestConfig,
+                 tokenizer) -> Dict[str, TextDataset]:
     data = {
         'train': training_config.load_dataset()[0],
         'validation': training_config.load_dataset()[1],
@@ -88,7 +89,7 @@ def get_datasets(control_config, test_config, tokenizer, training_config):
     }
 
 
-def get_training_args(training_config):
+def get_training_args(training_config: TrainingConfig) -> TrainingArguments:
     return TrainingArguments(
         output_dir=training_config.output_dir,
         learning_rate=training_config.learning_rate,
@@ -103,11 +104,11 @@ def get_training_args(training_config):
     )
 
 
-def get_trainer(datasets, model, training_validation_config):
+def get_trainer(training_config: TrainingConfig, datasets: Dict[str, TextDataset], model) -> Trainer:
     return Trainer(
         model=model,
         train_dataset=datasets['train'],
         eval_dataset=datasets['validation'],
-        compute_metrics=training_validation_config.compute_metrics,
-        args=get_training_args(training_validation_config)
+        compute_metrics=training_config.compute_metrics,
+        args=get_training_args(training_config)
     )

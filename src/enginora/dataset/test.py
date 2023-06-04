@@ -2,7 +2,7 @@ from enginora.dataset.common import *
 
 
 @dataclass
-class TestConfig(DatasetConfigWithSelectors, DatasetConfigWithMetrics):
+class TestConfig(DatasetConfigWithSelectors, WithLoadableMetrics):
 
     def __post_init__(self):
         self.selectors = [SelectorConfig(**t) for t in self.selectors]
