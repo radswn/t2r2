@@ -33,8 +33,22 @@ class DatasetConfigWithSelectors(DatasetConfig):
 
 
 @dataclass
-class DatasetConfigWithMetrics(DatasetConfig):
+class WithMetrics:
     metrics: List[MetricsConfig]
+
+    def compute_metrics(self, predictions) -> dict:
+        predictions, true_labels = predictions[0], predictions[1]
+        predictions = predictions.argmax(1)
+
+        return {
+            metric.name:
+                get_metric(metric.name)(true_labels, predictions)
+            for metric in self.metrics
+        }
+
+
+@dataclass
+class WithLoadableMetrics(WithMetrics):
     results_file: str
 
     def save_predictions(self, predictions):
@@ -45,13 +59,6 @@ class DatasetConfigWithMetrics(DatasetConfig):
         with open(self.results_file, 'rb') as file:
             return pickle.load(file)
 
-    def compute_metrics(self) -> dict:
+    def compute_metrics(self, predictions=None) -> dict:
         predictions = self.load_predictions()
-        predictions, true_labels = predictions[0], predictions[1]
-        predictions = predictions.argmax(1)
-
-        return {
-            metric.name:
-                get_metric(metric.name)(true_labels, predictions)
-            for metric in self.metrics
-        }
+        return super().compute_metrics(predictions)

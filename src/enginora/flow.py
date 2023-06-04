@@ -1,22 +1,22 @@
-from typing import Dict
+from typing import Dict, Tuple
 
 import torch
 import yaml
 from torch.utils.data.dataset import Dataset
 from transformers import TrainingArguments, IntervalStrategy, Trainer
 
-from enginora.dataset import ControlConfig, TrainingConfig, TestConfig, ValidationConfig
+from enginora.dataset import ControlConfig, TrainingConfig, TestConfig
 from enginora.model import ModelConfig
 
 
 def loop(config_path='./config.yaml') -> Dict:
-    model_config, training_config, validation_config, test_config, control_config = get_configurations(config_path)
+    model_config, training_config, test_config, control_config = get_configurations(config_path)
 
     tokenizer = model_config.create_tokenizer()
     model = model_config.create_model()
 
-    datasets = get_datasets(control_config, test_config, tokenizer, training_config, validation_config)
-    trainer = get_trainer(datasets, model, training_config, validation_config)
+    datasets = get_datasets(training_config, control_config, test_config, tokenizer)
+    trainer = get_trainer(training_config, datasets, model)
 
     train_results = trainer.train()
 
@@ -35,17 +35,16 @@ def loop(config_path='./config.yaml') -> Dict:
     }
 
 
-def get_configurations(path: str):
+def get_configurations(path: str) -> Tuple[ModelConfig, TrainingConfig, TestConfig, ControlConfig]:
     with open(path, 'r') as stream:
         configuration = yaml.safe_load(stream)
 
     model_config = ModelConfig(**configuration['model'])
     training_config = TrainingConfig(**configuration['training'])
-    validation_config = ValidationConfig(**configuration['validation'])
     test_config = TestConfig(**configuration['testing'])
     control_config = ControlConfig(**configuration['control'])
 
-    return model_config, training_config, validation_config, test_config, control_config
+    return model_config, training_config, test_config, control_config
 
 
 class TextDataset(Dataset):
@@ -67,10 +66,11 @@ class TextDataset(Dataset):
         }
 
 
-def get_datasets(control_config, test_config, tokenizer, training_config, validation_config):
+def get_datasets(training_config: TrainingConfig, control_config: ControlConfig, test_config: TestConfig,
+                 tokenizer) -> Dict[str, TextDataset]:
     data = {
-        'train': training_config.load_dataset(),
-        'validation': validation_config.load_dataset(),
+        'train': training_config.load_dataset()[0],
+        'validation': training_config.load_dataset()[1],
         'test': test_config.load_dataset(),
         'control': control_config.load_dataset(),
     }
@@ -89,7 +89,7 @@ def get_datasets(control_config, test_config, tokenizer, training_config, valida
     }
 
 
-def get_training_args(training_config, validation_config):
+def get_training_args(training_config: TrainingConfig) -> TrainingArguments:
     return TrainingArguments(
         output_dir=training_config.output_dir,
         learning_rate=training_config.learning_rate,
@@ -97,18 +97,18 @@ def get_training_args(training_config, validation_config):
         save_strategy=IntervalStrategy.EPOCH,
         logging_strategy=IntervalStrategy.EPOCH,
         per_device_train_batch_size=training_config.batch_size,
-        per_device_eval_batch_size=validation_config.batch_size,
+        per_device_eval_batch_size=training_config.batch_size,
         load_best_model_at_end=True,
-        metric_for_best_model=validation_config.metric_for_best_model,
+        metric_for_best_model=training_config.metric_for_best_model,
         num_train_epochs=training_config.epochs,
     )
 
 
-def get_trainer(datasets, model, training_config, validation_config):
+def get_trainer(training_config: TrainingConfig, datasets: Dict[str, TextDataset], model) -> Trainer:
     return Trainer(
         model=model,
         train_dataset=datasets['train'],
         eval_dataset=datasets['validation'],
-        compute_metrics=validation_config.compute_metrics,
-        args=get_training_args(training_config, validation_config)
+        compute_metrics=training_config.compute_metrics,
+        args=get_training_args(training_config)
     )

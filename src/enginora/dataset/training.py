@@ -1,37 +1,33 @@
+from typing import Tuple
+
+from sklearn.model_selection import train_test_split
+
 from enginora.dataset.common import *
 
 
 @dataclass
-class TrainingConfig(DatasetConfigWithSelectors):
+class TrainingConfig(DatasetConfigWithSelectors, WithMetrics):
     batch_size: int
     epochs: int
     learning_rate: float
+    validation_size: float
     output_dir: str
-
-    def __post_init__(self):
-        self.selectors = [SelectorConfig(**t) for t in self.selectors]
-        self.batch_size = int(self.batch_size)
-        self.epochs = int(self.epochs)
-        self.learning_rate = float(self.learning_rate)
-
-
-@dataclass
-class ValidationConfig(DatasetConfig):
-    # TODO: merge with training set
-    batch_size: int
-    metrics: List[MetricsConfig]
     metric_for_best_model: str
 
     def __post_init__(self):
-        self.batch_size = int(self.batch_size)
+        self.selectors = [SelectorConfig(**t) for t in self.selectors]
         self.metrics = [MetricsConfig(**m) for m in self.metrics]
+        self.batch_size = int(self.batch_size)
+        self.epochs = int(self.epochs)
+        self.learning_rate = float(self.learning_rate)
+        self.validation_size = float(self.validation_size)
 
-    def compute_metrics(self, predictions) -> dict:
-        predictions, true_labels = predictions[0], predictions[1]
-        predictions = predictions.argmax(1)
+    def load_dataset(self) -> Tuple[pd.DataFrame, pd.DataFrame]:
+        data = super().load_dataset()
+        X = data[['id', 'text']]
+        y = data['label']
 
-        return {
-            metric.name:
-                get_metric(metric.name)(true_labels, predictions)
-            for metric in self.metrics
-        }
+        X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=self.validation_size)
+        train_data = pd.concat([X_train, y_train], axis=1)
+        val_data = pd.concat([X_val, y_val], axis=1)
+        return train_data, val_data
