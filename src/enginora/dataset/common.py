@@ -42,7 +42,7 @@ class WithMetrics:
 
         return {
             metric.name:
-                get_metric(metric.name)(true_labels, predictions)
+                get_metric(metric.name)(true_labels, predictions, **metric.args)
             for metric in self.metrics
         }
 

@@ -30,14 +30,17 @@ def loop(config_path='./config.yaml') -> Dict:
         'train_results': train_results,
         'test_results': test_results.metrics,
         'control_results': control_results.metrics,
-        'test_set_metrics': test_config.compute_metrics(),  # FIXME: is it really needed?
-        'control_set_metrics': control_config.compute_metrics(),  # FIXME: is it really needed?
     }
 
 
 def get_configurations(path: str) -> Tuple[ModelConfig, TrainingConfig, TestConfig, ControlConfig]:
     with open(path, 'r') as stream:
         configuration = yaml.safe_load(stream)
+
+    metrics = configuration['metrics']
+
+    for config in ['training', 'testing', 'control']:
+        configuration[config]['metrics'] = metrics
 
     model_config = ModelConfig(**configuration['model'])
     training_config = TrainingConfig(**configuration['training'])
@@ -68,9 +71,10 @@ class TextDataset(Dataset):
 
 def get_datasets(training_config: TrainingConfig, control_config: ControlConfig, test_config: TestConfig,
                  tokenizer) -> Dict[str, TextDataset]:
+    training_dataset, validation_dataset = training_config.load_dataset()
     data = {
-        'train': training_config.load_dataset()[0],
-        'validation': training_config.load_dataset()[1],
+        'train': training_dataset,
+        'validation': validation_dataset,
         'test': test_config.load_dataset(),
         'control': control_config.load_dataset(),
     }
