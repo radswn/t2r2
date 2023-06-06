@@ -1,6 +1,6 @@
 import pickle
 from dataclasses import dataclass
-from typing import List
+from typing import List, Dict
 
 import pandas as pd
 
@@ -36,7 +36,7 @@ class DatasetConfigWithSelectors(DatasetConfig):
 class WithMetrics:
     metrics: List[MetricsConfig]
 
-    def compute_metrics(self, predictions) -> dict:
+    def compute_metrics(self, predictions) -> Dict[str, float]:
         predictions, true_labels = predictions[0], predictions[1]
         predictions = predictions.argmax(1)
 
@@ -59,6 +59,6 @@ class WithLoadableMetrics(WithMetrics):
         with open(self.results_file, 'rb') as file:
             return pickle.load(file)
 
-    def compute_metrics(self, predictions=None) -> dict:
+    def compute_metrics(self, predictions=None) -> Dict[str, float]:
         predictions = self.load_predictions()
         return super().compute_metrics(predictions)
