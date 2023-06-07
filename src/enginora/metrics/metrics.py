@@ -5,10 +5,7 @@ from sklearn.metrics import accuracy_score, f1_score
 
 
 def get_metric(name: str):
-    metrics = {
-        'accuracy': accuracy_score,
-        'f1': f1_score
-    }
+    metrics = {"accuracy": accuracy_score, "f1": f1_score}
 
     return metrics[name]
 

@@ -9,7 +9,7 @@ from enginora.dataset import ControlConfig, TrainingConfig, TestConfig
 from enginora.model import ModelConfig
 
 
-def loop(config_path='./config.yaml') -> Dict:
+def loop(config_path="./config.yaml") -> Dict:
     model_config, training_config, test_config, control_config = get_configurations(config_path)
 
     tokenizer = model_config.create_tokenizer()
@@ -20,32 +20,32 @@ def loop(config_path='./config.yaml') -> Dict:
 
     train_results = trainer.train()
 
-    test_results = trainer.predict(datasets['test'])
+    test_results = trainer.predict(datasets["test"])
     test_config.save_predictions(test_results)
 
-    control_results = trainer.predict(datasets['control'])
+    control_results = trainer.predict(datasets["control"])
     control_config.save_predictions(control_results)
 
     return {
-        'train_results': train_results,
-        'test_results': test_results.metrics,
-        'control_results': control_results.metrics,
+        "train_results": train_results,
+        "test_results": test_results.metrics,
+        "control_results": control_results.metrics,
     }
 
 
 def get_configurations(path: str) -> Tuple[ModelConfig, TrainingConfig, TestConfig, ControlConfig]:
-    with open(path, 'r') as stream:
+    with open(path, "r") as stream:
         configuration = yaml.safe_load(stream)
 
-    metrics = configuration['metrics']
+    metrics = configuration["metrics"]
 
-    for config in ['training', 'testing', 'control']:
-        configuration[config]['metrics'] = metrics
+    for config in ["training", "testing", "control"]:
+        configuration[config]["metrics"] = metrics
 
-    model_config = ModelConfig(**configuration['model'])
-    training_config = TrainingConfig(**configuration['training'])
-    test_config = TestConfig(**configuration['testing'])
-    control_config = ControlConfig(**configuration['control'])
+    model_config = ModelConfig(**configuration["model"])
+    training_config = TrainingConfig(**configuration["training"])
+    test_config = TestConfig(**configuration["testing"])
+    control_config = ControlConfig(**configuration["control"])
 
     return model_config, training_config, test_config, control_config
 
@@ -62,35 +62,27 @@ class TextDataset(Dataset):
 
     def __getitem__(self, i):
         return {
-            'input_ids': self.input_ids[i],
-            'attention_mask': self.attention_mask[i],
-            'token_type_ids': self.token_type_ids[i],
-            'labels': self.y[i]
+            "input_ids": self.input_ids[i],
+            "attention_mask": self.attention_mask[i],
+            "token_type_ids": self.token_type_ids[i],
+            "labels": self.y[i],
         }
 
 
-def get_datasets(training_config: TrainingConfig, control_config: ControlConfig, test_config: TestConfig,
-                 tokenizer) -> Dict[str, TextDataset]:
+def get_datasets(
+    training_config: TrainingConfig, control_config: ControlConfig, test_config: TestConfig, tokenizer
+) -> Dict[str, TextDataset]:
     training_dataset, validation_dataset = training_config.load_dataset()
     data = {
-        'train': training_dataset,
-        'validation': validation_dataset,
-        'test': test_config.load_dataset(),
-        'control': control_config.load_dataset(),
+        "train": training_dataset,
+        "validation": validation_dataset,
+        "test": test_config.load_dataset(),
+        "control": control_config.load_dataset(),
     }
-    tokens = {
-        dataset_type: tokenizer(dataset['text'].tolist())
-        for dataset_type, dataset in data.items()
-    }
-    labels = {
-        dataset_type: torch.tensor(dataset['label'].tolist())
-        for dataset_type, dataset in data.items()
-    }
+    tokens = {dataset_type: tokenizer(dataset["text"].tolist()) for dataset_type, dataset in data.items()}
+    labels = {dataset_type: torch.tensor(dataset["label"].tolist()) for dataset_type, dataset in data.items()}
 
-    return {
-        dataset_type: TextDataset(tokens[dataset_type], labels[dataset_type])
-        for dataset_type in data.keys()
-    }
+    return {dataset_type: TextDataset(tokens[dataset_type], labels[dataset_type]) for dataset_type in data.keys()}
 
 
 def get_training_args(training_config: TrainingConfig) -> TrainingArguments:
@@ -111,8 +103,8 @@ def get_training_args(training_config: TrainingConfig) -> TrainingArguments:
 def get_trainer(training_config: TrainingConfig, datasets: Dict[str, TextDataset], model) -> Trainer:
     return Trainer(
         model=model,
-        train_dataset=datasets['train'],
-        eval_dataset=datasets['validation'],
+        train_dataset=datasets["train"],
+        eval_dataset=datasets["validation"],
         compute_metrics=training_config.compute_metrics,
-        args=get_training_args(training_config)
+        args=get_training_args(training_config),
     )

@@ -6,7 +6,7 @@ from enginora.selector.dummy import DummySelector
 
 def get_selector(name: str) -> ClassVar[Selector]:
     selectors = {
-        'DUMMY': DummySelector,
+        "DUMMY": DummySelector,
     }
 
     return selectors[name]

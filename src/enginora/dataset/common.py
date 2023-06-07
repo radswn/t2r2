@@ -14,7 +14,7 @@ class DatasetConfig:
 
     def load_dataset(self) -> pd.DataFrame:
         # TODO: what columns should be accept as text/target (?)
-        return pd.read_csv(self.dataset_path, header=None, names=['id', 'text', 'label'])
+        return pd.read_csv(self.dataset_path, header=None, names=["id", "text", "label"])
 
 
 @dataclass
@@ -41,9 +41,7 @@ class WithMetrics:
         predictions = predictions.argmax(1)
 
         return {
-            metric.name:
-                get_metric(metric.name)(true_labels, predictions, **metric.args)
-            for metric in self.metrics
+            metric.name: get_metric(metric.name)(true_labels, predictions, **metric.args) for metric in self.metrics
         }
 
 
@@ -52,11 +50,11 @@ class WithLoadableMetrics(WithMetrics):
     results_file: str
 
     def save_predictions(self, predictions):
-        with open(self.results_file, 'wb') as file:
+        with open(self.results_file, "wb") as file:
             pickle.dump(predictions, file)
 
     def load_predictions(self):
-        with open(self.results_file, 'rb') as file:
+        with open(self.results_file, "rb") as file:
             return pickle.load(file)
 
     def compute_metrics(self, predictions=None) -> Dict[str, float]:
