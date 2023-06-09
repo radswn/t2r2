@@ -24,8 +24,8 @@ class TrainingConfig(DatasetConfigWithSelectors, WithMetrics):
 
     def load_dataset(self) -> Tuple[pd.DataFrame, pd.DataFrame]:
         data = super().load_dataset()
-        X = data[['id', 'text']]
-        y = data['label']
+        X = data[["id", "text"]]
+        y = data["label"]
 
         X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=self.validation_size)
         train_data = pd.concat([X_train, y_train], axis=1)

@@ -25,7 +25,7 @@ class ModelConfig:
             padding=self.padding,
             max_length=self.max_length,
             truncation=self.truncation,
-            return_tensors=self.return_tensors
+            return_tensors=self.return_tensors,
         )
 
     def create_model(self):

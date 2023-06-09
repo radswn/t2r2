@@ -6,7 +6,6 @@ import pandas as pd
 
 
 class Selector(ABC):
-
     def __init__(self, **kwargs):
         pass
 
