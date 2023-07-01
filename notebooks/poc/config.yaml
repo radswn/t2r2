@@ -32,6 +32,9 @@ validation:
 testing:
   dataset:
     path: ../../data/thedeep.subset.test.txt
+    selectors:
+      - args: { }
+        name: SLICING
   metrics:
     - name: accuracy
   results_file: ./file_test_results.pickle
