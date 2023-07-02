@@ -33,7 +33,7 @@ testing:
   dataset:
     path: ../../data/thedeep.subset.test.txt
     selectors:
-      - args: { }
+      - args: { result_file: '../../data/slicing.pickle'}
         name: SLICING
   metrics:
     - name: accuracy

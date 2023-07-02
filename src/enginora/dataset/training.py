@@ -27,7 +27,9 @@ class TrainingConfig(DatasetConfigWithSelectors, WithMetrics):
         X = data[["id", "text"]]
         y = data["label"]
 
-        X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=self.validation_size)
+        X_train, X_val, y_train, y_val = train_test_split(
+            X, y, test_size=self.validation_size
+        )
         train_data = pd.concat([X_train, y_train], axis=1)
         val_data = pd.concat([X_val, y_val], axis=1)
         return train_data, val_data
