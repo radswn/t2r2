@@ -10,10 +10,10 @@ from snorkel.preprocess import preprocessor
 from snorkel.slicing import PandasSFApplier
 from typing import Union, List, Callable
 
-
+# default slicing functions for text
 @slicing_function()
 def short(x):
-    return len(x.text.split()) < 5
+    return len(x.text.split()) < 60
 
 
 @preprocessor(memoize=True)
@@ -25,7 +25,7 @@ def textblob_sentiment(x):
 
 @slicing_function(pre=[textblob_sentiment])
 def textblob_polarity(x):
-    return x.polarity > 0.9
+    return x.polarity > 0.1
 
 
 class SlicingSelector(Selector):

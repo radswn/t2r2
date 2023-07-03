@@ -37,6 +37,9 @@ testing:
         name: SLICING
   metrics:
     - name: accuracy
+    - name: slicing_scores
+      args: { slice_file: '../../data/slicing.pickle'}
+    
   results_file: ./file_test_results.pickle
 
 control:
