@@ -12,12 +12,20 @@ metrics:
   - name: f1
     args:
       average: macro
+  - name: slicing
+    args: 
+      result_file: '../../data/slicing/slicing.pickle'
+      base_directory: "../../data/slicing/"
+      default_file_name: "slicing.pickle"
+        
 
 training:
-  dataset_path: ../../data/thedeep.subset.train.txt
+  dataset_path: ../../data/featuresets/thedeep.subset.train.txt
   selectors:
     - args: { }
       name: dummy
+    - args: { result_file: '../../data/slicing/train_slicing.pickle'}
+      name: slicing
   batch_size: 2
   epochs: 1
   learning_rate: 1e-3
@@ -26,10 +34,12 @@ training:
   metric_for_best_model: f1
 
 testing:
-  dataset_path: ../../data/thedeep.subset.test.txt
-  selectors: [ ]
+  dataset_path: ../../data/featuresets/thedeep.subset.test.txt
+  selectors: 
+    - args: { result_file: '../../data/slicing/test_slicing.pickle'}
+      name: slicing
   results_file: ./file_test_results.pickle
 
 control:
-  dataset_path: ../../data/thedeep.subset.control.txt
+  dataset_path: ../../data/featuresets/thedeep.subset.control.txt
   results_file: ./file_control_results.pickle

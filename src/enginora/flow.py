@@ -81,10 +81,10 @@ def get_datasets(
 ) -> Dict[str, TextDataset]:
     training_dataset, validation_dataset = training_config.load_dataset()
     data = {
-        "train": training_dataset,
-        "validation": validation_dataset,
-        "test": test_config.load_dataset(),
-        "control": control_config.load_dataset(),
+        "train": training_dataset[:20],
+        "validation": validation_dataset[:10],
+        "test": test_config.load_dataset()[:10],
+        "control": control_config.load_dataset()[:10],
     }
     tokens = {
         dataset_type: tokenizer(dataset["text"].tolist())

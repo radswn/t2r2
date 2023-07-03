@@ -9,6 +9,7 @@ from snorkel.slicing import SlicingFunction, slicing_function
 from snorkel.preprocess import preprocessor
 from snorkel.slicing import PandasSFApplier
 from typing import Union, List, Callable
+import pandas as pd
 
 # default slicing functions for text
 @slicing_function()
@@ -37,7 +38,8 @@ class SlicingSelector(Selector):
 
     def select(self, dataset: pd.DataFrame) -> pd.DataFrame:
         res = self.create_slicing_functions(dataset)
-        return res
+        res.dump(self.result_file)
+        return dataset #3 we only want stuff inside file, not passing
 
     def create_list_of_slicing_functions(
         self, list_of_slicing_functions: Union[List[Callable], None]

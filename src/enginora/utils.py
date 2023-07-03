@@ -1,5 +1,8 @@
 import inspect
 import functools
+from typing import Union # in later version of python simly replace with |
+import os
+import enum
 
 def ignore_unmatched_kwargs(f):
     """
@@ -33,3 +36,21 @@ def is_kwarg_of(key, f):
         param.kind is inspect.Parameter.KEYWORD_ONLY or
         param.kind is inspect.Parameter.POSITIONAL_OR_KEYWORD
     )
+
+
+def construct_results_file(slice_file : Union[str, None], stage: Union[str, None], base_directory: Union[str, None], default_file_name:Union[str, None]) -> str:
+    """Constructs filename where slices are stored"""
+    if slice_file is None:
+        slice_file = os.path.join(base_directory, str(stage.value) +"_" + default_file_name)
+    return slice_file
+
+
+class Stage(enum.Enum):
+    def __str__(self):
+        return str(self.value)
+    TRAINING= 'train'
+    VALIDATION= 'val'
+    TESTING = 'test'
+    CONTROL = 'cont'
+
+

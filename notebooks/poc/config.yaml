@@ -12,7 +12,7 @@ model:
 
 training:
   dataset:
-    path: ../../data/thedeep.subset.train.txt
+    path: ../../data/featuresets/thedeep.subset.train.txt
     selectors:
       - args: { }
         name: DUMMY
@@ -23,7 +23,7 @@ training:
 
 validation:
   dataset:
-    path: ../../data/thedeep.subset.validation.txt
+    path: ../../data/featuresets/thedeep.subset.validation.txt
   batch_size: '2'
   metrics:
     - name: accuracy
@@ -31,20 +31,22 @@ validation:
 
 testing:
   dataset:
-    path: ../../data/thedeep.subset.test.txt
+    path: ../../data/featuresets/thedeep.subset.test.txt
     selectors:
-      - args: { result_file: '../../data/slicing.pickle'}
-        name: SLICING
+      - args: { result_file: '../../data/slicing/slicing.pickle'}
+        name: slicing
   metrics:
     - name: accuracy
     - name: slicing_scores
-      args: { slice_file: '../../data/slicing.pickle'}
+      args: { slice_file: '../../data/slicing/slicing.pickle'}
     
   results_file: ./file_test_results.pickle
 
 control:
   dataset:
-    path: ../../data/thedeep.subset.control.txt
+    path: ../../data/featuresets/thedeep.subset.control.txt
   metrics:
     - name: accuracy
   results_file: ./file_control_results.pickle
+
+
