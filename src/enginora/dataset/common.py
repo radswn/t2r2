@@ -14,9 +14,7 @@ class DatasetConfig:
 
     def load_dataset(self) -> pd.DataFrame:
         # TODO: what columns should be accept as text/target (?)
-        return pd.read_csv(
-            self.dataset_path, header=None, names=["id", "text", "label"]
-        )
+        return pd.read_csv(self.dataset_path, header=None, names=["id", "text", "label"])
 
 
 @dataclass
@@ -37,7 +35,7 @@ class DatasetConfigWithSelectors(DatasetConfig):
 @dataclass
 class WithMetrics:
     metrics: List[MetricsConfig]
-    stage: Stage = field(init=False) 
+    stage: Stage = field(init=False)
 
     def compute_metrics(self, predictions) -> Dict[str, float]:
         predictions, true_labels = predictions[0], predictions[1]
@@ -46,7 +44,7 @@ class WithMetrics:
 
         return {
             metric.name: get_metric(metric.name)(
-                true_labels, predictions, **metric.args, proba_predictions = proba_predictions, stage = self.stage
+                true_labels, predictions, **metric.args, proba_predictions=proba_predictions, stage=self.stage
             )
             for metric in self.metrics
         }

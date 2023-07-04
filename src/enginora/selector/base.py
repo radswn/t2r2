@@ -7,6 +7,7 @@ import pandas as pd
 
 class Selector(ABC):
     """Abstract class for selectors"""
+
     def __init__(self, **kwargs):
         pass
 
@@ -18,5 +19,6 @@ class Selector(ABC):
 @dataclass
 class SelectorConfig:
     """Abstract class for selectorCongigs for training, testing and control"""
+
     name: str
     args: Dict

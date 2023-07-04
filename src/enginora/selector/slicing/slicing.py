@@ -4,54 +4,38 @@ Module for implementing slicing functions by snorkel.
 # FIXME: is this really a good module tree?
 from enginora.selector.base import *
 from snorkel.analysis import Scorer
-from textblob import TextBlob
 from snorkel.slicing import SlicingFunction, slicing_function
-from snorkel.preprocess import preprocessor
 from snorkel.slicing import PandasSFApplier
 from typing import Union, List, Callable
 import pandas as pd
+from enginora.selector.slicing import default_slicing_functions
+from enginora.selector.slicing.default_slicing_functions import short, textblob_polarity
 
 # default slicing functions for text
-@slicing_function()
-def short(x):
-    return len(x.text.split()) < 60
-
-
-@preprocessor(memoize=True)
-def textblob_sentiment(x):
-    scores = TextBlob(x.text)
-    x.polarity = scores.sentiment.polarity
-    return x
-
-
-@slicing_function(pre=[textblob_sentiment])
-def textblob_polarity(x):
-    return x.polarity > 0.1
 
 
 class SlicingSelector(Selector):
-    # wether or not to create default
     def __init__(self, result_file: str, list_of_slicing_functions=None):
         super().__init__()
         self.sfs = self.create_list_of_slicing_functions(list_of_slicing_functions)
         self.result_file = result_file
 
     def select(self, dataset: pd.DataFrame) -> pd.DataFrame:
-        res = self.create_slicing_functions(dataset)
-        res.dump(self.result_file)
-        return dataset #3 we only want stuff inside file, not passing
+        # TODO: thinking about slicing in general: I highly doubt that is is truly a selector...
+        if not len(self.sfs) == 0:
+            res = self.create_slicing_functions(dataset)
+            res.dump(self.result_file)
+        return dataset
 
-    def create_list_of_slicing_functions(
-        self, list_of_slicing_functions: Union[List[Callable], None]
-    ):
+    def create_list_of_slicing_functions(self, list_of_slicing_functions: Union[List[str], None]):
         # FIXME: add functionality not to rely on default (TEXT)
         if list_of_slicing_functions is None:
-            sfs = [short, textblob_polarity]
+            sfs = [short]
         else:
-            sfs = list_of_slicing_functions
+            sfs = [getattr(default_slicing_functions, function_name) for function_name in list_of_slicing_functions]
         return sfs
 
     def create_slicing_functions(self, dataset):
         applier = PandasSFApplier(self.sfs)
-        res = applier.apply(dataset)  # FIXME: name nicely
-        return res
+        slice_membership = applier.apply(dataset)
+        return slice_membership

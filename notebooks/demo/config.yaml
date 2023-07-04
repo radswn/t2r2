@@ -24,7 +24,7 @@ training:
   selectors:
     - args: { }
       name: dummy
-    - args: { result_file: '../../data/slicing/train_slicing.pickle'}
+    - args: { result_file: '../../data/slicing/train_slicing.pickle', list_of_slicing_functions: [short, textblob_polarity]}
       name: slicing
   batch_size: 2
   epochs: 1
@@ -38,8 +38,8 @@ testing:
   selectors: 
     - args: { result_file: '../../data/slicing/test_slicing.pickle'}
       name: slicing
-  results_file: ./file_test_results.pickle
+  results_file: ../../data/slicing/file_test_results.pickle
 
 control:
   dataset_path: ../../data/featuresets/thedeep.subset.control.txt
-  results_file: ./file_control_results.pickle
+  results_file: ../../data/slicing/file_control_results.pickle

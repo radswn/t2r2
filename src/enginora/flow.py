@@ -10,9 +10,7 @@ from enginora.model import ModelConfig
 
 
 def loop(config_path="./config.yaml") -> Dict:
-    model_config, training_config, test_config, control_config = get_configurations(
-        config_path
-    )
+    model_config, training_config, test_config, control_config = get_configurations(config_path)
 
     tokenizer = model_config.create_tokenizer()
     model = model_config.create_model()
@@ -85,19 +83,10 @@ def get_datasets(
         "test": test_config.load_dataset()[:10],
         "control": control_config.load_dataset()[:10],
     }
-    tokens = {
-        dataset_type: tokenizer(dataset["text"].tolist())
-        for dataset_type, dataset in data.items()
-    }
-    labels = {
-        dataset_type: torch.tensor(dataset["label"].tolist())
-        for dataset_type, dataset in data.items()
-    }
+    tokens = {dataset_type: tokenizer(dataset["text"].tolist()) for dataset_type, dataset in data.items()}
+    labels = {dataset_type: torch.tensor(dataset["label"].tolist()) for dataset_type, dataset in data.items()}
 
-    return {
-        dataset_type: TextDataset(tokens[dataset_type], labels[dataset_type])
-        for dataset_type in data.keys()
-    }
+    return {dataset_type: TextDataset(tokens[dataset_type], labels[dataset_type]) for dataset_type in data.keys()}
 
 
 def get_training_args(training_config: TrainingConfig) -> TrainingArguments:
@@ -115,9 +104,7 @@ def get_training_args(training_config: TrainingConfig) -> TrainingArguments:
     )
 
 
-def get_trainer(
-    training_config: TrainingConfig, datasets: Dict[str, TextDataset], model
-) -> Trainer:
+def get_trainer(training_config: TrainingConfig, datasets: Dict[str, TextDataset], model) -> Trainer:
     return Trainer(
         model=model,
         train_dataset=datasets["train"],

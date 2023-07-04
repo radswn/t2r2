@@ -1,6 +1,7 @@
 from enginora.dataset.common import *
 from dataclasses import field
 
+
 @dataclass
 class TestConfig(DatasetConfigWithSelectors, WithLoadableMetrics):
     def __post_init__(self):
