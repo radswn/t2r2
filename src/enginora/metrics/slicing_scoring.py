@@ -20,7 +20,7 @@ def slicing_scores(y_true, y_pred, slice_file: Union[str, None] = None, proba_pr
     scorer = Scorer(metrics=["accuracy"]) #3 add additional ones # no f1 for multiclass
     scorer_df = scorer.score_slices(
     S=slices[:len(y_true)], golds=y_true, preds=y_pred, probs=proba_predictions, as_dataframe=True)
-    return scorer_df
+    return scorer_df.to_json()
 
 
 

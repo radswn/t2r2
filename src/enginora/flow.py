@@ -19,7 +19,6 @@ def loop(config_path="./config.yaml") -> Dict:
 
     datasets = get_datasets(training_config, control_config, test_config, tokenizer)
     trainer = get_trainer(training_config, datasets, model)
-
     train_results = trainer.train()
 
     test_results = trainer.predict(datasets["test"])
