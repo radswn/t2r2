@@ -32,14 +32,8 @@ validation:
 testing:
   dataset:
     path: ../../data/featuresets/thedeep.subset.test.txt
-    selectors:
-      - args: { result_file: '../../data/slicing/slicing.pickle'}
-        name: slicing
   metrics:
     - name: accuracy
-    - name: slicing_scores
-      args: { slice_file: '../../data/slicing/slicing.pickle'}
-    
   results_file: ./file_test_results.pickle
 
 control:
@@ -48,5 +42,3 @@ control:
   metrics:
     - name: accuracy
   results_file: ./file_control_results.pickle
-
-
