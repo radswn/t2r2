@@ -28,7 +28,6 @@ class SlicingSelector(Selector):
         return dataset
 
     def create_list_of_slicing_functions(self, list_of_slicing_functions: Union[List[str], None]):
-        # FIXME: add functionality not to rely on default (TEXT)
         if list_of_slicing_functions is None:
             sfs = [short]
         else:
