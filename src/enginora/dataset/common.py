@@ -38,9 +38,7 @@ class WithMetrics:
     stage: Stage = field(init=False)
 
     def compute_metrics(self, predictions) -> Dict[str, float]:
-        predictions, true_labels = predictions[0], predictions[1]
-        proba_predictions = predictions
-        predictions = predictions.argmax(1)
+        proba_predictions, predictions, true_labels = predictions[0], predictions[0].argmax(1), predictions[1]
 
         return {
             metric.name: get_metric(metric.name)(

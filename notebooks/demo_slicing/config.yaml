@@ -22,10 +22,13 @@ metrics:
 training:
   dataset_path: ../../data/featuresets/thedeep.subset.train.txt
   selectors:
-    - args: { }
-      name: dummy
-    - args: { result_file: '../../data/slicing/train_slicing.pickle', list_of_slicing_functions: [short, textblob_polarity]}
-      name: slicing
+    - name: dummy
+      args: { }
+    - name: slicing
+      args: 
+        result_file: '../../data/slicing/train_slicing.pickle'
+        list_of_slicing_functions: [short, textblob_polarity]
+      
   batch_size: 2
   epochs: 1
   learning_rate: 1e-3
@@ -36,8 +39,10 @@ training:
 testing:
   dataset_path: ../../data/featuresets/thedeep.subset.test.txt
   selectors: 
-    - args: { result_file: '../../data/slicing/test_slicing.pickle'}
-      name: slicing
+    - name: slicing
+      args: 
+        result_file: '../../data/slicing/test_slicing.pickle'
+      
   results_file: ../../data/slicing/file_test_results.pickle
 
 control:

@@ -3,7 +3,6 @@ from typing import Tuple
 from sklearn.model_selection import train_test_split
 
 from enginora.dataset.common import *
-from dataclasses import field
 
 
 @dataclass
