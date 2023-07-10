@@ -25,6 +25,7 @@ from sklearn.metrics import (
     multilabel_confusion_matrix,
 )
 
+
 def get_metric(name: str):
     metrics = {
         "accuracy_score": accuracy_score,
