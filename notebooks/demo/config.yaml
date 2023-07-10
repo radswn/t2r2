@@ -9,7 +9,7 @@ model:
   truncation: True
 
 metrics:
-  - name: f1
+  - name: f1_score
     args:
       average: macro
 
