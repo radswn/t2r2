@@ -8,3 +8,4 @@ class TestConfig(DatasetConfigWithSelectors, WithLoadableMetrics):
         self.stage = Stage.TESTING
         self.selectors = [SelectorConfig(**t) for t in self.selectors]
         self.metrics = [MetricsConfig(**m) for m in self.metrics]
+        

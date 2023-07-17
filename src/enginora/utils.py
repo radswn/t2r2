@@ -3,6 +3,8 @@ import functools
 from typing import Union  # in later version of python simly replace with |
 import os
 import enum
+import mlflow
+from pathlib import Path
 
 
 def ignore_unmatched_kwargs(f):
@@ -53,3 +55,20 @@ class Stage(enum.Enum):
     VALIDATION = "val"
     TESTING = "test"
     CONTROL = "cont"
+
+def mlflow_create_experiment(experiment_name: str, default_tags = {"version": "v1", "priority": "P1"}) -> mlflow.entities.Experiment:
+    # Create an experiment name, which must be unique and case sensitive
+    experiment_id = mlflow.create_experiment(
+        experiment_name,
+        artifact_location=Path.cwd().joinpath("mlruns").as_uri(),
+        tags={"version": "v1", "priority": "P1"},
+    )
+    experiment = mlflow.get_experiment(experiment_id)
+    #FIXME : do logging instead of print 
+    print("Name: {}".format(experiment.name))
+    print("Experiment_id: {}".format(experiment.experiment_id))
+    print("Artifact Location: {}".format(experiment.artifact_location))
+    print("Tags: {}".format(experiment.tags))
+    print("Lifecycle_stage: {}".format(experiment.lifecycle_stage))
+    print("Creation timestamp: {}".format(experiment.creation_time))
+    return experiment

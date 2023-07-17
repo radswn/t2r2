@@ -6,3 +6,4 @@ transformers==4.20.1
 imblearn==2.2.0
 snorkel==0.9.9
 textblob==0.17.1# remove later
+mlflow==2.5.0

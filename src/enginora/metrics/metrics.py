@@ -34,7 +34,7 @@ def get_metric(name: str):
         "classification_report": classification_report,
         "cohen_kappa_score": cohen_kappa_score,
         "confusion_matrix": confusion_matrix,
-        "f1_score": f1_score,
+        "f1": f1_score,
         "fbeta_score": fbeta_score,
         "hamming_loss": hamming_loss,
         "hinge_loss": hinge_loss,

@@ -2,11 +2,24 @@ from typing import Dict, Tuple
 
 import torch
 import yaml
+import mlflow.pytorch
+from mlflow import MlflowClient
 from torch.utils.data.dataset import Dataset
 from transformers import TrainingArguments, IntervalStrategy, Trainer
 
 from enginora.dataset import ControlConfig, TrainingConfig, TestConfig
 from enginora.model import ModelConfig
+
+def print_auto_logged_info(r):
+    tags = {k: v for k, v in r.data.tags.items() if not k.startswith("mlflow.")}
+    artifacts = [f.path for f in MlflowClient().list_artifacts(r.info.run_id, "model")]
+    print("tracking uri:", mlflow.get_tracking_uri())
+    print("artifact uri:", mlflow.get_artifact_uri())
+    print("run_id: {}".format(r.info.run_id))
+    print("artifacts: {}".format(artifacts))
+    print("params: {}".format(r.data.params))
+    print("metrics: {}".format(r.data.metrics))
+    print("tags: {}".format(tags))
 
 
 def loop(config_path="./config.yaml") -> Dict:
@@ -17,13 +30,19 @@ def loop(config_path="./config.yaml") -> Dict:
 
     datasets = get_datasets(training_config, control_config, test_config, tokenizer)
     trainer = get_trainer(training_config, datasets, model)
-    train_results = trainer.train()
+    mlflow.pytorch.autolog()
+    
+    with mlflow.start_run() as run:
+        mlflow.pytorch.log_model(model, "model") # fixme add signature
+        train_results = trainer.train()
 
-    test_results = trainer.predict(datasets["test"])
-    test_config.save_predictions(test_results)
+        test_results = trainer.predict(datasets["test"])
+        test_config.save_predictions(test_results)
 
-    control_results = trainer.predict(datasets["control"])
-    control_config.save_predictions(control_results)
+        control_results = trainer.predict(datasets["control"])
+        control_config.save_predictions(control_results)
+
+    print_auto_logged_info(mlflow.get_run(run_id=run.info.run_id))
 
     return {
         "train_results": train_results,
@@ -78,10 +97,10 @@ def get_datasets(
 ) -> Dict[str, TextDataset]:
     training_dataset, validation_dataset = training_config.load_dataset()
     data = {
-        "train": training_dataset,
-        "validation": validation_dataset,
-        "test": test_config.load_dataset(),
-        "control": control_config.load_dataset(),
+        "train": training_dataset[:100],
+        "validation": validation_dataset[:100],
+        "test": test_config.load_dataset()[:100],
+        "control": control_config.load_dataset()[:100],
     }
     tokens = {dataset_type: tokenizer(dataset["text"].tolist()) for dataset_type, dataset in data.items()}
     labels = {dataset_type: torch.tensor(dataset["label"].tolist()) for dataset_type, dataset in data.items()}

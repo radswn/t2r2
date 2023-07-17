@@ -9,7 +9,7 @@ model:
   truncation: True
 
 metrics:
-  - name: f1_score
+  - name: f1
     args:
       average: macro
 
@@ -19,7 +19,7 @@ training:
     - args: { }
       name: dummy
   batch_size: 2
-  epochs: 1
+  epochs: 5
   learning_rate: 1e-3
   validation_size: 0.2
   output_dir: ClassificationBERT
