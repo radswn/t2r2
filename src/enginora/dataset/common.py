@@ -1,7 +1,7 @@
 import pickle
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import List, Dict
-
+from enginora.utils import Stage
 import pandas as pd
 
 from enginora.metrics import MetricsConfig, get_metric
@@ -35,13 +35,16 @@ class DatasetConfigWithSelectors(DatasetConfig):
 @dataclass
 class WithMetrics:
     metrics: List[MetricsConfig]
+    stage: Stage = field(init=False)
 
     def compute_metrics(self, predictions) -> Dict[str, float]:
-        predictions, true_labels = predictions[0], predictions[1]
-        predictions = predictions.argmax(1)
+        proba_predictions, predictions, true_labels = predictions[0], predictions[0].argmax(1), predictions[1]
 
         return {
-            metric.name: get_metric(metric.name)(true_labels, predictions, **metric.args) for metric in self.metrics
+            metric.name: get_metric(metric.name)(
+                true_labels, predictions, **metric.args, proba_predictions=proba_predictions, stage=self.stage
+            )
+            for metric in self.metrics
         }
 
 

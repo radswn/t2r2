@@ -17,7 +17,6 @@ def loop(config_path="./config.yaml") -> Dict:
 
     datasets = get_datasets(training_config, control_config, test_config, tokenizer)
     trainer = get_trainer(training_config, datasets, model)
-
     train_results = trainer.train()
 
     test_results = trainer.predict(datasets["test"])
@@ -33,7 +32,9 @@ def loop(config_path="./config.yaml") -> Dict:
     }
 
 
-def get_configurations(path: str) -> Tuple[ModelConfig, TrainingConfig, TestConfig, ControlConfig]:
+def get_configurations(
+    path: str,
+) -> Tuple[ModelConfig, TrainingConfig, TestConfig, ControlConfig]:
     with open(path, "r") as stream:
         configuration = yaml.safe_load(stream)
 
@@ -70,7 +71,10 @@ class TextDataset(Dataset):
 
 
 def get_datasets(
-    training_config: TrainingConfig, control_config: ControlConfig, test_config: TestConfig, tokenizer
+    training_config: TrainingConfig,
+    control_config: ControlConfig,
+    test_config: TestConfig,
+    tokenizer,
 ) -> Dict[str, TextDataset]:
     training_dataset, validation_dataset = training_config.load_dataset()
     data = {

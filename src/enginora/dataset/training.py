@@ -15,6 +15,7 @@ class TrainingConfig(DatasetConfigWithSelectors, WithMetrics):
     metric_for_best_model: str
 
     def __post_init__(self):
+        self.stage = Stage.TRAINING
         self.selectors = [SelectorConfig(**t) for t in self.selectors]
         self.metrics = [MetricsConfig(**m) for m in self.metrics]
         self.batch_size = int(self.batch_size)
