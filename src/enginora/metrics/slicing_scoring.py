@@ -9,7 +9,7 @@ from snorkel.analysis import Scorer
 import pandas as pd
 import os
 from typing import Union
-from enginora.utils import construct_results_file, Stage
+from enginora.utils.utils import construct_results_file, Stage
 
 # FIXME: later add config instead of passing all of those things
 

@@ -1,11 +1,12 @@
 import pickle
 from dataclasses import dataclass, field
 from typing import List, Dict
-from enginora.utils import Stage
+from enginora.utils.utils import Stage
 import pandas as pd
 import mlflow
 from enginora.metrics import MetricsConfig, get_metric
 from enginora.selector import get_selector, SelectorConfig
+from enginora.utils.MlflowManager import MlflowManager
 
 
 @dataclass
@@ -66,9 +67,10 @@ class WithLoadableMetrics(WithMetrics):
         res = super().compute_metrics(predictions)
         return res
     
-    def _log_metrics_to_mlflow(self,metrics):
+    def _log_metrics_to_mlflow(self, metrics):
         '''needs to be invoked strictly after computing and saving metrics - therefore, after saving predictions'''
+        mlflow_manager = MlflowManager()
         metrics_name_with_stage = dict([(metric_name + "_" + self.stage.__str__(), metric_value) for metric_name, metric_value in metrics.items()])
-        print("METRICS!!!", metrics_name_with_stage) 
-        mlflow.log_metrics(metrics_name_with_stage)
+        mlflow_manager.log_metrics(metrics_name_with_stage)
+        
         

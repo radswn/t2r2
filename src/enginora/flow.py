@@ -2,38 +2,29 @@ from typing import Dict, Tuple
 
 import torch
 import yaml
-import mlflow.pytorch
-from mlflow import MlflowClient
+import mlflow
+import pandas as pd
 from torch.utils.data.dataset import Dataset
 from transformers import TrainingArguments, IntervalStrategy, Trainer
 
 from enginora.dataset import ControlConfig, TrainingConfig, TestConfig
 from enginora.model import ModelConfig
-
-def print_auto_logged_info(r):
-    tags = {k: v for k, v in r.data.tags.items() if not k.startswith("mlflow.")}
-    artifacts = [f.path for f in MlflowClient().list_artifacts(r.info.run_id, "model")]
-    print("tracking uri:", mlflow.get_tracking_uri())
-    print("artifact uri:", mlflow.get_artifact_uri())
-    print("run_id: {}".format(r.info.run_id))
-    print("artifacts: {}".format(artifacts))
-    print("params: {}".format(r.data.params))
-    print("metrics: {}".format(r.data.metrics))
-    print("tags: {}".format(tags))
-
+from enginora.utils.MlflowManager import  MlflowManager
 
 def loop(config_path="./config.yaml") -> Dict:
-    model_config, training_config, test_config, control_config = get_configurations(config_path)
+    config, model_config, training_config, test_config, control_config = get_configurations(config_path)
+
+    mlflow_manager = MlflowManager(config['mlflow'])
 
     tokenizer = model_config.create_tokenizer()
     model = model_config.create_model()
 
     datasets = get_datasets(training_config, control_config, test_config, tokenizer)
     trainer = get_trainer(training_config, datasets, model)
-    mlflow.pytorch.autolog()
-    
-    with mlflow.start_run() as run:
-        mlflow.pytorch.log_model(model, "model") # fixme add signature
+    # QUESTION, there is autolog but it is experimental.
+    experiment_id = mlflow_manager.mlflow_create_experiment()
+    with mlflow.start_run(experiment_id = experiment_id) as run:
+        # fixme add signature
         train_results = trainer.train()
 
         test_results = trainer.predict(datasets["test"])
@@ -42,7 +33,8 @@ def loop(config_path="./config.yaml") -> Dict:
         control_results = trainer.predict(datasets["control"])
         control_config.save_predictions(control_results)
 
-    print_auto_logged_info(mlflow.get_run(run_id=run.info.run_id))
+        mlflow_manager.log_datasets(datasets)
+
 
     return {
         "train_results": train_results,
@@ -67,7 +59,9 @@ def get_configurations(
     test_config = TestConfig(**configuration["testing"])
     control_config = ControlConfig(**configuration["control"])
 
-    return model_config, training_config, test_config, control_config
+    config = configuration["config"]
+
+    return config, model_config, training_config, test_config, control_config
 
 
 class TextDataset(Dataset):
@@ -87,6 +81,15 @@ class TextDataset(Dataset):
             "token_type_ids": self.token_type_ids[i],
             "labels": self.y[i],
         }
+    
+    def _to_mlflow_entity(self):
+        dataset = pd.DataFrame({'input_ids':    self.input_ids.tolist(),
+                   'attention_mask': self.attention_mask.tolist(),
+                   'token_type_ids' : self.token_type_ids.tolist(),
+                   'labels': self.y.tolist()})
+
+        return mlflow.data.from_pandas(dataset)
+
 
 
 def get_datasets(
@@ -97,10 +100,10 @@ def get_datasets(
 ) -> Dict[str, TextDataset]:
     training_dataset, validation_dataset = training_config.load_dataset()
     data = {
-        "train": training_dataset[:100],
-        "validation": validation_dataset[:100],
-        "test": test_config.load_dataset()[:100],
-        "control": control_config.load_dataset()[:100],
+        "train": training_dataset,
+        "validation": validation_dataset,
+        "test": test_config.load_dataset(),
+        "control": control_config.load_dataset(),
     }
     tokens = {dataset_type: tokenizer(dataset["text"].tolist()) for dataset_type, dataset in data.items()}
     labels = {dataset_type: torch.tensor(dataset["label"].tolist()) for dataset_type, dataset in data.items()}
@@ -131,3 +134,7 @@ def get_trainer(training_config: TrainingConfig, datasets: Dict[str, TextDataset
         compute_metrics=training_config.compute_metrics,
         args=get_training_args(training_config),
     )
+
+def tensor_to_string(self):
+            return str(self)
+setattr(torch.Tensor, 'tostring', tensor_to_string)

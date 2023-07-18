@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import Dict, Any
 
 from enginora.metrics.slicing_scoring import slicing_scores
-from enginora.utils import ignore_unmatched_kwargs
+from enginora.utils.utils import ignore_unmatched_kwargs
 from sklearn.metrics import (
     accuracy_score,
     f1_score,
