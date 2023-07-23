@@ -19,12 +19,11 @@ def loop(config_path="./config.yaml") -> Dict:
     tokenizer = model_config.create_tokenizer()
     model = model_config.create_model()
 
-    datasets = get_datasets(training_config, control_config, test_config, tokenizer)
-    trainer = get_trainer(training_config, datasets, model)
-    # QUESTION, there is autolog but it is experimental.
     experiment_id = mlflow_manager.mlflow_create_experiment()
     with mlflow.start_run(experiment_id = experiment_id) as run:
-        # fixme add signature
+        datasets = get_datasets(training_config, control_config, test_config, tokenizer)
+        trainer = get_trainer(training_config, datasets, model)
+
         train_results = trainer.train()
 
         test_results = trainer.predict(datasets["test"])
@@ -33,7 +32,7 @@ def loop(config_path="./config.yaml") -> Dict:
         control_results = trainer.predict(datasets["control"])
         control_config.save_predictions(control_results)
 
-        mlflow_manager.log_datasets(datasets)
+        #mlflow_manager.log_datasets(datasets)
 
 
     return {
@@ -83,6 +82,7 @@ class TextDataset(Dataset):
         }
     
     def _to_mlflow_entity(self):
+        """NOt implemented yet, a lot of stuff in experimental """
         dataset = pd.DataFrame({'input_ids':    self.input_ids.tolist(),
                    'attention_mask': self.attention_mask.tolist(),
                    'token_type_ids' : self.token_type_ids.tolist(),
@@ -96,15 +96,16 @@ def get_datasets(
     training_config: TrainingConfig,
     control_config: ControlConfig,
     test_config: TestConfig,
-    tokenizer,
-) -> Dict[str, TextDataset]:
+    tokenizer) -> Dict[str, TextDataset]:
     training_dataset, validation_dataset = training_config.load_dataset()
     data = {
-        "train": training_dataset,
-        "validation": validation_dataset,
-        "test": test_config.load_dataset(),
-        "control": control_config.load_dataset(),
+        "train": training_dataset[:6],
+        "validation": validation_dataset[:6],
+        "test": test_config.load_dataset()[:6],
+        "control": control_config.load_dataset()[:6],
     }
+    MlflowManager().log_data(data)
+
     tokens = {dataset_type: tokenizer(dataset["text"].tolist()) for dataset_type, dataset in data.items()}
     labels = {dataset_type: torch.tensor(dataset["label"].tolist()) for dataset_type, dataset in data.items()}
 
@@ -135,6 +136,3 @@ def get_trainer(training_config: TrainingConfig, datasets: Dict[str, TextDataset
         args=get_training_args(training_config),
     )
 
-def tensor_to_string(self):
-            return str(self)
-setattr(torch.Tensor, 'tostring', tensor_to_string)

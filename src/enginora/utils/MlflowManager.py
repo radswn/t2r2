@@ -1,7 +1,6 @@
 import logging
 import mlflow
-import torch
-
+import pandas as pd
 
 class Singleton(type):
     _instances = {}
@@ -35,6 +34,12 @@ class MlflowManager(metaclass=Singleton):
     def log_metrics(self, metrics: dict):
         mlflow.log_metrics(metrics)
         self.logger.info("mlflow: logging metrics :" + " ".join(list(metrics.keys())))
+    
+    def log_data(self, data: dict[str, pd.DataFrame]):
+        for key, value in data.items():
+            mlflow.log_input(mlflow.data.from_pandas(value), context = key)
+        self.logger.info("mlflow: Dataset logged")
+        self.log_dataset_synopsis(data)
 
     def log_model(self, model, model_name = "model"):
         mlflow.pytorch.log_model(model, model_name)
@@ -44,7 +49,10 @@ class MlflowManager(metaclass=Singleton):
         mlflow.set_tracking_uri(self.tracking_uri)
         self.logger.info("mlflow: Tracking uri set")
 
-    def log_datasets(self, datasets: dict):
-        for dataset_context, dataset in datasets.items():
-            mlflow.log_input(dataset, context=dataset_context)
-        self.logger.info("mlflow: logged datasets")
+    def log_dataset_synopsis(self, data: dict[str, pd.DataFrame]):
+        '''working for csv only right now'''
+        for dataset_name, dataset_df in data.items():
+            dataset_df.describe().to_html(f"dataset_{dataset_name}.html")
+            mlflow.log_artifact(f"dataset_{dataset_name}.html",
+                                f"stat_descriptive_{dataset_name}")
+        self.logger.info("mlflow: Dataset synopsis logged")
