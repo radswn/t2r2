@@ -9,18 +9,19 @@ from transformers import TrainingArguments, IntervalStrategy, Trainer
 
 from enginora.dataset import ControlConfig, TrainingConfig, TestConfig
 from enginora.model import ModelConfig
-from enginora.utils.MlflowManager import  MlflowManager
+from enginora.utils.MlflowManager import MlflowManager
+
 
 def loop(config_path="./config.yaml") -> Dict:
     config, model_config, training_config, test_config, control_config = get_configurations(config_path)
 
-    mlflow_manager = MlflowManager(config['mlflow'])
+    mlflow_manager = MlflowManager(config["mlflow"])
 
     tokenizer = model_config.create_tokenizer()
     model = model_config.create_model()
 
     experiment_id = mlflow_manager.mlflow_create_experiment()
-    with mlflow.start_run(experiment_id = experiment_id) as run:
+    with mlflow.start_run(experiment_id=experiment_id) as run:
         datasets = get_datasets(training_config, control_config, test_config, tokenizer)
         trainer = get_trainer(training_config, datasets, model)
 
@@ -32,8 +33,7 @@ def loop(config_path="./config.yaml") -> Dict:
         control_results = trainer.predict(datasets["control"])
         control_config.save_predictions(control_results)
 
-        #mlflow_manager.log_datasets(datasets)
-
+        # mlflow_manager.log_datasets(datasets)
 
     return {
         "train_results": train_results,
@@ -80,29 +80,30 @@ class TextDataset(Dataset):
             "token_type_ids": self.token_type_ids[i],
             "labels": self.y[i],
         }
-    
+
     def _to_mlflow_entity(self):
-        """NOt implemented yet, a lot of stuff in experimental """
-        dataset = pd.DataFrame({'input_ids':    self.input_ids.tolist(),
-                   'attention_mask': self.attention_mask.tolist(),
-                   'token_type_ids' : self.token_type_ids.tolist(),
-                   'labels': self.y.tolist()})
+        """NOt implemented yet, a lot of stuff in experimental"""
+        dataset = pd.DataFrame(
+            {
+                "input_ids": self.input_ids.tolist(),
+                "attention_mask": self.attention_mask.tolist(),
+                "token_type_ids": self.token_type_ids.tolist(),
+                "labels": self.y.tolist(),
+            }
+        )
 
         return mlflow.data.from_pandas(dataset)
 
 
-
 def get_datasets(
-    training_config: TrainingConfig,
-    control_config: ControlConfig,
-    test_config: TestConfig,
-    tokenizer) -> Dict[str, TextDataset]:
+    training_config: TrainingConfig, control_config: ControlConfig, test_config: TestConfig, tokenizer
+) -> Dict[str, TextDataset]:
     training_dataset, validation_dataset = training_config.load_dataset()
     data = {
-        "train": training_dataset[:6],
-        "validation": validation_dataset[:6],
-        "test": test_config.load_dataset()[:6],
-        "control": control_config.load_dataset()[:6],
+        "train": training_dataset,
+        "validation": validation_dataset,
+        "test": test_config.load_dataset(),
+        "control": control_config.load_dataset(),
     }
     MlflowManager().log_data(data)
 
@@ -135,4 +136,3 @@ def get_trainer(training_config: TrainingConfig, datasets: Dict[str, TextDataset
         compute_metrics=training_config.compute_metrics,
         args=get_training_args(training_config),
     )
-

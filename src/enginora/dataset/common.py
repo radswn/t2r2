@@ -66,11 +66,11 @@ class WithLoadableMetrics(WithMetrics):
         predictions = self.load_predictions()
         res = super().compute_metrics(predictions)
         return res
-    
+
     def _log_metrics_to_mlflow(self, metrics):
-        '''needs to be invoked strictly after computing and saving metrics - therefore, after saving predictions'''
+        """needs to be invoked strictly after computing and saving metrics - therefore, after saving predictions"""
         mlflow_manager = MlflowManager()
-        metrics_name_with_stage = dict([(metric_name + "_" + self.stage.__str__(), metric_value) for metric_name, metric_value in metrics.items()])
+        metrics_name_with_stage = dict(
+            [(metric_name + "_" + self.stage.__str__(), metric_value) for metric_name, metric_value in metrics.items()]
+        )
         mlflow_manager.log_metrics(metrics_name_with_stage)
-        
-        

@@ -5,6 +5,7 @@ data/
 venv/
 **/.ipynb_checkpoints
 **/mlruns/
+**/mlartifacts/
 **/checkpoint-*/
 **/runs/
 **/*.pickle
