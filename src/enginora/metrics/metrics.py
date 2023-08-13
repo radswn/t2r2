@@ -34,7 +34,7 @@ def get_metric(name: str):
         "classification_report": classification_report,
         "cohen_kappa_score": cohen_kappa_score,
         "confusion_matrix": confusion_matrix,
-        "f1": f1_score,
+        "f1_score": f1_score,
         "fbeta_score": fbeta_score,
         "hamming_loss": hamming_loss,
         "hinge_loss": hinge_loss,
@@ -46,7 +46,7 @@ def get_metric(name: str):
         "recall_score": recall_score,
         "zero_one_loss": zero_one_loss,
         "brier_score_loss": brier_score_loss,
-        "slicing": slicing_scores,
+        "slicing_scores": slicing_scores,
         "multilabel_confusion_matrix": multilabel_confusion_matrix,
     }
     return ignore_unmatched_kwargs(metrics[name])

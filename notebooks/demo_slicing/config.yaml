@@ -9,10 +9,10 @@ model:
   truncation: True
 
 metrics:
-  - name: f1
+  - name: f1_score
     args:
       average: macro
-  - name: slicing
+  - name: slicing_scores
     args: 
       result_file: '../../data/slicing/slicing.pickle'
       base_directory: "../../data/slicing/"
@@ -34,7 +34,7 @@ training:
   learning_rate: 1e-3
   validation_size: 0.2
   output_dir: ClassificationBERT
-  metric_for_best_model: f1
+  metric_for_best_model: f1_score
 
 testing:
   dataset_path: ../../data/featuresets/thedeep.subset.test.txt
