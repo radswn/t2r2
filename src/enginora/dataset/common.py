@@ -29,8 +29,6 @@ class DatasetConfigWithSelectors(DatasetConfig):
         for t in self.selectors:
             selector = get_selector(t.name)(**t.args)
             df = selector.select(df)
-
-        # TODO: save the dataset after selectors
         return df
 
 
@@ -67,8 +65,7 @@ class WithLoadableMetrics(WithMetrics):
 
     def compute_metrics(self, predictions=None) -> Dict[str, float]:
         predictions = self.load_predictions()
-        res = super().compute_metrics(predictions)
-        return res
+        return super().compute_metrics(predictions)
 
     def _log_metrics_to_mlflow(self, metrics):
         """needs to be invoked strictly after computing and saving metrics - therefore, after saving predictions"""
