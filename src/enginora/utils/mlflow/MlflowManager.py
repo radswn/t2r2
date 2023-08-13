@@ -2,6 +2,7 @@ import logging
 import mlflow
 import pandas as pd
 import os
+from enginora.utils.mlflow.MlFlowConfig import MlFlowConfig
 
 
 class Singleton(type):
@@ -14,15 +15,14 @@ class Singleton(type):
 
 
 class MlflowManager(metaclass=Singleton):
-    def __init__(self, mlflow_config: dict):
-        self.experiment_name = mlflow_config["experiment_name"]
-        self.tags = mlflow_config["tags"]
-        self.tracking_uri = mlflow_config["tracking_uri"]
+    def __init__(self, mlflow_config: MlFlowConfig):
+        self.experiment_name = mlflow_config.experiment_name
+        self.tags = mlflow_config.tags
+        self.tracking_uri = mlflow_config.tracking_uri
         self.logger = logging.getLogger(__name__)
         self.set_tracking_uri()
 
     def mlflow_create_experiment(self) -> str:
-        # Create an experiment name, which must be unique and case sensitive
         experiment = mlflow.set_experiment(self.experiment_name)
         mlflow.set_experiment_tags(self.tags)
 

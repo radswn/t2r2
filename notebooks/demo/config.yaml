@@ -34,9 +34,8 @@ control:
   dataset_path: ../../data/featuresets/thedeep.subset.control.txt
   results_file: ./file_control_results.pickle
 
-config:
-  mlflow:
-    experiment_name: 'my_experiment_2'
-    tags:
-        version: 'v1'
-    tracking_uri: "http://localhost:5000"
+mlflow:
+  experiment_name: 'my_experiment_3'
+  tags:
+      version: 'v1'
+  tracking_uri: "http://localhost:5000"

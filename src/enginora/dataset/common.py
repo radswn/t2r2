@@ -6,7 +6,8 @@ import pandas as pd
 import mlflow
 from enginora.metrics import MetricsConfig, get_metric
 from enginora.selector import get_selector, SelectorConfig
-from enginora.utils.MlflowManager import MlflowManager
+from enginora.utils.mlflow.MlflowManager import MlflowManager
+from enginora.utils.utils import flatten_dict
 
 
 @dataclass
@@ -41,12 +42,14 @@ class WithMetrics:
     def compute_metrics(self, predictions) -> Dict[str, float]:
         proba_predictions, predictions, true_labels = predictions[0], predictions[0].argmax(1), predictions[1]
 
-        return {
-            metric.name: get_metric(metric.name)(
-                true_labels, predictions, **metric.args, proba_predictions=proba_predictions, stage=self.stage
-            )
-            for metric in self.metrics
-        }
+        return flatten_dict(
+            {
+                metric.name: get_metric(metric.name)(
+                    true_labels, predictions, **metric.args, proba_predictions=proba_predictions, stage=self.stage
+                )
+                for metric in self.metrics
+            }
+        )
 
 
 @dataclass

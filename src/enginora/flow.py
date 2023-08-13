@@ -9,13 +9,14 @@ from transformers import TrainingArguments, IntervalStrategy, Trainer
 
 from enginora.dataset import ControlConfig, TrainingConfig, TestConfig
 from enginora.model import ModelConfig
-from enginora.utils.MlflowManager import MlflowManager
+from enginora.utils.mlflow.MlFlowConfig import MlFlowConfig
+from enginora.utils.mlflow.MlflowManager import MlflowManager
 
 
 def loop(config_path="./config.yaml") -> Dict:
-    config, model_config, training_config, test_config, control_config = get_configurations(config_path)
+    mlflow_config, model_config, training_config, test_config, control_config = get_configurations(config_path)
 
-    mlflow_manager = MlflowManager(config["mlflow"])
+    mlflow_manager = MlflowManager(mlflow_config)
 
     tokenizer = model_config.create_tokenizer()
     model = model_config.create_model()
@@ -32,8 +33,6 @@ def loop(config_path="./config.yaml") -> Dict:
 
         control_results = trainer.predict(datasets["control"])
         control_config.save_predictions(control_results)
-
-        # mlflow_manager.log_datasets(datasets)
 
     return {
         "train_results": train_results,
@@ -58,9 +57,9 @@ def get_configurations(
     test_config = TestConfig(**configuration["testing"])
     control_config = ControlConfig(**configuration["control"])
 
-    config = configuration["config"]
+    mlflow_config = MlFlowConfig(**configuration["mlflow"])
 
-    return config, model_config, training_config, test_config, control_config
+    return mlflow_config, model_config, training_config, test_config, control_config
 
 
 class TextDataset(Dataset):

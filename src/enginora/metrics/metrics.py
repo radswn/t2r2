@@ -46,6 +46,7 @@ def get_metric(name: str):
         "recall_score": recall_score,
         "zero_one_loss": zero_one_loss,
         "brier_score_loss": brier_score_loss,
+        "slicing": slicing_scores,
         "multilabel_confusion_matrix": multilabel_confusion_matrix,
     }
     return ignore_unmatched_kwargs(metrics[name])

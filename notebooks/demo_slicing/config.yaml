@@ -48,3 +48,10 @@ testing:
 control:
   dataset_path: ../../data/featuresets/thedeep.subset.control.txt
   results_file: ../../data/slicing/file_control_results.pickle
+
+mlflow:
+  experiment_name: 'my_experiment_slicing'
+  tags:
+      version: 'v1'
+  tracking_uri: "http://localhost:5000"
+
