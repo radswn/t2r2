@@ -3,6 +3,13 @@ import functools
 from typing import Union  # in later version of python simly replace with |
 import os
 import enum
+from collections.abc import MutableMapping
+import pandas as pd
+
+
+def flatten_dict(d: MutableMapping, sep: str = "_") -> MutableMapping:
+    [flat_dict] = pd.json_normalize(d, sep=sep).to_dict(orient="records")
+    return flat_dict
 
 
 def ignore_unmatched_kwargs(f):

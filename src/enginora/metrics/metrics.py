@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import Dict, Any
 
 from enginora.metrics.slicing_scoring import slicing_scores
-from enginora.utils import ignore_unmatched_kwargs
+from enginora.utils.utils import ignore_unmatched_kwargs
 from sklearn.metrics import (
     accuracy_score,
     f1_score,
@@ -46,6 +46,7 @@ def get_metric(name: str):
         "recall_score": recall_score,
         "zero_one_loss": zero_one_loss,
         "brier_score_loss": brier_score_loss,
+        "slicing_scores": slicing_scores,
         "multilabel_confusion_matrix": multilabel_confusion_matrix,
     }
     return ignore_unmatched_kwargs(metrics[name])

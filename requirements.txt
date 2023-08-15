@@ -3,6 +3,7 @@ PyYAML==6.0
 scikit_learn==1.2.2
 torch==2.0.0
 transformers==4.20.1
-imblearn==2.2.0
+imblearn==0.0
 snorkel==0.9.9
-textblob==0.17.1# remove later
+textblob==0.17.1 # remove later
+mlflow==2.5.0
