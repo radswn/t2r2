@@ -3,6 +3,7 @@ FROM python:3.9-slim
 RUN apt-get update \
   && apt-get install -y git git-lfs sudo vim
 
+ARG REQ_FILE=requirements_dev.txt
 ARG USERNAME=user
 ARG USER_UID
 ARG USER_GID
@@ -14,8 +15,10 @@ RUN groupadd --gid ${USER_GID} ${USERNAME} \
 
 USER ${USERNAME}
 
-RUN pip install --upgrade pip
+ENV PYTHONPATH '${PYTHONPATH}:/workspaces/enginora/src:/home/${USERNAME}/.local/bin'
 
-COPY requirements.txt /app/requirements.txt
+COPY ${REQ_FILE} /app/${REQ_FILE}
 
-RUN pip install -r /app/requirements.txt
+RUN pip install --upgrade pip && \
+  pip install -r /app/${REQ_FILE} && \
+  sudo rm -r /app

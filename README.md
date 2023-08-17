@@ -9,6 +9,8 @@ BSc thesis project
 
 *TODO*
 
+*mention removing "_dev" from REQ_FILE arg in Dockerfile if one isn't a project developer*
+
 ## Development setup - devcontainers
 
 We will be developing our code using devcontainers. This allows for great isolation of the working environment, while maintaining local files synchronization and git workflow.
