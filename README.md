@@ -1,6 +1,8 @@
 # enginora
 BSc thesis project 
 
+[![Open in Dev Containers](https://img.shields.io/static/v1?label=Dev%20Containers&message=Open&color=blue&logo=visualstudiocode)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/radswn/enginora)
+
 ## Description
 
 *TODO*
@@ -99,6 +101,7 @@ Copy `.devcontainer/devcontainer.json.template` and rename the copy to `.devcont
 
 Now, before running, in `.devcontainer/devcontainer.json`:
 
+* remove "_dev" from the `REQ_FILE` arg if you don't wish to install additional libraries used only by the repository contributors
 * delete lines with `--gpus` and `all` in the `runArgs` attribute if you're not going to use CUDA gpus in the container
 * add to `customizations.vscode.extensions` any extension IDs that you would like to be automatically installed with the container
 * change `USER_UID` and `USER_GID` if your WSL IDs differ from 1000 (you can check them with `id -u` and `id -g`, respectively)

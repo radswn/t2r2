@@ -5,7 +5,8 @@
         "context": "..",
         "args": {
             "USER_UID": "1000",
-            "USER_GID": "1000"
+            "USER_GID": "1000",
+            "REQ_FILE": "requirements_dev.txt"
         },
         "dockerfile": "../Dockerfile"
     },
@@ -21,9 +22,7 @@
         "vscode": {
             "extensions": [
                 "ms-python.python",
-                "ms-python.vscode-pylance",
-                "ms-toolsai.jupyter",
-                "ms-azuretools.vscode-docker"
+                "ms-python.vscode-pylance"
             ]
         }
     },
