@@ -95,9 +95,12 @@ More detailed tutorial available [here](https://learn.microsoft.com/en-us/window
 
 ### Test the whole setup
 
-Before running, in `.devcontainer/devcontainer.json`:
+Copy `.devcontainer/devcontainer.json.template` and rename the copy to `.devcontainer/devcontainer.json`. This way you can easily customize your setup and not mess with the desired original state.
+
+Now, before running, in `.devcontainer/devcontainer.json`:
 
 * delete lines with `--gpus` and `all` in the `runArgs` attribute if you're not going to use CUDA gpus in the container
+* add to `customizations.vscode.extensions` any extension IDs that you would like to be automatically installed with the container
 * change `USER_UID` and `USER_GID` if your WSL IDs differ from 1000 (you can check them with `id -u` and `id -g`, respectively)
 
 
