@@ -3,7 +3,7 @@ name: build
 on: pull_request
 
 jobs:
-  check-code-format:
+  check-and-build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the repository

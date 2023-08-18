@@ -11,8 +11,6 @@ BSc thesis project
 
 *TODO*
 
-*mention removing "_dev" from REQ_FILE arg in Dockerfile if one isn't a project developer*
-
 ## Development setup - devcontainers
 
 We will be developing our code using devcontainers. This allows for great isolation of the working environment, while maintaining local files synchronization and git workflow.
@@ -101,8 +99,8 @@ Copy `.devcontainer/devcontainer.json.template` and rename the copy to `.devcont
 
 Now, before running, in `.devcontainer/devcontainer.json`:
 
-* remove "_dev" from the `REQ_FILE` arg if you don't wish to install additional libraries used only by the repository contributors
-* delete lines with `--gpus` and `all` in the `runArgs` attribute if you're not going to use CUDA gpus in the container
+* add "_dev" to the `REQ_FILE` arg if you wish to install additional libraries used only by the repository contributors (you may as well run `pip -r requirements_dev.txt`)
+* add lines with `"--gpus"` and `"all"` (in this order) in the `runArgs` attribute if you're going to use CUDA gpus in the container
 * add to `customizations.vscode.extensions` any extension IDs that you would like to be automatically installed with the container
 * change `USER_UID` and `USER_GID` if your WSL IDs differ from 1000 (you can check them with `id -u` and `id -g`, respectively)
 
