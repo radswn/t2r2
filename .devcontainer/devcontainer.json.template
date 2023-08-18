@@ -12,8 +12,6 @@
     },
 
     "runArgs": [
-        "--gpus",
-        "all",
         "--name",
         "enginora_project"
     ],
