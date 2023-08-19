@@ -1,11 +1,11 @@
 from typing import Dict, Tuple
 
+import mlflow
 import torch
 import yaml
-import mlflow
-import pandas as pd
 from torch.utils.data.dataset import Dataset
 from transformers import TrainingArguments, IntervalStrategy, Trainer
+from transformers.trainer_utils import PredictionOutput
 
 from enginora.dataset import ControlConfig, TrainingConfig, TestConfig
 from enginora.model import ModelConfig
@@ -14,25 +14,20 @@ from enginora.utils.mlflow.MlflowManager import MlflowManager
 
 
 def loop(config_path="./config.yaml") -> Dict:
-    mlflow_config, model_config, training_config, test_config, control_config = get_configurations(config_path)
-
-    mlflow_manager = MlflowManager(mlflow_config)
+    model_config, training_config, test_config, control_config, mlflow_config = get_configurations(config_path)
 
     tokenizer = model_config.create_tokenizer()
     model = model_config.create_model()
 
-    experiment_id = mlflow_manager.mlflow_create_experiment()
-    with mlflow.start_run(experiment_id=experiment_id) as run:
-        datasets = get_datasets(training_config, control_config, test_config, tokenizer)
-        trainer = get_trainer(training_config, datasets, model)
-
-        train_results = trainer.train()
-
-        test_results = trainer.predict(datasets["test"])
-        test_config.save_predictions(test_results)
-
-        control_results = trainer.predict(datasets["control"])
-        control_config.save_predictions(control_results)
+    if mlflow_config is not None:
+        mlflow_manager = MlflowManager(mlflow_config)
+        experiment_id = mlflow_manager.mlflow_create_experiment()
+        with mlflow.start_run(experiment_id=experiment_id) as run:
+            train_results, test_results, control_results = train_and_test(
+                model, tokenizer, training_config, test_config, control_config, mlflow_manager)
+    else:
+        train_results, test_results, control_results = train_and_test(
+            model, tokenizer, training_config, test_config, control_config)
 
     return {
         "train_results": train_results,
@@ -41,14 +36,31 @@ def loop(config_path="./config.yaml") -> Dict:
     }
 
 
+def train_and_test(
+        model, tokenizer, training_config: TrainingConfig, test_config: TestConfig, control_config: ControlConfig,
+        mlflow_manager: MlflowManager = None
+) -> Tuple[PredictionOutput, PredictionOutput, PredictionOutput]:
+    datasets = get_datasets(training_config, control_config, test_config, tokenizer, mlflow_manager)
+    trainer = get_trainer(training_config, datasets, model)
+
+    train_results = trainer.train()
+
+    test_results = trainer.predict(datasets["test"])
+    test_config.save_predictions(test_results, mlflow_manager)
+
+    control_results = trainer.predict(datasets["control"])
+    control_config.save_predictions(control_results, mlflow_manager)
+
+    return train_results, test_results, control_results
+
+
 def get_configurations(
-    path: str,
-) -> Tuple[ModelConfig, TrainingConfig, TestConfig, ControlConfig]:
+        path: str,
+) -> Tuple[ModelConfig, TrainingConfig, TestConfig, ControlConfig, MlFlowConfig]:
     with open(path, "r") as stream:
         configuration = yaml.safe_load(stream)
 
     metrics = configuration["metrics"]
-
     for config in ["training", "testing", "control"]:
         configuration[config]["metrics"] = metrics
 
@@ -57,9 +69,11 @@ def get_configurations(
     test_config = TestConfig(**configuration["testing"])
     control_config = ControlConfig(**configuration["control"])
 
-    mlflow_config = MlFlowConfig(**configuration["mlflow"])
+    mlflow_config = None
+    if "mlflow" in configuration:
+        mlflow_config = MlFlowConfig(**configuration["mlflow"])
 
-    return mlflow_config, model_config, training_config, test_config, control_config
+    return model_config, training_config, test_config, control_config, mlflow_config
 
 
 class TextDataset(Dataset):
@@ -80,22 +94,10 @@ class TextDataset(Dataset):
             "labels": self.y[i],
         }
 
-    def _to_mlflow_entity(self):
-        """NOt implemented yet, a lot of stuff in experimental"""
-        dataset = pd.DataFrame(
-            {
-                "input_ids": self.input_ids.tolist(),
-                "attention_mask": self.attention_mask.tolist(),
-                "token_type_ids": self.token_type_ids.tolist(),
-                "labels": self.y.tolist(),
-            }
-        )
-
-        return mlflow.data.from_pandas(dataset)
-
 
 def get_datasets(
-    training_config: TrainingConfig, control_config: ControlConfig, test_config: TestConfig, tokenizer
+        training_config: TrainingConfig, control_config: ControlConfig, test_config: TestConfig, tokenizer,
+        mlflow_manager: MlflowManager,
 ) -> Dict[str, TextDataset]:
     training_dataset, validation_dataset = training_config.load_dataset()
     data = {
@@ -104,7 +106,9 @@ def get_datasets(
         "test": test_config.load_dataset(),
         "control": control_config.load_dataset(),
     }
-    MlflowManager().log_data(data)
+
+    if mlflow_manager is not None:
+        mlflow_manager.log_data(data)
 
     tokens = {dataset_type: tokenizer(dataset["text"].tolist()) for dataset_type, dataset in data.items()}
     labels = {dataset_type: torch.tensor(dataset["label"].tolist()) for dataset_type, dataset in data.items()}
