@@ -1,12 +1,8 @@
 # demo with defaults configuration
 
 model:
-  max_length: 256
   model_name: bert-base-cased
   num_labels: 12
-  padding: max_length
-  return_tensors: pt
-  truncation: True
 
 metrics:
   - name: accuracy_score

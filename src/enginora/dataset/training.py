@@ -9,6 +9,7 @@ from enginora.dataset.common import *
 class TrainingConfig(DatasetConfigWithSelectors, WithMetrics):
     dataset_path: str = "./data/train.csv"
     output_dir: str = "./results/"
+    results_file: str = "./results/train_results.pickle"
     epochs: int = 1
     batch_size: int = 32
     learning_rate: float = 0.01
@@ -18,7 +19,7 @@ class TrainingConfig(DatasetConfigWithSelectors, WithMetrics):
     def __post_init__(self):
         self.stage = Stage.TRAINING
         self.selectors = [] if self.selectors is None else [SelectorConfig(**t) for t in self.selectors]
-        self.metrics = [MetricsConfig(**m) for m in self.metrics]
+        self.metrics = [] if self.metrics is None else [MetricsConfig(**m) for m in self.metrics]
         self.batch_size = int(self.batch_size)
         self.epochs = int(self.epochs)
         self.learning_rate = float(self.learning_rate)
