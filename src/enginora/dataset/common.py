@@ -36,7 +36,8 @@ class DatasetConfigWithSelectors(DatasetConfig):
 
 @dataclass
 class WithMetrics:
-    metrics: List[MetricsConfig]
+    results_file: str
+    metrics: List[MetricsConfig] = None
     stage: Stage = field(init=False)
 
     def compute_metrics(self, predictions) -> Dict[str, float]:
@@ -52,24 +53,15 @@ class WithMetrics:
             }
         )
 
-
-@dataclass
-class WithLoadableMetrics(WithMetrics):
-    results_file: str
-
-    def save_predictions(self, predictions, mlflow_manager: MlflowManager):
+    def save_results(self, predictions, mlflow_manager: MlflowManager):
         with open(self.results_file, "wb") as file:
             pickle.dump(predictions, file)
         if mlflow_manager is not None:
             self._log_metrics_to_mlflow(predictions.metrics, mlflow_manager)
 
-    def load_predictions(self):
+    def load_results(self):
         with open(self.results_file, "rb") as file:
             return pickle.load(file)
-
-    def compute_metrics(self, predictions=None) -> Dict[str, float]:
-        predictions = self.load_predictions()
-        return super().compute_metrics(predictions)
 
     def _log_metrics_to_mlflow(self, metrics, mlflow_manager: MlflowManager):
         """needs to be invoked strictly after computing and saving metrics - therefore, after saving predictions"""

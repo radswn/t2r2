@@ -13,6 +13,24 @@ from enginora.utils.mlflow.MlFlowConfig import MlFlowConfig
 from enginora.utils.mlflow.MlflowManager import MlflowManager
 
 
+def get_train_results(config_path="./config.yaml"):
+    _, train_config, _, _, _ = get_configurations(config_path)
+    train_results = train_config.load_results()
+    return train_results.metrics
+
+
+def get_test_results(config_path="./config.yaml"):
+    _, _, test_config, _, _ = get_configurations(config_path)
+    test_results = test_config.load_results()
+    return test_results.metrics
+
+
+def get_control_results(config_path="./config.yaml"):
+    _, _, _, control_config, _ = get_configurations(config_path)
+    control_results = control_config.load_results()
+    return control_results.metrics
+
+
 def loop(config_path="./config.yaml") -> Dict:
     model_config, training_config, test_config, control_config, mlflow_config = get_configurations(config_path)
 
@@ -44,12 +62,13 @@ def train_and_test(
     trainer = get_trainer(training_config, datasets, model)
 
     train_results = trainer.train()
+    training_config.save_results(train_results, mlflow_manager)
 
     test_results = trainer.predict(datasets["test"])
-    test_config.save_predictions(test_results, mlflow_manager)
+    test_config.save_results(test_results, mlflow_manager)
 
     control_results = trainer.predict(datasets["control"])
-    control_config.save_predictions(control_results, mlflow_manager)
+    control_config.save_results(control_results, mlflow_manager)
 
     return train_results, test_results, control_results
 
