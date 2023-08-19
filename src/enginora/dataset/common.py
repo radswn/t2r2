@@ -1,12 +1,13 @@
 import pickle
 from dataclasses import dataclass, field
 from typing import List, Dict
-from enginora.utils.utils import Stage
+
 import pandas as pd
-import mlflow
+
 from enginora.metrics import MetricsConfig, get_metric
 from enginora.selector import get_selector, SelectorConfig
 from enginora.utils.mlflow.MlflowManager import MlflowManager
+from enginora.utils.utils import Stage
 from enginora.utils.utils import flatten_dict
 
 
@@ -16,12 +17,13 @@ class DatasetConfig:
 
     def load_dataset(self) -> pd.DataFrame:
         # TODO: what columns should be accept as text/target (?)
+        # TODO: maybe create ids if not provided (?)
         return pd.read_csv(self.dataset_path, header=None, names=["id", "text", "label"])
 
 
 @dataclass
 class DatasetConfigWithSelectors(DatasetConfig):
-    selectors: List[SelectorConfig]
+    selectors: List[SelectorConfig] = None
 
     def load_dataset(self) -> pd.DataFrame:
         df = super().load_dataset()
@@ -40,6 +42,7 @@ class WithMetrics:
     def compute_metrics(self, predictions) -> Dict[str, float]:
         proba_predictions, predictions, true_labels = predictions[0], predictions[0].argmax(1), predictions[1]
 
+        # FIXME: wrong typing here!!!
         return flatten_dict(
             {
                 metric.name: get_metric(metric.name)(
@@ -54,10 +57,11 @@ class WithMetrics:
 class WithLoadableMetrics(WithMetrics):
     results_file: str
 
-    def save_predictions(self, predictions):
+    def save_predictions(self, predictions, mlflow_manager: MlflowManager):
         with open(self.results_file, "wb") as file:
             pickle.dump(predictions, file)
-        self._log_metrics_to_mlflow(predictions.metrics)
+        if mlflow_manager is not None:
+            self._log_metrics_to_mlflow(predictions.metrics, mlflow_manager)
 
     def load_predictions(self):
         with open(self.results_file, "rb") as file:
@@ -67,9 +71,8 @@ class WithLoadableMetrics(WithMetrics):
         predictions = self.load_predictions()
         return super().compute_metrics(predictions)
 
-    def _log_metrics_to_mlflow(self, metrics):
+    def _log_metrics_to_mlflow(self, metrics, mlflow_manager: MlflowManager):
         """needs to be invoked strictly after computing and saving metrics - therefore, after saving predictions"""
-        mlflow_manager = MlflowManager()
         metrics_name_with_stage = dict(
             [(metric_name + "_" + self.stage.__str__(), metric_value) for metric_name, metric_value in metrics.items()]
         )
