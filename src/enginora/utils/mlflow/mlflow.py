@@ -1,8 +1,16 @@
 import logging
+import os
+from dataclasses import dataclass
+
 import mlflow
 import pandas as pd
-import os
-from enginora.utils.mlflow.MlFlowConfig import MlFlowConfig
+
+
+@dataclass
+class MlFlowConfig:
+    experiment_name: str
+    tags: dict
+    tracking_uri: str
 
 
 class Singleton(type):

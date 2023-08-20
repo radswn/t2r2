@@ -6,7 +6,7 @@ import pandas as pd
 
 from enginora.metrics import MetricsConfig, get_metric
 from enginora.selector import get_selector, SelectorConfig
-from enginora.utils.mlflow.MlflowManager import MlflowManager
+from enginora.utils.mlflow import MlflowManager
 from enginora.utils.utils import Stage
 from enginora.utils.utils import flatten_dict
 
