@@ -9,8 +9,7 @@ from transformers.trainer_utils import PredictionOutput
 
 from enginora.dataset import ControlConfig, TrainingConfig, TestConfig
 from enginora.model import ModelConfig
-from enginora.utils.mlflow.MlFlowConfig import MlFlowConfig
-from enginora.utils.mlflow.MlflowManager import MlflowManager
+from enginora.utils.mlflow import MlflowManager, MlFlowConfig
 
 
 def get_train_results(config_path="./config.yaml"):
