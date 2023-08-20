@@ -1,10 +1,12 @@
+import os.path
 import pickle
 from dataclasses import dataclass, field
 from typing import List, Dict
 
 import pandas as pd
+import yaml
 
-from enginora.metrics import MetricsConfig, get_metric
+from enginora.metrics import get_metric, MetricsConfig
 from enginora.selector import get_selector, SelectorConfig
 from enginora.utils.mlflow import MlflowManager
 from enginora.utils.utils import Stage
@@ -37,6 +39,7 @@ class DatasetConfigWithSelectors(DatasetConfig):
 @dataclass
 class WithMetrics:
     results_file: str
+    metrics_file: str = "./results/metrics.yaml"
     metrics: List[MetricsConfig] = None
     stage: Stage = field(init=False)
 
@@ -53,15 +56,32 @@ class WithMetrics:
             }
         )
 
-    def save_results(self, predictions, mlflow_manager: MlflowManager):
+    def save_results(self, results, mlflow_manager: MlflowManager):
         with open(self.results_file, "wb") as file:
-            pickle.dump(predictions, file)
+            pickle.dump(results, file)
+
+        self._dump_metrics(results.metrics)
         if mlflow_manager is not None:
-            self._log_metrics_to_mlflow(predictions.metrics, mlflow_manager)
+            self._log_metrics_to_mlflow(results.metrics, mlflow_manager)
 
     def load_results(self):
         with open(self.results_file, "rb") as file:
             return pickle.load(file)
+
+    def load_metrics(self) -> Dict:
+        with open(self.metrics_file, "r") as file:
+            return yaml.safe_load(file)
+
+    def _dump_metrics(self, metrics):
+        file_content = {}
+        if os.path.exists(self.metrics_file):
+            with open(self.metrics_file, "r") as file:
+                file_content = yaml.safe_load(file)
+
+        file_content[self.stage.value] = metrics
+
+        with open(self.metrics_file, "w") as file:
+            yaml.dump(file_content, file)
 
     def _log_metrics_to_mlflow(self, metrics, mlflow_manager: MlflowManager):
         """needs to be invoked strictly after computing and saving metrics - therefore, after saving predictions"""

@@ -57,6 +57,6 @@ class Stage(enum.Enum):
         return str(self.value)
 
     TRAINING = "train"
-    VALIDATION = "val"
+    VALIDATION = "validation"
     TESTING = "test"
-    CONTROL = "cont"
+    CONTROL = "control"
