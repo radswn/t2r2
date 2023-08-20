@@ -5,29 +5,15 @@ import torch
 import yaml
 from torch.utils.data.dataset import Dataset
 from transformers import TrainingArguments, IntervalStrategy, Trainer
-from transformers.trainer_utils import PredictionOutput
 
 from enginora.dataset import ControlConfig, TrainingConfig, TestConfig
 from enginora.model import ModelConfig
 from enginora.utils.mlflow import MlflowManager, MlFlowConfig
 
 
-def get_train_results(config_path="./config.yaml"):
+def get_metrics(config_path="./config.yaml"):
     _, train_config, _, _, _ = get_configurations(config_path)
-    train_results = train_config.load_results()
-    return train_results.metrics
-
-
-def get_test_results(config_path="./config.yaml"):
-    _, _, test_config, _, _ = get_configurations(config_path)
-    test_results = test_config.load_results()
-    return test_results.metrics
-
-
-def get_control_results(config_path="./config.yaml"):
-    _, _, _, control_config, _ = get_configurations(config_path)
-    control_results = control_config.load_results()
-    return control_results.metrics
+    return train_config.load_metrics()
 
 
 def loop(config_path="./config.yaml") -> Dict:
@@ -41,22 +27,28 @@ def loop(config_path="./config.yaml") -> Dict:
         experiment_id = mlflow_manager.mlflow_create_experiment()
         with mlflow.start_run(experiment_id=experiment_id) as run:
             train_results, test_results, control_results = train_and_test(
-                model, tokenizer, training_config, test_config, control_config, mlflow_manager)
+                model, tokenizer, training_config, test_config, control_config, mlflow_manager
+            )
     else:
         train_results, test_results, control_results = train_and_test(
-            model, tokenizer, training_config, test_config, control_config)
+            model, tokenizer, training_config, test_config, control_config
+        )
 
     return {
         "train_results": train_results,
-        "test_results": test_results.metrics,
-        "control_results": control_results.metrics,
+        "test_results": test_results,
+        "control_results": control_results,
     }
 
 
 def train_and_test(
-        model, tokenizer, training_config: TrainingConfig, test_config: TestConfig, control_config: ControlConfig,
-        mlflow_manager: MlflowManager = None
-) -> Tuple[PredictionOutput, PredictionOutput, PredictionOutput]:
+    model,
+    tokenizer,
+    training_config: TrainingConfig,
+    test_config: TestConfig,
+    control_config: ControlConfig,
+    mlflow_manager: MlflowManager = None,
+):
     datasets = get_datasets(training_config, control_config, test_config, tokenizer, mlflow_manager)
     trainer = get_trainer(training_config, datasets, model)
 
@@ -69,11 +61,11 @@ def train_and_test(
     control_results = trainer.predict(datasets["control"])
     control_config.save_results(control_results, mlflow_manager)
 
-    return train_results, test_results, control_results
+    return train_results.metrics, test_results.metrics, control_results.metrics
 
 
 def get_configurations(
-        path: str,
+    path: str,
 ) -> Tuple[ModelConfig, TrainingConfig, TestConfig, ControlConfig, MlFlowConfig]:
     with open(path, "r") as stream:
         configuration = yaml.safe_load(stream)
@@ -87,9 +79,7 @@ def get_configurations(
     test_config = TestConfig(**configuration["testing"])
     control_config = ControlConfig(**configuration["control"])
 
-    mlflow_config = None
-    if "mlflow" in configuration:
-        mlflow_config = MlFlowConfig(**configuration["mlflow"])
+    mlflow_config = None if "mlflow" in configuration else MlFlowConfig(**configuration["mlflow"])
 
     return model_config, training_config, test_config, control_config, mlflow_config
 
@@ -114,8 +104,11 @@ class TextDataset(Dataset):
 
 
 def get_datasets(
-        training_config: TrainingConfig, control_config: ControlConfig, test_config: TestConfig, tokenizer,
-        mlflow_manager: MlflowManager,
+    training_config: TrainingConfig,
+    control_config: ControlConfig,
+    test_config: TestConfig,
+    tokenizer,
+    mlflow_manager: MlflowManager,
 ) -> Dict[str, TextDataset]:
     training_dataset, validation_dataset = training_config.load_dataset()
     data = {
