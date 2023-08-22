@@ -26,11 +26,13 @@ class DatasetConfig:
 @dataclass
 class DatasetConfigWithSelectors(DatasetConfig):
     selectors: List[SelectorConfig] = None
+    random_state: int = 123
 
     def load_dataset(self) -> pd.DataFrame:
         df = super().load_dataset()
 
         for t in self.selectors:
+            t.args["random_state"] = self.random_state
             selector = get_selector(t.name)(**t.args)
             df = selector.select(df)
         return df

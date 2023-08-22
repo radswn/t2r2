@@ -70,6 +70,10 @@ def get_configurations(
     with open(path, "r") as stream:
         configuration = yaml.safe_load(stream)
 
+    random_state = configuration["random_state"]
+    configuration["training"]["random_state"] = random_state
+    configuration["testing"]["random_state"] = random_state
+
     metrics = configuration["metrics"]
     for config in ["training", "testing", "control"]:
         configuration[config]["metrics"] = metrics
