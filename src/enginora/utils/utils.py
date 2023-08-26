@@ -1,9 +1,10 @@
-import inspect
-import functools
-from typing import Union  # in later version of python simly replace with |
-import os
 import enum
+import functools
+import inspect
+import os
 from collections.abc import MutableMapping
+from typing import Union  # in later version of python simly replace with |
+
 import pandas as pd
 
 

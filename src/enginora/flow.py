@@ -1,23 +1,55 @@
-from typing import Dict, Tuple
+from typing import Dict, List, Tuple
 
 import mlflow
 import torch
 import yaml
 from torch.utils.data.dataset import Dataset
-from transformers import TrainingArguments, IntervalStrategy, Trainer
+from transformers import IntervalStrategy, Trainer, TrainingArguments
 
-from enginora.dataset import ControlConfig, TrainingConfig, TestConfig
+from enginora.dataset import ControlConfig, TestConfig, TrainingConfig
 from enginora.model import ModelConfig
-from enginora.utils.mlflow import MlflowManager, MlFlowConfig
+from enginora.utils import repo
+from enginora.utils.mlflow import MlFlowConfig, MlflowManager
+from enginora.utils.repo import DvcConfig
 
 
-def get_metrics(config_path="./config.yaml"):
-    _, train_config, _, _, _ = get_configurations(config_path)
-    return train_config.load_metrics()
+def init(config_path="./config.yaml"):
+    """
+    If dvc enabled then initialize repository.
+    Always store metrics for experiment tracking.
+    Storing datasets, results and model is optional.
+    """
+    _, training_config, test_config, control_config, _, dvc_config = get_configurations(config_path)
+    if dvc_config.enabled:
+        repo.init(config_path, [training_config.metrics_file, test_config.metrics_file, control_config.metrics_file])
+
+
+def dvc_checkout(config_path="./config.yaml"):
+    repo.checkout()
+
+
+def dvc_metrics(config_path="./config.yaml"):
+    repo.metrics_diff()
+
+
+def dvc_params(config_path="./config.yaml"):
+    repo.params_diff()
+
+
+def get_metrics(config_path="./config.yaml") -> List[Dict]:
+    _, train_config, test_config, control_config, _, _ = get_configurations(config_path)
+    deduplicated_metrics = {
+        train_config.metrics_file: train_config,
+        test_config.metrics_file: train_config,
+        control_config.metrics_file: train_config,
+    }
+    return [cfg.load_metrics() for cfg in deduplicated_metrics]
 
 
 def loop(config_path="./config.yaml") -> Dict:
-    model_config, training_config, test_config, control_config, mlflow_config = get_configurations(config_path)
+    model_config, training_config, test_config, control_config, mlflow_config, dvc_config = get_configurations(
+        config_path
+    )
 
     tokenizer = model_config.create_tokenizer()
     model = model_config.create_model()
@@ -33,6 +65,8 @@ def loop(config_path="./config.yaml") -> Dict:
         train_results, test_results, control_results = train_and_test(
             model, tokenizer, training_config, test_config, control_config
         )
+
+    dvc_config.add(config_path, training_config, test_config, control_config, model_config)
 
     return {
         "train_results": train_results,
@@ -66,7 +100,7 @@ def train_and_test(
 
 def get_configurations(
     path: str,
-) -> Tuple[ModelConfig, TrainingConfig, TestConfig, ControlConfig, MlFlowConfig]:
+) -> Tuple[ModelConfig, TrainingConfig, TestConfig, ControlConfig, MlFlowConfig, DvcConfig]:
     with open(path, "r") as stream:
         configuration = yaml.safe_load(stream)
 
@@ -89,8 +123,9 @@ def get_configurations(
     if "mlflow" in configuration:
         configuration["mlflow"]["random_state"] = random_state
         mlflow_config = MlFlowConfig(**configuration["mlflow"])
+    dvc_config = DvcConfig() if "dvc" not in configuration else DvcConfig(**configuration["dvc"])
 
-    return model_config, training_config, test_config, control_config, mlflow_config
+    return model_config, training_config, test_config, control_config, mlflow_config, dvc_config
 
 
 def set_seed(random_state: int):
