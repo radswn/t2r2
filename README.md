@@ -114,3 +114,17 @@ When opening, VS Code should automatically prompt with an option to *Reopen fold
 If running for the first time, it will take several minutes to build the image and start the container. Click `show logs` to monitor the process.
 
 If no errors appear (bold assumption), a new window should open with *Dev Container: Enginora project* in the bottom-left corner.
+
+### Notes on further use and image rebuilding
+
+Any time we introduce some changes to the Dockerfile, the image should be rebuilt for changes to take place. What happens then, is the one aspect of DevContainers, that is not handled automatically - image pruning.
+
+Whenever a new image is built by VSCode, the old one gets assigned `<none>:<none>` name and its tag is moved to the new version. The old ones **are not removed automatically**. Hence, if you rebuild many images, you might end up (as I did) with 10 images, each one about 7GB, that are only taking precious disk space.
+
+What is worse, WSL allocates disk space dynamically. What that means, is - even if you remove the images, the space will still be allocated and you might run out of memory on your host system.
+
+The solution to that is as follows:
+
+* Whenever you want to get rid of the old images, run `docker image prune`.
+* You may also run `docker system prune` to also remove unused containers. Just make sure you're fine with what will be removed.
+* Follow instructions from [this comment](https://stackoverflow.com/a/74870395).

@@ -15,7 +15,8 @@ RUN groupadd --gid ${USER_GID} ${USERNAME} \
 
 USER ${USERNAME}
 
-ENV PYTHONPATH=${PYTHONPATH}:/workspaces/enginora/src:/home/${USERNAME}/.local/bin
+ENV PYTHONPATH=${PYTHONPATH}:/workspaces/enginora/src
+ENV PATH=${PATH}:/home/${USERNAME}/.local/bin
 
 COPY ${REQ_FILE} /app/${REQ_FILE}
 
