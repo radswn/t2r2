@@ -39,3 +39,4 @@ mlflow:
   tags:
       version: 'v1'
   tracking_uri: "http://localhost:5000"
+  registered_model_name: 'my_registered_model'

@@ -3,7 +3,7 @@ import mlflow
 import pandas as pd
 import os
 from enginora.utils.mlflow.MlFlowConfig import MlFlowConfig
-
+from mlflow.models.signature import Schema
 
 class Singleton(type):
     _instances = {}
@@ -20,6 +20,7 @@ class MlflowManager(metaclass=Singleton):
         self.tags = mlflow_config.tags
         self.tracking_uri = mlflow_config.tracking_uri
         self.logger = logging.getLogger(__name__)
+        self.registered_model_name = mlflow_config.registered_model_name
         self.set_tracking_uri()
 
     def mlflow_create_experiment(self) -> str:
@@ -45,9 +46,14 @@ class MlflowManager(metaclass=Singleton):
         self.logger.info("mlflow: Dataset logged")
         self.log_dataset_synopsis(data)
 
-    def log_model(self, model, model_name="model"):
-        mlflow.pytorch.log_model(model, model_name)
+    def log_model(self, model, input_schema, model_name="model"):
+        signature = mlflow.models.ModelSignature(inputs = input_schema)
+        mlflow.pytorch.log_model(model, 
+                                    model_name, 
+                                    registered_model_name = self.registered_model_name,
+                                    signature=signature)
         self.logger.info("mlflow: logging model")
+        
 
     def set_tracking_uri(self):
         mlflow.set_tracking_uri(self.tracking_uri)

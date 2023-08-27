@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-
+from mlflow.models.signature import infer_signature
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
 
@@ -33,3 +33,4 @@ class ModelConfig:
             self.model_name,
             num_labels=self.num_labels,
         )
+        
