@@ -1,11 +1,9 @@
 from typing import Dict, Tuple
 
-import json
 import torch
 import yaml
 import mlflow
 import numpy as np
-import pandas as pd
 from torch.utils.data.dataset import Dataset
 from transformers import TrainingArguments, IntervalStrategy, Trainer
 from mlflow.types.schema import TensorSpec, Schema
@@ -31,7 +29,7 @@ def loop(config_path="./config.yaml") -> Dict:
 
         train_results = trainer.train()
 
-        MlflowManager().log_model(model, datasets["train"].get_input_dict())
+        MlflowManager().log_model(model, datasets["train"].get_input_schema())
 
         test_results = trainer.predict(datasets["test"])
         test_config.save_predictions(test_results)
@@ -85,7 +83,7 @@ class TextDataset(Dataset):
             "labels": self.y[i],
         }
 
-    def get_input_dict(self):
+    def get_input_schema(self):
         input = Schema(
             [
                 TensorSpec(np.dtype(np.int64), shape=self.input_ids.shape, name="input_ids"),
