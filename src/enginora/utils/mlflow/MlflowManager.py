@@ -5,6 +5,7 @@ import os
 from enginora.utils.mlflow.MlFlowConfig import MlFlowConfig
 from mlflow.models.signature import Schema
 
+
 class Singleton(type):
     _instances = {}
 
@@ -47,13 +48,11 @@ class MlflowManager(metaclass=Singleton):
         self.log_dataset_synopsis(data)
 
     def log_model(self, model, input_schema, model_name="model"):
-        signature = mlflow.models.ModelSignature(inputs = input_schema)
-        mlflow.pytorch.log_model(model, 
-                                    model_name, 
-                                    registered_model_name = self.registered_model_name,
-                                    signature=signature)
+        signature = mlflow.models.ModelSignature(inputs=input_schema)
+        mlflow.pytorch.log_model(
+            model, model_name, registered_model_name=self.registered_model_name, signature=signature
+        )
         self.logger.info("mlflow: logging model")
-        
 
     def set_tracking_uri(self):
         mlflow.set_tracking_uri(self.tracking_uri)

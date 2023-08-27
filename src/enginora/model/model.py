@@ -33,4 +33,3 @@ class ModelConfig:
             self.model_name,
             num_labels=self.num_labels,
         )
-        

@@ -30,9 +30,9 @@ def loop(config_path="./config.yaml") -> Dict:
         trainer = get_trainer(training_config, datasets, model)
 
         train_results = trainer.train()
-        
+
         MlflowManager().log_model(model, datasets["train"].get_input_dict())
-        
+
         test_results = trainer.predict(datasets["test"])
         test_config.save_predictions(test_results)
 
@@ -84,12 +84,15 @@ class TextDataset(Dataset):
             "token_type_ids": self.token_type_ids[i],
             "labels": self.y[i],
         }
+
     def get_input_dict(self):
-        input = Schema([
-                    TensorSpec(np.dtype(np.int64), shape = self.input_ids.shape, name = 'input_ids'),
-                    TensorSpec(np.dtype(np.int64), shape = self.attention_mask.shape, name = 'attention_mask'),
-                    TensorSpec(np.dtype(np.int64), shape = self.token_type_ids.shape, name = 'token_type_ids')
-        ])
+        input = Schema(
+            [
+                TensorSpec(np.dtype(np.int64), shape=self.input_ids.shape, name="input_ids"),
+                TensorSpec(np.dtype(np.int64), shape=self.attention_mask.shape, name="attention_mask"),
+                TensorSpec(np.dtype(np.int64), shape=self.token_type_ids.shape, name="token_type_ids"),
+            ]
+        )
         return input
 
 
