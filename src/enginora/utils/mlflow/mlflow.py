@@ -28,6 +28,7 @@ class MlflowManager(metaclass=Singleton):
         self.tags = mlflow_config.tags
         self.tracking_uri = mlflow_config.tracking_uri
         self.logger = logging.getLogger(__name__)
+        self.random_state = mlflow_config.random_state
         self.set_tracking_uri()
 
     def mlflow_create_experiment(self) -> str:
@@ -37,6 +38,7 @@ class MlflowManager(metaclass=Singleton):
         self.logger.info("***SETTING EXPERIMENT***")
         self.logger.info("Name: {}".format(experiment.name))
         self.logger.info("Experiment_id: {}".format(experiment.experiment_id))
+        self.logger.info("Random State: {}".format(self.random_state))
         self.logger.info("Artifact Location: {}".format(experiment.artifact_location))
         self.logger.info("Tags: {}".format(experiment.tags))
         self.logger.info("Lifecycle_stage: {}".format(experiment.lifecycle_stage))

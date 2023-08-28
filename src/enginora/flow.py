@@ -73,6 +73,7 @@ def get_configurations(
     random_state = configuration["random_state"]
     configuration["training"]["random_state"] = random_state
     configuration["testing"]["random_state"] = random_state
+    configuration["mlflow"]["random_state"] = random_state
 
     metrics = configuration["metrics"]
     for config in ["training", "testing", "control"]:
