@@ -1,0 +1,42 @@
+# demo configuration
+
+model:
+  max_length: 256
+  model_name: bert-base-cased
+  num_labels: 12
+  padding: max_length
+  return_tensors: pt
+  truncation: True
+
+metrics:
+  - name: f1_score
+    args:
+      average: macro
+
+training:
+  dataset_path: ../../data/featuresets/thedeep.subset.train.txt
+  selectors:
+    - args: { }
+      name: dummy
+  batch_size: 2
+  epochs: 2
+  learning_rate: 1e-3
+  validation_size: 0.2
+  output_dir: ClassificationBERT
+  metric_for_best_model: f1_score
+
+testing:
+  dataset_path: ../../data/featuresets/thedeep.subset.test.txt
+  selectors: [ ]
+  results_file: ./file_test_results.pickle
+
+control:
+  dataset_path: ../../data/featuresets/thedeep.subset.control.txt
+  results_file: ./file_control_results.pickle
+
+mlflow:
+  experiment_name: 'my_experiment_3'
+  tags:
+      version: 'v1'
+  tracking_uri: "http://localhost:5000"
+  registered_model_name: 'my_registered_model'

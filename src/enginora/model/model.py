@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from mlflow.models.signature import infer_signature
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
 

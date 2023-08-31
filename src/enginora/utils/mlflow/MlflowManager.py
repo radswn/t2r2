@@ -2,8 +2,12 @@ import logging
 import mlflow
 import pandas as pd
 import os
+import pandas as pd
+from IPython.display import display
+from typing import List, Union
 from enginora.utils.mlflow.MlFlowConfig import MlFlowConfig
 from mlflow.models.signature import Schema
+from mlflow.tracking import MlflowClient
 
 
 class Singleton(type):
@@ -42,6 +46,8 @@ class MlflowManager(metaclass=Singleton):
         self.logger.info("mlflow: logging metrics :" + " ".join(list(metrics.keys())))
 
     def log_data(self, data: dict[str, pd.DataFrame]):
+        # log raw data directory
+        mlflow.log_artifact("../../data")
         for key, value in data.items():
             mlflow.log_input(mlflow.data.from_pandas(value), context=key)
         self.logger.info("mlflow: Dataset logged")
@@ -65,3 +71,56 @@ class MlflowManager(metaclass=Singleton):
             mlflow.log_artifact(f"dataset_{dataset_name}.html", f"stat_descriptive_{dataset_name}")
             os.remove(f"dataset_{dataset_name}.html")
         self.logger.info("mlflow: Dataset synopsis logged")
+
+    @staticmethod
+    def display_runs_filtered_on_metric(
+        experiment_names: Union[List[str], None],
+        metric: str,
+        order_desc: bool = True,
+        verbose=True,
+        filter_on_completed_only=True,
+    ) -> None:
+        order = "DESC" if order_desc else "ASC"
+        order_expression = [f"metrics.{metric} {order}"]
+        filterstring = "status = 'FINISHED'" if filter_on_completed_only else ""
+
+        df = mlflow.search_runs(
+            filter_string=filterstring, experiment_names=experiment_names, order_by=order_expression
+        )
+        if verbose:
+            display(df)
+
+    @staticmethod
+    def download_artifacts_filtered_on_metric(
+        experiment_names: Union[List[str], None], metric: str, order_desc: bool = True, filter_on_completed_only=True
+    ) -> None:
+        client = MlflowClient()
+        local_dir = "artifacts_loaded/"
+        if not os.path.exists(local_dir):
+            os.mkdir(local_dir)
+        order = "DESC" if order_desc else "ASC"
+        order_expression = [f"metrics.{metric} {order}"]
+        filterstring = "status = 'FINISHED'" if filter_on_completed_only else ""
+
+        df = mlflow.search_runs(
+            filter_string=filterstring, experiment_names=experiment_names, order_by=order_expression
+        )
+
+        run_id = df.loc[0, "run_id"]
+        artifacts = client.list_artifacts(run_id)
+        for artifact in artifacts:
+            local_path = client.download_artifacts(run_id, artifact.path, dst_path=local_dir)
+
+    @staticmethod
+    def display_metrics(
+        experiment_names: Union[List[str], None], verbose=True, filter_on_completed_only=True
+    ) -> List[str]:
+        filterstring = "status = 'FINISHED'" if filter_on_completed_only else ""
+
+        df = mlflow.search_runs(filter_string=filterstring, experiment_names=experiment_names)
+        metrics_human_readable = [col[len("metrics.") :] for col in df if col.startswith("metrics.")]
+        if verbose:
+            print("The metrics logged which you can retrieve from this experiment are: ")
+            print("", *metrics_human_readable, sep="\n - ")
+
+        return metrics_human_readable
