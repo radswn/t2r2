@@ -55,7 +55,7 @@ def get_metric(name: str):
 @dataclass
 class MetricsConfig:
     name: str
-    args: Dict[str, Any]
+    args: Dict[str, Any] = None
 
     def __post_init__(self):
         if self.args is None:

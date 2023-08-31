@@ -6,10 +6,10 @@ from transformers import AutoTokenizer, AutoModelForSequenceClassification
 class ModelConfig:
     model_name: str
     num_labels: int
-    max_length: int
-    truncation: bool
-    padding: str
-    return_tensors: str
+    max_length: int = 256
+    padding: str = "max_length"
+    truncation: bool = True
+    return_tensors: str = "pt"
 
     def __post_init__(self):
         self.num_labels = int(self.num_labels)

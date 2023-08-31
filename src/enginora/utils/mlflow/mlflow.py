@@ -1,13 +1,19 @@
 import logging
 import mlflow
-import pandas as pd
 import os
 import pandas as pd
+
 from IPython.display import display
+from dataclasses import dataclass
 from typing import List, Union
-from enginora.utils.mlflow.MlFlowConfig import MlFlowConfig
-from mlflow.models.signature import Schema
-from mlflow.tracking import MlflowClient
+
+
+@dataclass
+class MlFlowConfig:
+    experiment_name: str
+    tags: dict
+    tracking_uri: str
+    registered_model_name: str
 
 
 class Singleton(type):
@@ -114,7 +120,7 @@ class MlflowManager(metaclass=Singleton):
 
     @staticmethod
     def download_artifacts_from_run(run_id: str, default_dst_path: str = "artifacts_loaded/") -> None:
-        client = MlflowClient()
+        client = mlflow.tracking.MlflowClient()
         if not os.path.exists(default_dst_path):
             os.mkdir(default_dst_path)
 

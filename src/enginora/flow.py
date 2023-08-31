@@ -1,59 +1,83 @@
 from typing import Dict, Tuple
 
+import mlflow
 import torch
 import yaml
-import mlflow
 import numpy as np
+
 from torch.utils.data.dataset import Dataset
 from transformers import TrainingArguments, IntervalStrategy, Trainer
 from mlflow.types.schema import TensorSpec, Schema
 
 from enginora.dataset import ControlConfig, TrainingConfig, TestConfig
 from enginora.model import ModelConfig
-from enginora.utils.mlflow.MlFlowConfig import MlFlowConfig
-from enginora.utils.mlflow.MlflowManager import MlflowManager
+from enginora.utils.mlflow import MlflowManager, MlFlowConfig
+
+
+def get_metrics(config_path="./config.yaml"):
+    _, train_config, _, _, _ = get_configurations(config_path)
+    return train_config.load_metrics()
 
 
 def loop(config_path="./config.yaml") -> Dict:
-    mlflow_config, model_config, training_config, test_config, control_config = get_configurations(config_path)
-
-    mlflow_manager = MlflowManager(mlflow_config)
+    model_config, training_config, test_config, control_config, mlflow_config = get_configurations(config_path)
 
     tokenizer = model_config.create_tokenizer()
     model = model_config.create_model()
+    
+    if mlflow_config is not None:
+        mlflow_manager = MlflowManager(mlflow_config)
+        experiment_id = mlflow_manager.mlflow_create_experiment()
+        with mlflow.start_run(experiment_id=experiment_id) as run:
+            mlflow_manager.log_config(config_path="./config.yaml")
+            train_results, test_results, control_results = train_and_test(
+                model, tokenizer, training_config, test_config, control_config, mlflow_manager
+            )
 
-    experiment_id = mlflow_manager.mlflow_create_experiment()
-    with mlflow.start_run(experiment_id=experiment_id) as run:
-        MlflowManager().log_config(config_path="./config.yaml")
-
-        datasets = get_datasets(training_config, control_config, test_config, tokenizer)
-        trainer = get_trainer(training_config, datasets, model)
-
-        train_results = trainer.train()
-
-        MlflowManager().log_model(model, datasets["train"].get_input_schema())
-
-        test_results = trainer.predict(datasets["test"])
-        test_config.save_predictions(test_results)
-
-        control_results = trainer.predict(datasets["control"])
-        control_config.save_predictions(control_results)
+        train_results, test_results, control_results = train_and_test(
+            model, tokenizer, training_config, test_config, control_config
+        )
 
     return {
         "train_results": train_results,
-        "test_results": test_results.metrics,
-        "control_results": control_results.metrics,
+        "test_results": test_results,
+        "control_results": control_results,
     }
+
+
+def train_and_test(
+    model,
+    tokenizer,
+    training_config: TrainingConfig,
+    test_config: TestConfig,
+    control_config: ControlConfig,
+    mlflow_manager: MlflowManager = None,
+):
+    datasets = get_datasets(training_config, control_config, test_config, tokenizer, mlflow_manager)
+    trainer = get_trainer(training_config, datasets, model)
+    
+    if mlflow_manager is None:
+        mlflow_manager.log_model(model, datasets["train"].get_input_schema())
+
+    train_results = trainer.train()
+    training_config.save_results(train_results, mlflow_manager)
+
+    test_results = trainer.predict(datasets["test"])
+    test_config.save_results(test_results, mlflow_manager)
+
+    control_results = trainer.predict(datasets["control"])
+    control_config.save_results(control_results, mlflow_manager)
+
+    return train_results.metrics, test_results.metrics, control_results.metrics
 
 
 def get_configurations(
     path: str,
-) -> Tuple[ModelConfig, TrainingConfig, TestConfig, ControlConfig]:
+) -> Tuple[ModelConfig, TrainingConfig, TestConfig, ControlConfig, MlFlowConfig]:
     with open(path, "r") as stream:
         configuration = yaml.safe_load(stream)
 
     metrics = configuration["metrics"]
-
     for config in ["training", "testing", "control"]:
         configuration[config]["metrics"] = metrics
 
@@ -62,9 +86,9 @@ def get_configurations(
     test_config = TestConfig(**configuration["testing"])
     control_config = ControlConfig(**configuration["control"])
 
-    mlflow_config = MlFlowConfig(**configuration["mlflow"])
+    mlflow_config = None if "mlflow" in configuration else MlFlowConfig(**configuration["mlflow"])
 
-    return mlflow_config, model_config, training_config, test_config, control_config
+    return model_config, training_config, test_config, control_config, mlflow_config
 
 
 class TextDataset(Dataset):
@@ -95,9 +119,12 @@ class TextDataset(Dataset):
         )
         return input
 
-
 def get_datasets(
-    training_config: TrainingConfig, control_config: ControlConfig, test_config: TestConfig, tokenizer
+    training_config: TrainingConfig,
+    control_config: ControlConfig,
+    test_config: TestConfig,
+    tokenizer,
+    mlflow_manager: MlflowManager,
 ) -> Dict[str, TextDataset]:
     training_dataset, validation_dataset = training_config.load_dataset()
     data = {
@@ -106,7 +133,9 @@ def get_datasets(
         "test": test_config.load_dataset(),
         "control": control_config.load_dataset(),
     }
-    MlflowManager().log_data(data)
+
+    if mlflow_manager is not None:
+        mlflow_manager.log_data(data)
 
     tokens = {dataset_type: tokenizer(dataset["text"].tolist()) for dataset_type, dataset in data.items()}
     labels = {dataset_type: torch.tensor(dataset["label"].tolist()) for dataset_type, dataset in data.items()}

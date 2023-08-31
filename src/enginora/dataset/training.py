@@ -7,17 +7,19 @@ from enginora.dataset.common import *
 
 @dataclass
 class TrainingConfig(DatasetConfigWithSelectors, WithMetrics):
-    batch_size: int
-    epochs: int
-    learning_rate: float
-    validation_size: float
-    output_dir: str
-    metric_for_best_model: str
+    dataset_path: str = "./data/train.csv"
+    output_dir: str = "./results/"
+    results_file: str = "./results/train_results.pickle"
+    epochs: int = 1
+    batch_size: int = 32
+    learning_rate: float = 0.01
+    validation_size: float = 0.2
+    metric_for_best_model: str = "accuracy_score"
 
     def __post_init__(self):
         self.stage = Stage.TRAINING
-        self.selectors = [SelectorConfig(**t) for t in self.selectors]
-        self.metrics = [MetricsConfig(**m) for m in self.metrics]
+        self.selectors = [] if self.selectors is None else [SelectorConfig(**t) for t in self.selectors]
+        self.metrics = [] if self.metrics is None else [MetricsConfig(**m) for m in self.metrics]
         self.batch_size = int(self.batch_size)
         self.epochs = int(self.epochs)
         self.learning_rate = float(self.learning_rate)
