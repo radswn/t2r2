@@ -24,7 +24,7 @@ def loop(config_path="./config.yaml") -> Dict:
 
     tokenizer = model_config.create_tokenizer()
     model = model_config.create_model()
-    
+
     if mlflow_config is not None:
         mlflow_manager = MlflowManager(mlflow_config)
         experiment_id = mlflow_manager.mlflow_create_experiment()
@@ -55,7 +55,7 @@ def train_and_test(
 ):
     datasets = get_datasets(training_config, control_config, test_config, tokenizer, mlflow_manager)
     trainer = get_trainer(training_config, datasets, model)
-    
+
     if mlflow_manager is None:
         mlflow_manager.log_model(model, datasets["train"].get_input_schema())
 
@@ -118,6 +118,7 @@ class TextDataset(Dataset):
             ]
         )
         return input
+
 
 def get_datasets(
     training_config: TrainingConfig,
