@@ -33,13 +33,3 @@ testing:
 control:
   dataset_path: ../../data/featuresets/thedeep.subset.control.txt
   results_file: ./file_control_results.pickle
-<<<<<<< HEAD
-
-mlflow:
-  experiment_name: 'my_experiment_3'
-  tags:
-      version: 'v1'
-  tracking_uri: "http://localhost:5000"
-  registered_model_name: 'my_registered_model'
-=======
->>>>>>> 43f041cd908f0d8042a03f9202efd9982af4245e
