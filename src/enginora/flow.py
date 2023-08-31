@@ -24,6 +24,8 @@ def loop(config_path="./config.yaml") -> Dict:
 
     experiment_id = mlflow_manager.mlflow_create_experiment()
     with mlflow.start_run(experiment_id=experiment_id) as run:
+        MlflowManager().log_config(config_path="./config.yaml")
+
         datasets = get_datasets(training_config, control_config, test_config, tokenizer)
         trainer = get_trainer(training_config, datasets, model)
 
@@ -99,10 +101,10 @@ def get_datasets(
 ) -> Dict[str, TextDataset]:
     training_dataset, validation_dataset = training_config.load_dataset()
     data = {
-        "train": training_dataset[:10],
-        "validation": validation_dataset[:10],
-        "test": test_config.load_dataset()[:10],
-        "control": control_config.load_dataset()[:10],
+        "train": training_dataset,
+        "validation": validation_dataset,
+        "test": test_config.load_dataset(),
+        "control": control_config.load_dataset(),
     }
     MlflowManager().log_data(data)
 

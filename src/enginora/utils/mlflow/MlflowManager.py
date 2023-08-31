@@ -53,6 +53,10 @@ class MlflowManager(metaclass=Singleton):
         self.logger.info("mlflow: Dataset logged")
         self.log_dataset_synopsis(data)
 
+    def log_config(self, config_path: str):
+        """Logs the vital configuration file"""
+        mlflow.log_artifact(config_path)
+
     def log_model(self, model, input_schema, model_name="model"):
         signature = mlflow.models.ModelSignature(inputs=input_schema)
         mlflow.pytorch.log_model(
@@ -92,12 +96,12 @@ class MlflowManager(metaclass=Singleton):
 
     @staticmethod
     def download_artifacts_filtered_on_metric(
-        experiment_names: Union[List[str], None], metric: str, order_desc: bool = True, filter_on_completed_only=True
+        experiment_names: Union[List[str], None],
+        metric: str,
+        order_desc: bool = True,
+        filter_on_completed_only=True,
+        default_dst_path: str = "artifacts_loaded/",
     ) -> None:
-        client = MlflowClient()
-        local_dir = "artifacts_loaded/"
-        if not os.path.exists(local_dir):
-            os.mkdir(local_dir)
         order = "DESC" if order_desc else "ASC"
         order_expression = [f"metrics.{metric} {order}"]
         filterstring = "status = 'FINISHED'" if filter_on_completed_only else ""
@@ -105,11 +109,18 @@ class MlflowManager(metaclass=Singleton):
         df = mlflow.search_runs(
             filter_string=filterstring, experiment_names=experiment_names, order_by=order_expression
         )
-
         run_id = df.loc[0, "run_id"]
+        MlflowManager.download_artifacts_from_run(run_id, default_dst_path=default_dst_path)
+
+    @staticmethod
+    def download_artifacts_from_run(run_id: str, default_dst_path: str = "artifacts_loaded/") -> None:
+        client = MlflowClient()
+        if not os.path.exists(default_dst_path):
+            os.mkdir(default_dst_path)
+
         artifacts = client.list_artifacts(run_id)
         for artifact in artifacts:
-            local_path = client.download_artifacts(run_id, artifact.path, dst_path=local_dir)
+            client.download_artifacts(run_id, artifact.path, dst_path=default_dst_path)
 
     @staticmethod
     def display_metrics(
