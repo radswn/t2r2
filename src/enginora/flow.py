@@ -83,7 +83,7 @@ def get_configurations(
     test_config = TestConfig(**configuration["testing"])
     control_config = ControlConfig(**configuration["control"])
 
-    mlflow_config = None 
+    mlflow_config = None
     if "mlflow" in configuration:
         configuration["mlflow"]["random_state"] = random_state
         mlflow_config = MlFlowConfig(**configuration["mlflow"])
