@@ -70,10 +70,9 @@ def get_configurations(
     with open(path, "r") as stream:
         configuration = yaml.safe_load(stream)
 
-    random_state = configuration["random_state"]
+    random_state = configuration.get("random_strate", 123)
     configuration["training"]["random_state"] = random_state
     configuration["testing"]["random_state"] = random_state
-    configuration["mlflow"]["random_state"] = random_state
 
     metrics = configuration["metrics"]
     for config in ["training", "testing", "control"]:
@@ -84,7 +83,10 @@ def get_configurations(
     test_config = TestConfig(**configuration["testing"])
     control_config = ControlConfig(**configuration["control"])
 
-    mlflow_config = None if "mlflow" in configuration else MlFlowConfig(**configuration["mlflow"])
+    mlflow_config = None 
+    if "mlflow" in configuration:
+        configuration["mlflow"]["random_state"] = random_state
+        mlflow_config = MlFlowConfig(**configuration["mlflow"])
 
     return model_config, training_config, test_config, control_config, mlflow_config
 
