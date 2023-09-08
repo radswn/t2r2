@@ -11,7 +11,6 @@ class MlFlowConfig:
     experiment_name: str
     tags: dict
     tracking_uri: str
-    random_state: int
 
 
 class Singleton(type):
@@ -24,12 +23,12 @@ class Singleton(type):
 
 
 class MlflowManager(metaclass=Singleton):
-    def __init__(self, mlflow_config: MlFlowConfig):
+    def __init__(self, mlflow_config: MlFlowConfig, random_state: int):
         self.experiment_name = mlflow_config.experiment_name
         self.tags = mlflow_config.tags
         self.tracking_uri = mlflow_config.tracking_uri
         self.logger = logging.getLogger(__name__)
-        self.random_state = mlflow_config.random_state
+        self.random_state = random_state
         self.set_tracking_uri()
 
     def mlflow_create_experiment(self) -> str:

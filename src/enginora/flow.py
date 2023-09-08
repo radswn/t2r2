@@ -23,7 +23,7 @@ def loop(config_path="./config.yaml") -> Dict:
     model = model_config.create_model()
 
     if mlflow_config is not None:
-        mlflow_manager = MlflowManager(mlflow_config)
+        mlflow_manager = MlflowManager(mlflow_config, training_config.random_state)
         experiment_id = mlflow_manager.mlflow_create_experiment()
         with mlflow.start_run(experiment_id=experiment_id) as run:
             train_results, test_results, control_results = train_and_test(
@@ -70,9 +70,11 @@ def get_configurations(
     with open(path, "r") as stream:
         configuration = yaml.safe_load(stream)
 
-    random_state = configuration.get("random_strate", 123)
+    random_state = configuration.get("random_state", 123)
     configuration["training"]["random_state"] = random_state
     configuration["testing"]["random_state"] = random_state
+
+    set_seed(random_state)
 
     metrics = configuration["metrics"]
     for config in ["training", "testing", "control"]:
@@ -89,6 +91,13 @@ def get_configurations(
         mlflow_config = MlFlowConfig(**configuration["mlflow"])
 
     return model_config, training_config, test_config, control_config, mlflow_config
+
+
+def set_seed(random_state: int):
+    torch.manual_seed(random_state)
+    torch.cuda.manual_seed_all(random_state)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
 
 
 class TextDataset(Dataset):
