@@ -23,7 +23,7 @@ def loop(config_path="./config.yaml") -> Dict:
     model = model_config.create_model()
 
     if mlflow_config is not None:
-        mlflow_manager = MlflowManager(mlflow_config, training_config.random_state)
+        mlflow_manager = MlflowManager(mlflow_config)
         experiment_id = mlflow_manager.mlflow_create_experiment()
         with mlflow.start_run(experiment_id=experiment_id) as run:
             train_results, test_results, control_results = train_and_test(
@@ -97,7 +97,6 @@ def set_seed(random_state: int):
     torch.manual_seed(random_state)
     torch.cuda.manual_seed_all(random_state)
     torch.backends.cudnn.deterministic = True
-    torch.backends.cudnn.benchmark = False
 
 
 class TextDataset(Dataset):
