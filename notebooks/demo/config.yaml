@@ -1,4 +1,5 @@
 # demo configuration
+random_state: 123
 
 model:
   max_length: 256
