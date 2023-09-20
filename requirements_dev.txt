@@ -7,3 +7,6 @@ imblearn==0.0
 snorkel==0.9.9
 textblob==0.17.1
 mlflow==2.5.0
+black==23.7.0
+jupyter==1.0.0
+pytest==7.4.0

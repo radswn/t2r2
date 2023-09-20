@@ -1,0 +1,30 @@
+{
+    "name": "Enginora Project",
+
+    "build": {
+        "context": "..",
+        "args": {
+            "USER_UID": "1000",
+            "USER_GID": "1000",
+            "REQ_FILE": "requirements.txt"
+        },
+        "dockerfile": "../Dockerfile"
+    },
+
+    "runArgs": [
+        "--name",
+        "enginora_project"
+    ],
+
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-python.python",
+                "ms-python.vscode-pylance",
+                "ms-toolsai.jupyter"
+            ]
+        }
+    },
+
+    "containerUser": "user"
+}
