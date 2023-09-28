@@ -21,6 +21,7 @@ class DatasetConfig:
     has_header: bool
 
     def load_dataset(self) -> pd.DataFrame:
+<<<<<<< HEAD
         header = 0 if self.has_header else None
 
         df = pd.read_csv(self.dataset_path, header=header)
@@ -28,6 +29,11 @@ class DatasetConfig:
         df.columns = ["text", "label"]
 
         return df
+=======
+        # TODO: what columns should be accept as text/target (?)
+        # TODO: maybe create ids if not provided (?)
+        return pd.read_csv(self.dataset_path, header=None, names=["id", "text", "label"])[:10]
+>>>>>>> a3a0848 (add users custom selector [wip])
 
 
 @dataclass
