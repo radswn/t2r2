@@ -4,7 +4,7 @@ import mlflow
 import torch
 import yaml
 from torch.utils.data.dataset import Dataset
-from transformers import TrainingArguments, IntervalStrategy, Trainer
+from transformers import IntervalStrategy, Trainer, TrainingArguments
 
 from enginora.dataset import ControlConfig, TrainingConfig, TestConfig
 from enginora.model import ModelConfig
@@ -50,6 +50,7 @@ def train_and_test(
     mlflow_manager: MlflowManager = None,
 ):
     datasets = get_datasets(training_config, control_config, test_config, tokenizer, mlflow_manager)
+    training_args = get_training_args() # TODO PUT IN CONFIG
     trainer = get_trainer(training_config, datasets, model)
 
     train_results = trainer.train()
