@@ -4,7 +4,7 @@ import mlflow
 import torch
 import yaml
 from torch.utils.data.dataset import Dataset
-from transformers import IntervalStrategy, Trainer, TrainingArguments
+from transformers import Trainer
 
 from enginora.dataset import ControlConfig, TestConfig, TrainingConfig
 from enginora.model import ModelConfig
@@ -177,26 +177,11 @@ def get_datasets(
     return {dataset_type: TextDataset(tokens[dataset_type], labels[dataset_type]) for dataset_type in data.keys()}
 
 
-def get_training_args(training_config: TrainingConfig) -> TrainingArguments:
-    return TrainingArguments(
-        output_dir=training_config.output_dir,
-        learning_rate=training_config.learning_rate,
-        evaluation_strategy=IntervalStrategy.EPOCH,
-        save_strategy=IntervalStrategy.EPOCH,
-        logging_strategy=IntervalStrategy.EPOCH,
-        per_device_train_batch_size=training_config.batch_size,
-        per_device_eval_batch_size=training_config.batch_size,
-        load_best_model_at_end=True,
-        metric_for_best_model=training_config.metric_for_best_model,
-        num_train_epochs=training_config.epochs,
-    )
-
-
 def get_trainer(training_config: TrainingConfig, datasets: Dict[str, TextDataset], model) -> Trainer:
     return Trainer(
         model=model,
         train_dataset=datasets["train"],
         eval_dataset=datasets["validation"],
         compute_metrics=training_config.compute_metrics,
-        args=get_training_args(training_config),
+        args=training_config.get_training_args(),
     )
