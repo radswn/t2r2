@@ -2,6 +2,7 @@ from enginora.selector.base import *
 from importlib import util
 from os import path
 
+
 class CustomSelector(Selector):
     def __init__(self, module_path, class_name):
         self.module_path = module_path
@@ -18,7 +19,7 @@ class CustomSelector(Selector):
 
     def select(self, dataset: pd.DataFrame) -> pd.DataFrame:
         user_instance = self.user_class()
-        if hasattr(user_instance, 'select'):
+        if hasattr(user_instance, "select"):
             return user_instance.select(dataset)
         else:
             raise AttributeError(f"The class {self.class_name} does not have a 'select' method.")
