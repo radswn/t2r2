@@ -138,3 +138,20 @@ The solution to that is as follows:
 * Whenever you want to get rid of the old images, run `docker image prune`.
 * You may also run `docker system prune` to also remove unused containers. Just make sure you're fine with what will be removed.
 * Follow instructions from [this comment](https://stackoverflow.com/a/74870395).
+
+## Other options
+
+### Implement your own selector
+
+We give you an opportunity to use your own selectors.
+
+1. Prepare a class you want to use - it should implement a 'select' function.
+2. When choosing a selectors that you want to use be sure to provide 'custom' as one of them. Its arguments should be adjusted to your class path and name.
+Example:
+```
+  selectors:
+    - name: custom
+      args: 
+        class_name: MyOwnSelector 
+        module_path: ./my_selector.py
+```
