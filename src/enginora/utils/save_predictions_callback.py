@@ -13,23 +13,22 @@ class SavePredictionsCallback(TrainerCallback):
         self.epoch += 1
 
     def on_prediction_step(self, args, state, control, **kwargs):
-
-        kwargs['model'].eval()
+        kwargs["model"].eval()
 
         predictions = []
         labels = []
         with torch.no_grad():
-            for i in range(len(kwargs['train_dataloader'].dataset.input_ids)):
-                input_id = kwargs['train_dataloader'].dataset.input_ids[i]
-                attention_mask = kwargs['train_dataloader'].dataset.attention_mask[i]
-                token_type_id = kwargs['train_dataloader'].dataset.token_type_ids[i]
-                label = kwargs['train_dataloader'].dataset.y[i]
+            for i in range(len(kwargs["train_dataloader"].dataset.input_ids)):
+                input_id = kwargs["train_dataloader"].dataset.input_ids[i]
+                attention_mask = kwargs["train_dataloader"].dataset.attention_mask[i]
+                token_type_id = kwargs["train_dataloader"].dataset.token_type_ids[i]
+                label = kwargs["train_dataloader"].dataset.y[i]
 
                 input_id = input_id.unsqueeze(0).clone().detach()  # Add batch dimension
                 attention_mask = attention_mask.unsqueeze(0).clone().detach()  # Add batch dimension
                 token_type_id = token_type_id.unsqueeze(0).clone().detach()  # Add batch dimension
 
-                outputs = kwargs['model'](input_id, attention_mask=attention_mask, token_type_ids=token_type_id)
+                outputs = kwargs["model"](input_id, attention_mask=attention_mask, token_type_ids=token_type_id)
                 logits = outputs.logits
                 probabilities = torch.softmax(logits, dim=1)
                 predictions.append(probabilities)

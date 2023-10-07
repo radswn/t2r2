@@ -7,6 +7,7 @@ from enginora.dataset.common import *
 from enginora.utils.data_cartography.data_cartography import compute_data_cartography_metrics, create_plot
 from enginora.utils.save_predictions_callback import SavePredictionsCallback
 
+
 @dataclass
 class TrainingConfig(DatasetConfigWithSelectors, WithMetrics):
     dataset_path: str = "./data/train.csv"
@@ -19,11 +20,11 @@ class TrainingConfig(DatasetConfigWithSelectors, WithMetrics):
     validation_size: float = 0.2
     metric_for_best_model: str = "accuracy_score"
     perform_data_cartography: bool = False
-    data_cartography_results: str = './data_cartography_metrics.pickle'
+    data_cartography_results: str = "./data_cartography_metrics.pickle"
     callbacks: Tuple[TrainerCallback, ...] = ()
 
     def load_validation_dataset(self) -> pd.DataFrame:
-        """ Method for loading validation dataset if one exists"""
+        """Method for loading validation dataset if one exists"""
         # TODO: what columns should be accept as text/target (?)
         # TODO: maybe create ids if not provided (?)
         return pd.read_csv(self.validation_dataset_path, header=None, names=["id", "text", "label"])
@@ -68,7 +69,9 @@ class TrainingConfig(DatasetConfigWithSelectors, WithMetrics):
             self.data_cartography()
 
     def data_cartography(self):
-        save_prediction_callback = next((callback for callback in self.get_callbacks() if isinstance(callback, SavePredictionsCallback)), None)
+        save_prediction_callback = next(
+            (callback for callback in self.get_callbacks() if isinstance(callback, SavePredictionsCallback)), None
+        )
         predictions = pd.DataFrame(save_prediction_callback.get_predictions())
         labels = save_prediction_callback.get_labels()
         number_of_epochs = save_prediction_callback.get_epochs()

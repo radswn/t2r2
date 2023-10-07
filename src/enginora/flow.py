@@ -164,9 +164,10 @@ def get_trainer(training_config: TrainingConfig, datasets: Dict[str, TextDataset
         eval_dataset=datasets["validation"],
         compute_metrics=training_config.compute_metrics,
         args=get_training_args(training_config),
-        callbacks=training_config.get_callbacks()
+        callbacks=training_config.get_callbacks(),
     )
 
-#TODO: DELETE THIS - NINA
-if __name__=="__main__":
+
+# TODO: DELETE THIS - NINA
+if __name__ == "__main__":
     loop()
