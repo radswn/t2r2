@@ -50,7 +50,6 @@ def train_and_test(
     mlflow_manager: MlflowManager = None,
 ):
     datasets = get_datasets(training_config, control_config, test_config, tokenizer, mlflow_manager)
-    training_args = get_training_args() # TODO PUT IN CONFIG
     trainer = get_trainer(training_config, datasets, model)
 
     train_results = trainer.train()
@@ -128,10 +127,10 @@ def get_datasets(
 ) -> Dict[str, TextDataset]:
     training_dataset, validation_dataset = training_config.load_dataset()
     data = {
-        "train": training_dataset,
-        "validation": validation_dataset,
-        "test": test_config.load_dataset(),
-        "control": control_config.load_dataset(),
+        "train": training_dataset[:10],
+        "validation": validation_dataset[:10],
+        "test": test_config.load_dataset()[:10],
+        "control": control_config.load_dataset()[:10],
     }
 
     if mlflow_manager is not None:
@@ -165,4 +164,9 @@ def get_trainer(training_config: TrainingConfig, datasets: Dict[str, TextDataset
         eval_dataset=datasets["validation"],
         compute_metrics=training_config.compute_metrics,
         args=get_training_args(training_config),
+        callbacks=training_config.get_callbacks()
     )
+
+#TODO: DELETE THIS - NINA
+if __name__=="__main__":
+    loop()

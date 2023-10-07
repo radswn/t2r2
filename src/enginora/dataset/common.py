@@ -1,7 +1,7 @@
 import os.path
 import pickle
 from dataclasses import dataclass, field
-from typing import List, Dict
+from typing import Dict, List, MutableMapping, Union
 
 import pandas as pd
 import yaml
@@ -45,7 +45,7 @@ class WithMetrics:
     metrics: List[MetricsConfig] = None
     stage: Stage = field(init=False)
 
-    def compute_metrics(self, predictions) -> Dict[str, float]:
+    def compute_metrics(self, predictions) -> MutableMapping:
         proba_predictions, predictions, true_labels = predictions[0], predictions[0].argmax(1), predictions[1]
 
         # FIXME: wrong typing here!!!
@@ -60,6 +60,7 @@ class WithMetrics:
         )
 
     def save_results(self, results, mlflow_manager: MlflowManager):
+        os.makedirs(os.path.dirname(self.results_file), exist_ok=True)
         with open(self.results_file, "wb") as file:
             pickle.dump(results, file)
 
