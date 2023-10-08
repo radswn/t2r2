@@ -60,7 +60,9 @@ class WithMetrics:
         )
 
     def save_results(self, results, mlflow_manager: MlflowManager):
-        os.makedirs(os.path.dirname(self.results_file), exist_ok=True)
+        dirname = os.path.dirname(self.results_file)
+        if dirname:
+            os.makedirs(dirname, exist_ok=True)
         with open(self.results_file, "wb") as file:
             pickle.dump(results, file)
 

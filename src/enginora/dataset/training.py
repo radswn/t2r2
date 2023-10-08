@@ -13,7 +13,7 @@ class TrainingConfig(DatasetConfigWithSelectors, WithMetrics):
     dataset_path: str = "./data/train.csv"
     validation_dataset_path: str = None
     output_dir: str = "./results/"
-    results_file: str = "./results/train_results.pickle"
+    results_file: str = "train_results.pickle"
     epochs: int = 1
     batch_size: int = 32
     learning_rate: float = 0.01
@@ -69,6 +69,9 @@ class TrainingConfig(DatasetConfigWithSelectors, WithMetrics):
             self.data_cartography()
 
     def data_cartography(self):
+        """
+        Collation of metrics obtained by SavePredictions Trainer Callback. Those are metrics but not computed on
+        the validation set. Technically possible to do that on_train_en in the callback."""
         save_prediction_callback = next(
             (callback for callback in self.get_callbacks() if isinstance(callback, SavePredictionsCallback)), None
         )

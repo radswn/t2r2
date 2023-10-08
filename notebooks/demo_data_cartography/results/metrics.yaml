@@ -1,19 +1,19 @@
 control:
   test_f1_score: 0.06666666666666668
   test_loss: 2.5299649238586426
-  test_runtime: 20.696
-  test_samples_per_second: 0.483
-  test_steps_per_second: 0.242
+  test_runtime: 22.7541
+  test_samples_per_second: 0.439
+  test_steps_per_second: 0.22
 test:
   test_f1_score: 0.030303030303030304
   test_loss: 3.199620485305786
-  test_runtime: 20.6769
-  test_samples_per_second: 0.484
-  test_steps_per_second: 0.242
+  test_runtime: 22.8982
+  test_samples_per_second: 0.437
+  test_steps_per_second: 0.218
 train:
   epoch: 2.0
-  total_flos: 2631346790400.0
-  train_loss: 2.396585464477539
-  train_runtime: 66.2328
-  train_samples_per_second: 0.302
-  train_steps_per_second: 0.151
+  total_flos: 26313467904000.0
+  train_loss: 2.458188171386719
+  train_runtime: 659.2023
+  train_samples_per_second: 0.303
+  train_steps_per_second: 0.152

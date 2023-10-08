@@ -127,10 +127,10 @@ def get_datasets(
 ) -> Dict[str, TextDataset]:
     training_dataset, validation_dataset = training_config.load_dataset()
     data = {
-        "train": training_dataset[:10],
+        "train": training_dataset[:100],
         "validation": validation_dataset[:10],
-        "test": test_config.load_dataset()[:10],
-        "control": control_config.load_dataset()[:10],
+        "test": test_config.load_dataset()[:100],
+        "control": control_config.load_dataset()[:100],
     }
 
     if mlflow_manager is not None:
