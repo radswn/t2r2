@@ -5,13 +5,15 @@ import numpy as np
 
 
 class DataCartographySelector(Selector):
-    def __init__(self, hard_to_learn: float = 0.0,
-                 easy_to_learn: float = 0.0,
-                 ambiguous: float = 0.0,
-                 random: float = 0.0,
-                 input_filepath: str = "./data_cartography_metrics.pickle",
-                 random_state: Union[int, None] = None
-                 ):
+    def __init__(
+        self,
+        hard_to_learn: float = 0.0,
+        easy_to_learn: float = 0.0,
+        ambiguous: float = 0.0,
+        random: float = 0.0,
+        input_filepath: str = "./data_cartography_metrics.pickle",
+        random_state: Union[int, None] = None,
+    ):
         assert hard_to_learn + easy_to_learn + ambiguous + random <= 1
         assert hard_to_learn > 0 or easy_to_learn > 0 or ambiguous > 0
         super().__init__()
@@ -34,8 +36,8 @@ class DataCartographySelector(Selector):
         ambiguous_sample_size = int(self.ambiguous * size_of_new_dataset)
 
         # Sort the DataFrame by "variability" and "correctness" in descending order
-        df_sorted_variability = df.sort_values(by='variability', ascending=False)
-        df_sorted_correctness = df.sort_values(by='correctness', ascending=False)
+        df_sorted_variability = df.sort_values(by="variability", ascending=False)
+        df_sorted_correctness = df.sort_values(by="correctness", ascending=False)
 
         # Select the top 50% of records with the highest variability
 
@@ -47,7 +49,9 @@ class DataCartographySelector(Selector):
         # Select the top 30% of records with the highest correctness
         ambiguous_indices = df_sorted_correctness.index[:easy_sample_size] if ambiguous_sample_size else []
 
-        random_indices = df.sample(frac=self.random, replace=False, random_state=self.random_satate).index if self.random > 0 else []
+        random_indices = (
+            df.sample(frac=self.random, replace=False, random_state=self.random_satate).index if self.random > 0 else []
+        )
         # Combine the selected indices into a set (without duplicates)
         selected_indices = list(set(easy_indices) | set(hard_indices) | set(ambiguous_indices) | set(random_indices))
         return selected_indices
@@ -55,5 +59,3 @@ class DataCartographySelector(Selector):
     def select(self, dataset: pd.DataFrame) -> pd.DataFrame:
         indices = self.select_right_indices()
         return dataset.iloc[indices]
-
-

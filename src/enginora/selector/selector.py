@@ -6,6 +6,7 @@ from enginora.selector.slicing import SlicingSelector
 from enginora.selector.undersampling import RandomUnderSamplerSelector
 from enginora.selector.data_cartography import DataCartographySelector
 
+
 def get_selector(name: str) -> Type[Selector]:
     selectors = {
         "dummy": DummySelector,
