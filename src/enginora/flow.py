@@ -127,8 +127,8 @@ def get_datasets(
 ) -> Dict[str, TextDataset]:
     training_dataset, validation_dataset = training_config.load_dataset()
     data = {
-        "train": training_dataset[:100],
-        "validation": validation_dataset[:10],
+        "train": training_dataset[:5000],
+        "validation": validation_dataset[:100],
         "test": test_config.load_dataset()[:100],
         "control": control_config.load_dataset()[:100],
     }
@@ -170,4 +170,4 @@ def get_trainer(training_config: TrainingConfig, datasets: Dict[str, TextDataset
 
 # TODO: DELETE THIS - NINA
 if __name__ == "__main__":
-    loop()
+    loop("C:/Users/ismyn/UNI/enginora/enginora/notebooks/demo_data_cartography/config_run_data_cartography.yaml")

@@ -1,19 +1,19 @@
 control:
   test_f1_score: 0.06666666666666668
-  test_loss: 2.5299649238586426
-  test_runtime: 22.7541
-  test_samples_per_second: 0.439
-  test_steps_per_second: 0.22
+  test_loss: 5.031211853027344
+  test_runtime: 3.9379
+  test_samples_per_second: 2.539
+  test_steps_per_second: 1.27
 test:
   test_f1_score: 0.030303030303030304
-  test_loss: 3.199620485305786
-  test_runtime: 22.8982
-  test_samples_per_second: 0.437
-  test_steps_per_second: 0.218
+  test_loss: 3.715395450592041
+  test_runtime: 3.7093
+  test_samples_per_second: 2.696
+  test_steps_per_second: 1.348
 train:
-  epoch: 2.0
-  total_flos: 26313467904000.0
-  train_loss: 2.458188171386719
-  train_runtime: 659.2023
-  train_samples_per_second: 0.303
-  train_steps_per_second: 0.152
+  epoch: 6.0
+  total_flos: 9472848445440.0
+  train_loss: 1.4648439354366727
+  train_runtime: 123.4428
+  train_samples_per_second: 0.583
+  train_steps_per_second: 0.292

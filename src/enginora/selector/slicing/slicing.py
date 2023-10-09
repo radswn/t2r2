@@ -15,7 +15,7 @@ from enginora.selector.slicing.default_slicing_functions import short, textblob_
 
 
 class SlicingSelector(Selector):
-    def __init__(self, result_file: str, list_of_slicing_functions=None):
+    def __init__(self, result_file: str, list_of_slicing_functions=None, **kwargs):
         super().__init__()
         self.sfs = self.create_list_of_slicing_functions(list_of_slicing_functions)
         self.result_file = result_file

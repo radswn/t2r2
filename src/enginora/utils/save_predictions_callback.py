@@ -11,8 +11,6 @@ class SavePredictionsCallback(TrainerCallback):
 
     def on_epoch_end(self, args: TrainingArguments, state: TrainerState, control: TrainerControl, **kwargs) -> None:
         self.epoch += 1
-
-    def on_prediction_step(self, args, state, control, **kwargs):
         kwargs["model"].eval()
 
         predictions = []

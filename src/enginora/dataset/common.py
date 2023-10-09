@@ -80,6 +80,10 @@ class WithMetrics:
 
     def _dump_metrics(self, metrics):
         file_content = {}
+        dirname = os.path.dirname(self.metrics_file)
+        if dirname:
+            os.makedirs(dirname, exist_ok=True)
+
         if os.path.exists(self.metrics_file):
             with open(self.metrics_file, "r") as file:
                 file_content = yaml.safe_load(file)
