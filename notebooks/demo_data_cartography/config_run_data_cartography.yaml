@@ -21,7 +21,7 @@ training:
     - args: { }
       name: dummy
   batch_size: 2
-  epochs: 2
+  epochs: 7
   learning_rate: 1e-3
   metric_for_best_model: f1_score
   perform_data_cartography: True

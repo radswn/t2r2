@@ -56,13 +56,16 @@ def compute_data_cartography_metrics(predictions, labels, epochs):
     - DataFrame with these metrics.
     - DataFrame with more typical training evaluation metrics, such as accuracy / loss.
     """
+    
     confidence_ = {}
     variability_ = {}
     threshold_closeness_ = {}
     correctness_ = {}
     forgetfulness_ = {}
     num_tot_epochs = epochs
+    
     # Functions to be applied to the data.
+    
     variability_func = lambda conf: np.std(conf)
     threshold_closeness_func = lambda conf: conf * (1 - conf)
     training_accuracy = defaultdict(float)
