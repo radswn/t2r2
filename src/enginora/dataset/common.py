@@ -7,7 +7,7 @@ import pandas as pd
 import yaml
 
 from enginora.metrics import get_metric, MetricsConfig
-from enginora.selector import get_selector, SelectorConfig
+from enginora.selector import get_selector, get_custom_selector, SelectorConfig
 from enginora.utils.mlflow import MlflowManager
 from enginora.utils.utils import Stage
 from enginora.utils.utils import flatten_dict
@@ -21,6 +21,7 @@ class DatasetConfig:
     has_header: bool
 
     def load_dataset(self) -> pd.DataFrame:
+<<<<<<< HEAD
         header = 0 if self.has_header else None
 
         df = pd.read_csv(self.dataset_path, header=header)
@@ -28,6 +29,11 @@ class DatasetConfig:
         df.columns = ["text", "label"]
 
         return df
+=======
+        # TODO: what columns should be accept as text/target (?)
+        # TODO: maybe create ids if not provided (?)
+        return pd.read_csv(self.dataset_path, header=None, names=["id", "text", "label"])[:10]
+>>>>>>> 7e869b9 (change method of handling custom selector)
 
 
 @dataclass
@@ -39,7 +45,11 @@ class DatasetConfigWithSelectors(DatasetConfig):
         df = super().load_dataset()
 
         for selector_config in self.selectors:
-            selector = get_selector(selector_config.name)(**selector_config.args)
+            if 'module_path' in selector_config.args:
+                selector = get_custom_selector(selector_config.args['module_path'], 
+                                               selector_config.name)(**selector_config.args)
+            else:
+                selector = get_selector(selector_config.name)(**selector_config.args)
             df = selector.select(df)
 
         return df

@@ -17,9 +17,8 @@ metrics:
 training:
   dataset_path: ../../data/featuresets/thedeep.subset.train.txt
   selectors:
-    - name: custom
+    - name: UserSelector
       args: 
-        class_name: UserSelector 
         module_path: ./user_selector.py
   batch_size: 2
   epochs: 2
