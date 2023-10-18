@@ -45,9 +45,10 @@ class DatasetConfigWithSelectors(DatasetConfig):
         df = super().load_dataset()
 
         for selector_config in self.selectors:
-            if 'module_path' in selector_config.args:
-                selector = get_custom_selector(selector_config.args['module_path'], 
-                                               selector_config.name)(**selector_config.args)
+            if "module_path" in selector_config.args:
+                selector = get_custom_selector(selector_config.args["module_path"], selector_config.name)(
+                    **selector_config.args
+                )
             else:
                 selector = get_selector(selector_config.name)(**selector_config.args)
             df = selector.select(df)

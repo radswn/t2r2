@@ -7,13 +7,11 @@ from enginora.selector.undersampling import RandomUnderSamplerSelector
 from importlib import util
 from os import path
 
+
 def get_selector(name: str) -> Type[Selector]:
-    selectors = {
-        "dummy": DummySelector,
-        "slicing": SlicingSelector,
-        "random_under_sampler": RandomUnderSamplerSelector
-    }
+    selectors = {"dummy": DummySelector, "slicing": SlicingSelector, "random_under_sampler": RandomUnderSamplerSelector}
     return selectors[name]
+
 
 def get_custom_selector(module_path: str, class_name: str) -> Type[Selector]:
     module_name, _ = path.splitext(path.basename(module_path))
