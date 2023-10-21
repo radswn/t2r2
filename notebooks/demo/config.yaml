@@ -15,11 +15,14 @@ metrics:
       average: macro
 
 training:
-  dataset_path: ../../data/featuresets/thedeep.subset.train.txt
+  dataset_path: ../../data/thedeep/train.txt
+  has_header: False
+  text_column_id: 1
+  label_column_id: 2
   selectors:
     - args: { }
       name: dummy
-  batch_size: 2
+  batch_size: 8
   epochs: 2
   learning_rate: 1e-3
   validation_size: 0.2
@@ -27,10 +30,16 @@ training:
   metric_for_best_model: f1_score
 
 testing:
-  dataset_path: ../../data/featuresets/thedeep.subset.test.txt
+  dataset_path: ../../data/thedeep/test.txt
+  has_header: False
+  text_column_id: 1
+  label_column_id: 2
   selectors: [ ]
   results_file: ./file_test_results.pickle
 
 control:
-  dataset_path: ../../data/featuresets/thedeep.subset.control.txt
+  dataset_path: ../../data/thedeep/control.txt
+  has_header: False
+  text_column_id: 1
+  label_column_id: 2
   results_file: ./file_control_results.pickle

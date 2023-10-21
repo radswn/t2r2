@@ -1,0 +1,34 @@
+random_state: 123
+
+model:
+  max_length: 256
+  model_name: distilbert-base-uncased
+  num_labels: 2
+  padding: max_length
+  return_tensors: pt
+  truncation: True
+
+metrics:
+  - name: f1_score
+  - name: balanced_accuracy
+
+training:
+  dataset_path: ../../../data/imdb/train.csv
+  selectors:
+    - args: { }
+      name: dummy
+  batch_size: 64
+  epochs: 5
+  learning_rate: 1e-4
+  validation_size: 0.2
+  output_dir: imdb_distilbert
+  metric_for_best_model: balanced_accuracy
+
+testing:
+  dataset_path: ../../../data/imdb/test.csv
+  selectors: [ ]
+  results_file: ./file_test_results.pickle
+
+control:
+  dataset_path: ../../../data/imdb/control.csv
+  results_file: ./file_control_results.pickle
