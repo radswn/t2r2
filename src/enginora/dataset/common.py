@@ -21,7 +21,6 @@ class DatasetConfig:
     has_header: bool
 
     def load_dataset(self) -> pd.DataFrame:
-<<<<<<< HEAD
         header = 0 if self.has_header else None
 
         df = pd.read_csv(self.dataset_path, header=header)
@@ -29,11 +28,6 @@ class DatasetConfig:
         df.columns = ["text", "label"]
 
         return df
-=======
-        # TODO: what columns should be accept as text/target (?)
-        # TODO: maybe create ids if not provided (?)
-        return pd.read_csv(self.dataset_path, header=None, names=["id", "text", "label"])[:10]
->>>>>>> 7e869b9 (change method of handling custom selector)
 
 
 @dataclass
@@ -45,6 +39,7 @@ class DatasetConfigWithSelectors(DatasetConfig):
         df = super().load_dataset()
 
         for selector_config in self.selectors:
+            selector_config.args["random_state"] = self.random_state
             if "module_path" in selector_config.args:
                 selector = get_custom_selector(selector_config.args["module_path"], selector_config.name)(
                     **selector_config.args
