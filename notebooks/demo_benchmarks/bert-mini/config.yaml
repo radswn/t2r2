@@ -1,0 +1,34 @@
+random_state: 123
+
+model:
+  max_length: 256
+  model_name: prajjwal1/bert-mini
+  num_labels: 2
+  padding: max_length
+  return_tensors: pt
+  truncation: True
+
+metrics:
+  - name: f1_score
+  - name: accuracy_score
+
+training:
+  dataset_path: ../../../data/rotten_tomatoes/train.csv
+  selectors:
+    - args: { }
+      name: dummy
+  batch_size: 32
+  epochs: 2
+  learning_rate: 1e-3
+  validation_size: 0.2
+  output_dir: rotten_tomatoes_bert_mini
+  metric_for_best_model: accuracy_score
+
+testing:
+  dataset_path: ../../../data/rotten_tomatoes/test.csv
+  selectors: [ ]
+  results_file: ./file_test_results.pickle
+
+control:
+  dataset_path: ../../../data/rotten_tomatoes/control.csv
+  results_file: ./file_control_results.pickle

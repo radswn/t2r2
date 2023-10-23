@@ -16,11 +16,18 @@ from enginora.utils.utils import flatten_dict
 @dataclass
 class DatasetConfig:
     dataset_path: str
+    text_column_id: int
+    label_column_id: int
+    has_header: bool
 
     def load_dataset(self) -> pd.DataFrame:
-        # TODO: what columns should be accept as text/target (?)
-        # TODO: maybe create ids if not provided (?)
-        return pd.read_csv(self.dataset_path, header=None, names=["id", "text", "label"])
+        header = 0 if self.has_header else None
+
+        df = pd.read_csv(self.dataset_path, header=header)
+        df = df.iloc[:, [self.text_column_id, self.label_column_id]]
+        df.columns = ["text", "label"]
+
+        return df
 
 
 @dataclass
@@ -35,6 +42,7 @@ class DatasetConfigWithSelectors(DatasetConfig):
             selector_config.args["random_state"] = self.random_state
             selector = get_selector(selector_config.name)(**selector_config.args)
             df = selector.select(df)
+
         return df
 
 
@@ -45,8 +53,8 @@ class WithMetrics:
     metrics: List[MetricsConfig] = None
     stage: Stage = field(init=False)
 
-    def compute_metrics(self, predictions) -> Dict[str, float]:
-        proba_predictions, predictions, true_labels = predictions[0], predictions[0].argmax(1), predictions[1]
+    def compute_metrics(self, outputs) -> Dict[str, float]:
+        proba_predictions, predictions, true_labels = outputs[0], outputs[0].argmax(1), outputs[1]
 
         # FIXME: wrong typing here!!!
         return flatten_dict(
@@ -59,6 +67,7 @@ class WithMetrics:
         )
 
     def save_results(self, results, mlflow_manager: MlflowManager):
+        # FIXME: error if directory (e.g. results/) doesn't exist
         with open(self.results_file, "wb") as file:
             pickle.dump(results, file)
 

@@ -6,7 +6,7 @@ from transformers import AutoTokenizer, AutoModelForSequenceClassification
 @dataclass
 class ModelConfig:
     model_name: str
-    num_labels: int
+    num_labels: int = 2
     max_length: int = 256
     padding: str = "max_length"
     truncation: bool = True
@@ -26,6 +26,7 @@ class ModelConfig:
             max_length=self.max_length,
             truncation=self.truncation,
             return_tensors=self.return_tensors,
+            return_token_type_ids=True,
         )
 
     def create_model(self):

@@ -9,6 +9,9 @@ from enginora.dataset.common import *
 @dataclass
 class TrainingConfig(DatasetConfigWithSelectors, WithMetrics):
     dataset_path: str = "./data/train.csv"
+    text_column_id: int = 0
+    label_column_id: int = 1
+    has_header: bool = True
     output_dir: str = "./results/"
     results_file: str = "./results/train_results.pickle"
     epochs: int = 1
@@ -28,7 +31,7 @@ class TrainingConfig(DatasetConfigWithSelectors, WithMetrics):
 
     def load_dataset(self) -> Tuple[pd.DataFrame, pd.DataFrame]:
         data = super().load_dataset()
-        X = data[["id", "text"]]
+        X = data["text"]
         y = data["label"]
 
         X_train, X_val, y_train, y_val = train_test_split(
