@@ -7,7 +7,7 @@ import pandas as pd
 import yaml
 
 from enginora.metrics import get_metric, MetricsConfig
-from enginora.selector import get_selector, SelectorConfig
+from enginora.selector import get_selector, get_custom_selector, SelectorConfig
 from enginora.utils.mlflow import MlflowManager
 from enginora.utils.utils import Stage
 from enginora.utils.utils import flatten_dict
@@ -40,7 +40,12 @@ class DatasetConfigWithSelectors(DatasetConfig):
 
         for selector_config in self.selectors:
             selector_config.args["random_state"] = self.random_state
-            selector = get_selector(selector_config.name)(**selector_config.args)
+            if "module_path" in selector_config.args:
+                selector = get_custom_selector(selector_config.args["module_path"], selector_config.name)(
+                    **selector_config.args
+                )
+            else:
+                selector = get_selector(selector_config.name)(**selector_config.args)
             df = selector.select(df)
 
         return df

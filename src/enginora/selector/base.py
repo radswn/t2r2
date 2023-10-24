@@ -18,7 +18,7 @@ class Selector(ABC):
 
 @dataclass
 class SelectorConfig:
-    """Abstract class for selectorCongigs for training, testing and control"""
+    """Abstract class for selectorConfigs for training, testing and control"""
 
     name: str
     args: Dict
