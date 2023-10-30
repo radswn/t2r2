@@ -53,4 +53,5 @@ class TrainingConfig(DatasetConfigWithSelectors, WithMetrics):
             load_best_model_at_end=True,
             metric_for_best_model=self.metric_for_best_model,
             num_train_epochs=self.epochs,
+            report_to=None,
         )
