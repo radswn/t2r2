@@ -1,3 +1,7 @@
+"""
+ Code partly copied from the Data Cartography repo: https://github.com/allenai/cartography.git
+ Based on: https://arxiv.org/abs/1812.05159
+ """
 import os
 import logging
 import tqdm
