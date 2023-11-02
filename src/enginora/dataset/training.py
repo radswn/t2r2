@@ -1,7 +1,7 @@
 from typing import List, Tuple
 
 from sklearn.model_selection import train_test_split
-from transformers import TrainerCallback
+from transformers import IntervalStrategy, TrainingArguments, TrainerCallback
 
 from enginora.dataset.common import *
 from enginora.utils.data_cartography.data_cartography import compute_data_cartography_metrics, visualize_data_cartography
@@ -12,6 +12,9 @@ from enginora.utils.save_predictions_callback import SavePredictionsCallback
 class TrainingConfig(DatasetConfigWithSelectors, WithMetrics):
     dataset_path: str = "./data/train.csv"
     validation_dataset_path: str = None
+    text_column_id: int = 0
+    label_column_id: int = 1
+    has_header: bool = True
     output_dir: str = "./results/"
     results_file: str = "train_results.pickle"
     epochs: int = 1
@@ -40,7 +43,7 @@ class TrainingConfig(DatasetConfigWithSelectors, WithMetrics):
 
     def load_dataset(self) -> Tuple[pd.DataFrame, pd.DataFrame]:
         data = super().load_dataset()
-        X = data[["id", "text"]]
+        X = data["text"]
         y = data["label"]
 
         if self.validation_dataset_path is None:
@@ -56,7 +59,7 @@ class TrainingConfig(DatasetConfigWithSelectors, WithMetrics):
             train_data = pd.concat([X, y], axis=1)
             val_data = pd.concat([X_val, y_val], axis=1)
         return train_data, val_data
-
+      
     def get_callbacks(self) -> List[TrainerCallback]:
         """Gets Callback which are passed to Trainer"""
         return list(self.callbacks)
@@ -83,3 +86,19 @@ class TrainingConfig(DatasetConfigWithSelectors, WithMetrics):
             pickle.dump(df_metrics_for_data_cartography, file)
 
         visualize_data_cartography(df_metrics_for_data_cartography, self.output_dir)
+
+    def get_training_args(self) -> TrainingArguments:
+        return TrainingArguments(
+            output_dir=self.output_dir,
+            learning_rate=self.learning_rate,
+            evaluation_strategy=IntervalStrategy.EPOCH,
+            save_strategy=IntervalStrategy.EPOCH,
+            logging_strategy=IntervalStrategy.EPOCH,
+            per_device_train_batch_size=self.batch_size,
+            per_device_eval_batch_size=self.batch_size,
+            load_best_model_at_end=True,
+            metric_for_best_model=self.metric_for_best_model,
+            num_train_epochs=self.epochs,
+            report_to=None,
+        )
+

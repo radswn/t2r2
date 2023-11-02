@@ -7,7 +7,7 @@ import pandas as pd
 import yaml
 
 from enginora.metrics import get_metric, MetricsConfig
-from enginora.selector import get_selector, SelectorConfig
+from enginora.selector import get_selector, get_custom_selector, SelectorConfig
 from enginora.utils.mlflow import MlflowManager
 from enginora.utils.utils import Stage
 from enginora.utils.utils import flatten_dict
@@ -16,11 +16,18 @@ from enginora.utils.utils import check_if_directory_exists
 @dataclass
 class DatasetConfig:
     dataset_path: str
+    text_column_id: int
+    label_column_id: int
+    has_header: bool
 
     def load_dataset(self) -> pd.DataFrame:
-        # TODO: what columns should be accept as text/target (?)
-        # TODO: maybe create ids if not provided (?)
-        return pd.read_csv(self.dataset_path, header=None, names=["id", "text", "label"])
+        header = 0 if self.has_header else None
+
+        df = pd.read_csv(self.dataset_path, header=header)
+        df = df.iloc[:, [self.text_column_id, self.label_column_id]]
+        df.columns = ["text", "label"]
+
+        return df
 
 
 @dataclass
@@ -33,8 +40,14 @@ class DatasetConfigWithSelectors(DatasetConfig):
 
         for selector_config in self.selectors:
             selector_config.args["random_state"] = self.random_state
-            selector = get_selector(selector_config.name)(**selector_config.args)
+            if "module_path" in selector_config.args:
+                selector = get_custom_selector(selector_config.args["module_path"], selector_config.name)(
+                    **selector_config.args
+                )
+            else:
+                selector = get_selector(selector_config.name)(**selector_config.args)
             df = selector.select(df)
+
         return df
 
 
@@ -45,8 +58,8 @@ class WithMetrics:
     metrics: List[MetricsConfig] = None
     stage: Stage = field(init=False)
 
-    def compute_metrics(self, predictions) -> MutableMapping:
-        proba_predictions, predictions, true_labels = predictions[0], predictions[0].argmax(1), predictions[1]
+    def compute_metrics(self, outputs) -> MutableMapping:
+        proba_predictions, predictions, true_labels = outputs[0], outputs[0].argmax(1), outputs[1]
 
         return flatten_dict(
             {
@@ -58,7 +71,9 @@ class WithMetrics:
         )
 
     def save_results(self, results, mlflow_manager: MlflowManager):
+
         check_if_directory_exists(self.results_file)
+  
         with open(self.results_file, "wb") as file:
             pickle.dump(results, file)
 

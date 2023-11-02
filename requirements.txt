@@ -7,3 +7,4 @@ imblearn==0.0
 snorkel==0.9.9
 textblob==0.17.1
 mlflow==2.5.0
+dvc==3.15.3
