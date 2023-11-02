@@ -11,7 +11,7 @@ from enginora.selector import get_selector, SelectorConfig
 from enginora.utils.mlflow import MlflowManager
 from enginora.utils.utils import Stage
 from enginora.utils.utils import flatten_dict
-
+from enginora.utils.utils import check_if_directory_exists
 
 @dataclass
 class DatasetConfig:
@@ -58,9 +58,7 @@ class WithMetrics:
         )
 
     def save_results(self, results, mlflow_manager: MlflowManager):
-        dirname = os.path.dirname(self.results_file)
-        if dirname:
-            os.makedirs(dirname, exist_ok=True)
+        check_if_directory_exists(self.results_file)
         with open(self.results_file, "wb") as file:
             pickle.dump(results, file)
 
@@ -78,9 +76,7 @@ class WithMetrics:
 
     def _dump_metrics(self, metrics):
         file_content = {}
-        dirname = os.path.dirname(self.metrics_file)
-        if dirname:
-            os.makedirs(dirname, exist_ok=True)
+        check_if_directory_exists(self.metrics_file)
 
         if os.path.exists(self.metrics_file):
             with open(self.metrics_file, "r") as file:
