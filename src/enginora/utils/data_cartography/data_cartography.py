@@ -133,7 +133,7 @@ def create_plot(
     dataframe, output_dir: str, hue_metric="correct.", title="data_cartography", model_name="model", show_hist=True
 ):
     # Subsample data to plot, so the plot is not too busy.
-    dataframe = dataframe.sample(n=25000 if dataframe.shape[0] > 25000 else len(dataframe))
+    dataframe = dataframe.sample(n=min(25000, len(dataframe)))
 
     # Normalize correctness to a value between 0 and 1.
     dataframe = dataframe.assign(corr_frac=lambda d: d.correctness / d.correctness.max())
