@@ -21,7 +21,6 @@ class TrainingConfig(DatasetConfigWithSelectors, WithMetrics):
     metric_for_best_model: str = "accuracy_score"
     perform_data_cartography: bool = False
     data_cartography_results: str = "./data_cartography_metrics.pickle"
-    callbacks: Tuple[TrainerCallback, ...] = ()
 
     def load_validation_dataset(self) -> pd.DataFrame:
         """Method for loading validation dataset if one exists"""
