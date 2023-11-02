@@ -27,7 +27,7 @@ class TrainingConfig(DatasetConfigWithSelectors, WithMetrics):
         """Method for loading validation dataset if one exists"""
         # TODO: what columns should be accept as text/target (?)
         # TODO: maybe create ids if not provided (?)
-        return pd.read_csv(self.validation_dataset_path, header=None, names=["id", "text", "label"])
+        return pd.read_csv(self.validation_dataset_path, header=None, names=["text", "label"])
 
     def __post_init__(self):
         self.stage = Stage.TRAINING
@@ -52,7 +52,7 @@ class TrainingConfig(DatasetConfigWithSelectors, WithMetrics):
             val_data = pd.concat([X_val, y_val], axis=1)
         else:
             val_data = self.load_validation_dataset()
-            X_val = val_data[["id", "text"]]
+            X_val = val_data["text"]
             y_val = val_data["label"]
             train_data = pd.concat([X, y], axis=1)
             val_data = pd.concat([X_val, y_val], axis=1)
