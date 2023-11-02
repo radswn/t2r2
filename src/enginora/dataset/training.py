@@ -4,7 +4,7 @@ from sklearn.model_selection import train_test_split
 from transformers import TrainerCallback
 
 from enginora.dataset.common import *
-from enginora.utils.data_cartography.data_cartography import compute_data_cartography_metrics, create_plot
+from enginora.utils.data_cartography.data_cartography import compute_data_cartography_metrics, visualize_data_cartography
 from enginora.utils.save_predictions_callback import SavePredictionsCallback
 
 
@@ -83,4 +83,4 @@ class TrainingConfig(DatasetConfigWithSelectors, WithMetrics):
         with open(self.data_cartography_results, "wb") as file:
             pickle.dump(df_metrics_for_data_cartography, file)
 
-        create_plot(df_metrics_for_data_cartography, self.output_dir)
+        visualize_data_cartography(df_metrics_for_data_cartography, self.output_dir)

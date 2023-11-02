@@ -129,7 +129,7 @@ def compute_data_cartography_metrics(predictions, labels, epochs):
     return df
 
 
-def create_plot(
+def visualize_data_cartography(
     dataframe, output_dir: str, hue_metric="correct.", title="data_cartography", model_name="model", show_hist=True
 ):
     # Subsample data to plot, so the plot is not too busy.
