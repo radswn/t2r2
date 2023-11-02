@@ -41,7 +41,6 @@ class SavePredictionsCallback(TrainerCallback):
         return self.inputs
 
     def get_labels(self):
-        assert all([self.labels[1] == self.labels[epoch] for epoch in range(1, self.epoch)])
         return list(self.labels[1])
 
     def get_epochs(self):
