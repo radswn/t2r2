@@ -48,8 +48,6 @@ class WithMetrics:
     def compute_metrics(self, predictions) -> MutableMapping:
         proba_predictions, predictions, true_labels = predictions[0], predictions[0].argmax(1), predictions[1]
 
-        # FIXME: wrong typing here!!!
-        # TODO: save proba etc by epoch
         return flatten_dict(
             {
                 metric.name: get_metric(metric.name)(

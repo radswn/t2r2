@@ -166,8 +166,3 @@ def get_trainer(training_config: TrainingConfig, datasets: Dict[str, TextDataset
         args=get_training_args(training_config),
         callbacks=training_config.get_callbacks(),
     )
-
-
-# TODO: DELETE THIS - NINA
-if __name__ == "__main__":
-    loop("C:/Users/ismyn/UNI/enginora/enginora/notebooks/demo_data_cartography/config_run_data_cartography.yaml")

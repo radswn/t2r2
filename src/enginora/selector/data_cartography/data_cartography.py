@@ -39,14 +39,10 @@ class DataCartographySelector(Selector):
         df_sorted_variability = df.sort_values(by="variability", ascending=False)
         df_sorted_correctness = df.sort_values(by="correctness", ascending=False)
 
-        # Select the top 50% of records with the highest variability
-
         easy_indices = df_sorted_variability.index[:ambiguous_sample_size] if easy_sample_size else []
 
-        # Select the bottom 10% of records with the lowest correctness
         hard_indices = df_sorted_correctness.index[-hard_sample_size:] if hard_sample_size else []
 
-        # Select the top 30% of records with the highest correctness
         ambiguous_indices = df_sorted_correctness.index[:easy_sample_size] if ambiguous_sample_size else []
 
         random_indices = (
