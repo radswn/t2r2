@@ -4,6 +4,9 @@ from enginora.dataset.common import *
 @dataclass
 class TestConfig(DatasetConfigWithSelectors, WithMetrics):
     dataset_path: str = "./data/test.csv"
+    text_column_id: int = 0
+    label_column_id: int = 1
+    has_header: bool = True
     results_file: str = "./results/test_results.pickle"
 
     def __post_init__(self):

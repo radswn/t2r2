@@ -9,7 +9,34 @@ BSc thesis project
 
 ## Quick start
 
-*TODO*
+### Implement your own selector
+
+We give you an opportunity to use your own selectors.
+
+1. Prepare a class you want to use - it should inherit from `Selector` class from `enginora.selector`. Implement its `select` method.
+2. When declarating your own selector - provide `module_path` as one of the arguments.
+
+Below we present a simple example how to do it.
+
+`config.yaml` part
+
+```
+  selectors:
+    - name: UserSelector
+      args: 
+        module_path: ./my_selector.py
+```
+
+`my_selector.py` code
+
+```
+import pandas as pd
+from enginora.selector import Selector
+
+class UserSelector(Selector):
+    def select(self, dataset: pd.DataFrame) -> pd.DataFrame:
+        return dataset[:5]
+```
 
 ## Development setup - devcontainers
 
@@ -78,7 +105,17 @@ First, install Visual Studio Code either
 * manually from https://code.visualstudio.com/download or
 * `winget install -e --id Microsoft.VisualStudioCode`   
 
-Then, install required extensions listed in `.\vscode\extensions.json`. VSC should automatically prompt to install them as soon as the project is opened.
+Then, install required extensions:
+```json
+{
+    "recommendations": [
+        "ms-vscode-remote.vscode-remote-extensionpack",
+        "ms-azuretools.vscode-docker"
+    ]
+}
+```
+You can put them in `.\vscode\extensions.json`. 
+Then VSC should automatically prompt to install them as soon as the project is opened.
 
 ### Optional - enable CUDA in containers
 
