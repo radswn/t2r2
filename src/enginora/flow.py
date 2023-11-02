@@ -184,5 +184,5 @@ def get_trainer(training_config: TrainingConfig, datasets: Dict[str, TextDataset
         eval_dataset=datasets["validation"],
         compute_metrics=training_config.compute_metrics,
         args=training_config.get_training_args(),
-        callbacks=training_config.get_callbacks()
+        callbacks=training_config.get_callbacks(),
     )

@@ -4,7 +4,10 @@ from sklearn.model_selection import train_test_split
 from transformers import IntervalStrategy, TrainingArguments, TrainerCallback
 
 from enginora.dataset.common import *
-from enginora.utils.data_cartography.data_cartography import compute_data_cartography_metrics, visualize_data_cartography
+from enginora.utils.data_cartography.data_cartography import (
+    compute_data_cartography_metrics,
+    visualize_data_cartography,
+)
 from enginora.utils.save_predictions_callback import SavePredictionsCallback
 
 
@@ -59,7 +62,7 @@ class TrainingConfig(DatasetConfigWithSelectors, WithMetrics):
             train_data = pd.concat([X, y], axis=1)
             val_data = pd.concat([X_val, y_val], axis=1)
         return train_data, val_data
-      
+
     def get_callbacks(self) -> List[TrainerCallback]:
         """Gets Callback which are passed to Trainer"""
         return list(self.callbacks)
@@ -101,4 +104,3 @@ class TrainingConfig(DatasetConfigWithSelectors, WithMetrics):
             num_train_epochs=self.epochs,
             report_to=None,
         )
-

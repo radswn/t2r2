@@ -13,6 +13,7 @@ from enginora.utils.utils import Stage
 from enginora.utils.utils import flatten_dict
 from enginora.utils.utils import check_if_directory_exists
 
+
 @dataclass
 class DatasetConfig:
     dataset_path: str
@@ -71,9 +72,8 @@ class WithMetrics:
         )
 
     def save_results(self, results, mlflow_manager: MlflowManager):
-
         check_if_directory_exists(self.results_file)
-  
+
         with open(self.results_file, "wb") as file:
             pickle.dump(results, file)
 
