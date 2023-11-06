@@ -235,8 +235,8 @@ def visualize_data_cartography(
 
     os.makedirs(f"{output_dir}/figures/", exist_ok=True)
     filename = (
-        f"{output_dir}/figures/{title}_{model_name}.pdf"
+        f"{output_dir}/figures/{title}_{model_name}.png"
         if show_hist
-        else f"{output_dir}/figures/compact_{title}_{model_name}.pdf"
+        else f"{output_dir}/figures/compact_{title}_{model_name}.png"
     )
     fig.savefig(filename, dpi=300)
