@@ -15,13 +15,13 @@ from enginora.selector.slicing.default_slicing_functions import short, textblob_
 
 
 class SlicingSelector(Selector):
-    def __init__(self, result_file: str, list_of_slicing_functions=None):
+    def __init__(self, result_file: str, list_of_slicing_functions=None, **kwargs):
         super().__init__()
         self.sfs = self.create_list_of_slicing_functions(list_of_slicing_functions)
         self.result_file = result_file
 
     def select(self, dataset: pd.DataFrame) -> pd.DataFrame:
-        # TODO: thinking about slicing in general: I highly doubt that is is truly a selector...
+        # NIT: thinking about slicing in general: I highly doubt that is is truly a selector...
         if not len(self.sfs) == 0:
             res = self.create_slicing_functions(dataset)
             res.dump(self.result_file)

@@ -4,7 +4,7 @@ import mlflow
 import torch
 import yaml
 from torch.utils.data.dataset import Dataset
-from transformers import Trainer
+from transformers import IntervalStrategy, Trainer, TrainingArguments
 
 from enginora.dataset import ControlConfig, TestConfig, TrainingConfig
 from enginora.model import ModelConfig
@@ -184,4 +184,5 @@ def get_trainer(training_config: TrainingConfig, datasets: Dict[str, TextDataset
         eval_dataset=datasets["validation"],
         compute_metrics=training_config.compute_metrics,
         args=training_config.get_training_args(),
+        callbacks=training_config.get_callbacks(),
     )

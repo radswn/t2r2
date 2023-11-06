@@ -1,0 +1,43 @@
+# demo configuration
+random_state: 123
+
+model:
+  max_length: 256
+  model_name: bert-base-cased
+  num_labels: 12
+  padding: max_length
+  return_tensors: pt
+  truncation: True
+
+metrics:
+  - name: f1_score
+    args:
+      average: macro
+
+training:
+  dataset_path: ../../data/featuresets/thedeep.subset.train.txt
+  validation_dataset_path: ../../data/featuresets/thedeep.subset.validation.txt
+  text_column_id: 1
+  label_column_id: 2
+  selectors:
+    - args: { }
+      name: dummy
+  batch_size: 2
+  epochs: 7
+  learning_rate: 1e-3
+  metric_for_best_model: f1_score
+  perform_data_cartography: True
+
+
+testing:
+  dataset_path: ../../data/featuresets/thedeep.subset.test.txt
+  text_column_id: 1
+  label_column_id: 2
+  selectors: [ ]
+  results_file: ./file_test_results.pickle
+
+control:
+  dataset_path: ../../data/featuresets/thedeep.subset.control.txt
+  text_column_id: 1
+  label_column_id: 2
+  results_file: ./file_control_results.pickle

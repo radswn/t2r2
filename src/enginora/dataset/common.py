@@ -1,7 +1,7 @@
 import os.path
 import pickle
 from dataclasses import dataclass, field
-from typing import List, Dict
+from typing import Dict, List, MutableMapping, Union
 
 import pandas as pd
 import yaml
@@ -11,6 +11,7 @@ from enginora.selector import get_selector, get_custom_selector, SelectorConfig
 from enginora.utils.mlflow import MlflowManager
 from enginora.utils.utils import Stage
 from enginora.utils.utils import flatten_dict
+from enginora.utils.utils import check_if_directory_exists
 
 
 @dataclass
@@ -58,10 +59,9 @@ class WithMetrics:
     metrics: List[MetricsConfig] = None
     stage: Stage = field(init=False)
 
-    def compute_metrics(self, outputs) -> Dict[str, float]:
+    def compute_metrics(self, outputs) -> MutableMapping:
         proba_predictions, predictions, true_labels = outputs[0], outputs[0].argmax(1), outputs[1]
 
-        # FIXME: wrong typing here!!!
         return flatten_dict(
             {
                 metric.name: get_metric(metric.name)(
@@ -72,7 +72,8 @@ class WithMetrics:
         )
 
     def save_results(self, results, mlflow_manager: MlflowManager):
-        # FIXME: error if directory (e.g. results/) doesn't exist
+        check_if_directory_exists(self.results_file)
+
         with open(self.results_file, "wb") as file:
             pickle.dump(results, file)
 
@@ -90,6 +91,8 @@ class WithMetrics:
 
     def _dump_metrics(self, metrics):
         file_content = {}
+        check_if_directory_exists(self.metrics_file)
+
         if os.path.exists(self.metrics_file):
             with open(self.metrics_file, "r") as file:
                 file_content = yaml.safe_load(file)

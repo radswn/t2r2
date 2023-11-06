@@ -1,6 +1,7 @@
 import logging
 import os
 from dataclasses import dataclass
+from typing import Dict
 
 import mlflow
 import pandas as pd
@@ -50,7 +51,7 @@ class MlflowManager(metaclass=Singleton):
         mlflow.log_metrics(metrics)
         self.logger.info("mlflow: logging metrics :" + " ".join(list(metrics.keys())))
 
-    def log_data(self, data: dict[str, pd.DataFrame]):
+    def log_data(self, data: Dict[str, pd.DataFrame]):
         for key, value in data.items():
             mlflow.log_input(mlflow.data.from_pandas(value), context=key)
         self.logger.info("mlflow: Dataset logged")
@@ -64,7 +65,7 @@ class MlflowManager(metaclass=Singleton):
         mlflow.set_tracking_uri(self.tracking_uri)
         self.logger.info("mlflow: Tracking uri set")
 
-    def log_dataset_synopsis(self, data: dict[str, pd.DataFrame]):
+    def log_dataset_synopsis(self, data: Dict[str, pd.DataFrame]):
         """working for csv only right now"""
         for dataset_name, dataset_df in data.items():
             dataset_df.describe().to_html(f"dataset_{dataset_name}.html")

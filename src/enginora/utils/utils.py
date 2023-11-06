@@ -61,3 +61,10 @@ class Stage(enum.Enum):
     VALIDATION = "validation"
     TESTING = "test"
     CONTROL = "control"
+
+
+def check_if_directory_exists(output_path: str):
+    """Checks if directory exists, if not creates it"""
+    dirname = os.path.dirname(output_path)
+    if dirname:
+        os.makedirs(dirname, exist_ok=True)
