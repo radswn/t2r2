@@ -1,5 +1,5 @@
 {
-    "name": "Enginora Project",
+    "name": "T2R2 Project",
 
     "build": {
         "context": "..",
@@ -13,7 +13,7 @@
 
     "runArgs": [
         "--name",
-        "enginora_project"
+        "t2r2"
     ],
 
     "customizations": {

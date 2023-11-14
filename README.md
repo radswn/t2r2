@@ -1,7 +1,7 @@
-# enginora
+# Train, test, record, repeat - incremental environment for testing AI models
 BSc thesis project 
 
-[![Open in Dev Containers](https://img.shields.io/static/v1?label=Dev%20Containers&message=Open&color=blue&logo=visualstudiocode)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/radswn/enginora)
+[![Open in Dev Containers](https://img.shields.io/static/v1?label=Dev%20Containers&message=Open&color=blue&logo=visualstudiocode)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/radswn/t2r2)
 
 ## Description
 
@@ -13,7 +13,7 @@ BSc thesis project
 
 We give you an opportunity to use your own selectors.
 
-1. Prepare a class you want to use - it should inherit from `Selector` class from `enginora.selector`. Implement its `select` method.
+1. Prepare a class you want to use - it should inherit from `Selector` class from `t2r2.selector`. Implement its `select` method.
 2. When declarating your own selector - provide `module_path` as one of the arguments.
 
 Below we present a simple example how to do it.
@@ -31,7 +31,7 @@ Below we present a simple example how to do it.
 
 ```
 import pandas as pd
-from enginora.selector import Selector
+from t2r2.selector import Selector
 
 class UserSelector(Selector):
     def select(self, dataset: pd.DataFrame) -> pd.DataFrame:
@@ -75,7 +75,7 @@ If you encounter `fatal: could not open '.git/COMMIT_EDITMSG': Permission denied
 To test that your WSL and git are working
 
 * (in Powershell) restart WSL to make sure the changes are applied: `wsl --shutdown`
-* (in WSL) clone this repo: `git clone https://github.com/radswn/enginora.git`
+* (in WSL) clone this repo: `git clone https://github.com/radswn/t2r2.git`
 
 If something doesn't work at the end of the setup and some time passed, consider reinstalling WSL2 to make sure you are using latest versions.
 
@@ -150,7 +150,7 @@ When opening, VS Code should automatically prompt with an option to *Reopen fold
 
 If running for the first time, it will take several minutes to build the image and start the container. Click `show logs` to monitor the process.
 
-If no errors appear (bold assumption), a new window should open with *Dev Container: Enginora project* in the bottom-left corner.
+If no errors appear (bold assumption), a new window should open with *Dev Container: T2R2 project* in the bottom-left corner.
 
 ### Notes on further use and image rebuilding
 
