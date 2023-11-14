@@ -107,8 +107,10 @@ def get_configurations(
     random_state = configuration.get("random_state", 123)
     configuration["training"]["random_state"] = random_state
     configuration["testing"]["random_state"] = random_state
+    
+    device = configuration.get("device", "cuda" if torch.cuda.is_available() else "cpu")
 
-    set_seed(random_state)
+    set_seed_and_device(random_state, device)
 
     metrics = configuration["metrics"]
     for config in ["training", "testing", "control"]:
@@ -128,10 +130,16 @@ def get_configurations(
     return model_config, training_config, test_config, control_config, mlflow_config, dvc_config
 
 
-def set_seed(random_state: int):
+def set_seed_and_device(random_state: int, device: str):
     torch.manual_seed(random_state)
     torch.cuda.manual_seed_all(random_state)
     torch.backends.cudnn.deterministic = True
+    if device == "cuda" and torch.cuda.is_available():
+        torch.set_default_tensor_type('torch.cuda.FloatTensor')
+        torch.cuda.set_device("cuda")
+        print("[T2R2] Torch device set to CUDA.")
+    elif device == "cuda" and not torch.cuda.is_available():
+        print("[T2R2] CUDA not available.")
 
 
 class TextDataset(Dataset):
