@@ -108,9 +108,9 @@ def get_configurations(
     random_state = configuration.get("random_state", 123)
     configuration["training"]["random_state"] = random_state
     configuration["testing"]["random_state"] = random_state
-    
+
     device = configuration.get("device", "cuda:0" if torch.cuda.is_available() else None)
-   
+
     set_seed_and_device(random_state, device)
 
     metrics = configuration["metrics"]
@@ -136,7 +136,7 @@ def set_seed_and_device(random_state: int, device: str):
     torch.cuda.manual_seed_all(random_state)
     torch.backends.cudnn.deterministic = True
     if device and torch.cuda.is_available():
-        torch.set_default_tensor_type('torch.cuda.FloatTensor')
+        torch.set_default_tensor_type("torch.cuda.FloatTensor")
         torch.cuda.set_device(device)
         print("[T2R2] Torch device set to CUDA.")
     elif device and not torch.cuda.is_available():
