@@ -9,6 +9,19 @@ BSc thesis project
 
 ## Quick start
 
+### Choose your pytorch device
+
+In `config.yaml` you may add a parameter `device` and set it to `cuda:X` where X would be a GPU that you want to use.
+
+e.g.
+```
+  device: cuda:0
+  
+  model:
+    model_name: ...
+    [...]
+```
+
 ### Implement your own selector
 
 We give you an opportunity to use your own selectors.
