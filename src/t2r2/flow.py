@@ -39,6 +39,7 @@ def dvc_params(config_path="./config.yaml"):
 def get_metrics(config_path="./config.yaml") -> List[Dict]:
     _, train_config, test_config, control_config, _, _ = get_configurations(config_path)
     deduplicated_metrics = {
+        # FIXME is it supposed to be "train_config" everywhere?
         train_config.metrics_file: train_config,
         test_config.metrics_file: train_config,
         control_config.metrics_file: train_config,
@@ -108,8 +109,8 @@ def get_configurations(
     configuration["training"]["random_state"] = random_state
     configuration["testing"]["random_state"] = random_state
     
-    device = configuration.get("device", "cuda" if torch.cuda.is_available() else "cpu")
-
+    device = configuration.get("device", "cuda:0" if torch.cuda.is_available() else None)
+   
     set_seed_and_device(random_state, device)
 
     metrics = configuration["metrics"]
@@ -134,11 +135,11 @@ def set_seed_and_device(random_state: int, device: str):
     torch.manual_seed(random_state)
     torch.cuda.manual_seed_all(random_state)
     torch.backends.cudnn.deterministic = True
-    if device == "cuda" and torch.cuda.is_available():
+    if device and torch.cuda.is_available():
         torch.set_default_tensor_type('torch.cuda.FloatTensor')
-        torch.cuda.set_device("cuda")
+        torch.cuda.set_device(device)
         print("[T2R2] Torch device set to CUDA.")
-    elif device == "cuda" and not torch.cuda.is_available():
+    elif device and not torch.cuda.is_available():
         print("[T2R2] CUDA not available.")
 
 
@@ -181,7 +182,6 @@ def get_datasets(
 
     tokens = {dataset_type: tokenizer(dataset["text"].tolist()) for dataset_type, dataset in data.items()}
     labels = {dataset_type: torch.tensor(dataset["label"].tolist()) for dataset_type, dataset in data.items()}
-    print(type(labels['train']))
     return {dataset_type: TextDataset(tokens[dataset_type], labels[dataset_type]) for dataset_type in data.keys()}
 
 
