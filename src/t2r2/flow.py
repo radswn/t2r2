@@ -136,8 +136,7 @@ def set_seed_and_device(random_state: int, device: str):
     torch.cuda.manual_seed_all(random_state)
     torch.backends.cudnn.deterministic = True
     if device and torch.cuda.is_available():
-        torch.set_default_tensor_type("torch.cuda.FloatTensor")
-        torch.cuda.set_device(device)
+        torch.set_default_device(device)
         print("[T2R2] Torch device set to CUDA.")
     elif device and not torch.cuda.is_available():
         print("[T2R2] CUDA not available.")
