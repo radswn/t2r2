@@ -109,7 +109,7 @@ def get_configurations(
     configuration["training"]["random_state"] = random_state
     configuration["testing"]["random_state"] = random_state
 
-    device = configuration.get("device", "cuda:0" if torch.cuda.is_available() else None)
+    device = configuration.get("device", None)
 
     set_seed_and_device(random_state, device)
 
