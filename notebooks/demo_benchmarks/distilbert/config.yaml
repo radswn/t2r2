@@ -13,6 +13,7 @@ metrics:
 
 training:
   dataset_path: ../../../data/imdb/train.csv
+  output_dir: imdb_distilbert_results
   selectors:
     - args: { }
       name: dummy
@@ -25,9 +26,11 @@ training:
 
 testing:
   dataset_path: ../../../data/imdb/test.csv
+  output_dir: imdb_distilbert_results
   selectors: [ ]
   results_file: ./file_test_results.pickle
 
 control:
   dataset_path: ../../../data/imdb/control.csv
+  output_dir: imdb_distilbert_results
   results_file: ./file_control_results.pickle
