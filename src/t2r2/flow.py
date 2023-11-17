@@ -63,9 +63,7 @@ def loop(config_path="./config.yaml") -> Dict:
         mlflow_manager = MlflowManager(config.mlflow)
         experiment_id = mlflow_manager.mlflow_create_experiment()
         with mlflow.start_run(experiment_id=experiment_id) as run:
-            train_results, test_results, control_results = train_and_test(
-                model, tokenizer, config, mlflow_manager
-            )
+            train_results, test_results, control_results = train_and_test(model, tokenizer, config, mlflow_manager)
     else:
         train_results, test_results, control_results = train_and_test(model, tokenizer, config)
 
@@ -76,6 +74,7 @@ def loop(config_path="./config.yaml") -> Dict:
         "test_results": test_results,
         "control_results": control_results,
     }
+
 
 @dataclass
 class Config:
@@ -109,7 +108,8 @@ class Config:
             check_metric(metric)
             metric_names.append(metric.name)
 
-        assert self.training.metric_for_best_model in metric_names
+        if self.training.metric_for_best_model not in metric_names and self.training.metric_for_best_model != "loss":
+            raise ValueError(f"metric for best model is not defined in metrics")
 
     def _propagate_metrics(self):
         self.training["metrics"] = self.metrics

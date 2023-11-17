@@ -3,6 +3,7 @@ import pytest
 from t2r2.flow import check_metric
 from t2r2.metrics import MetricsConfig
 
+
 def test_valid_metric():
     metric_dict = {"name": "accuracy_score", "args": {"normalize": True}}
     metric = MetricsConfig(**metric_dict)

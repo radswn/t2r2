@@ -24,7 +24,7 @@ class TrainingConfig(DatasetConfigWithSelectors, WithMetrics):
     batch_size: int = 32
     learning_rate: float = 0.01
     validation_size: float = 0.2
-    metric_for_best_model: str = "accuracy_score"
+    metric_for_best_model: str = "loss"
     perform_data_cartography: bool = False
     data_cartography_results: str = "./data_cartography_metrics.pickle"
 
