@@ -1,11 +1,15 @@
-from typing import Dict, List, Tuple
+from typing import Dict, List, Any
+from dataclasses import dataclass
 
+import sklearn
 import mlflow
 import torch
 import yaml
-from torch.utils.data.dataset import Dataset
-from transformers import IntervalStrategy, Trainer, TrainingArguments
 
+from torch.utils.data.dataset import Dataset
+from transformers import Trainer
+
+from t2r2.metrics import get_metric, MetricsConfig
 from t2r2.dataset import ControlConfig, TestConfig, TrainingConfig
 from t2r2.model import ModelConfig
 from t2r2.utils import repo
@@ -19,9 +23,10 @@ def init(config_path="./config.yaml"):
     Always store metrics for experiment tracking.
     Storing datasets, results and model is optional.
     """
-    _, training_config, test_config, control_config, _, dvc_config = get_configurations(config_path)
-    if dvc_config.enabled:
-        repo.init(config_path, [training_config.metrics_file, test_config.metrics_file, control_config.metrics_file])
+    config = get_config(config_path)
+
+    if config.dvc:
+        repo.init(config_path, [config.training.metrics_file, config.testing.metrics_file, config.control.metrics_file])
 
 
 def dvc_checkout(config_path="./config.yaml"):
@@ -37,36 +42,36 @@ def dvc_params(config_path="./config.yaml"):
 
 
 def get_metrics(config_path="./config.yaml") -> List[Dict]:
-    _, train_config, test_config, control_config, _, _ = get_configurations(config_path)
+    config = get_config(config_path)
+
     deduplicated_metrics = {
-        train_config.metrics_file: train_config,
-        test_config.metrics_file: train_config,
-        control_config.metrics_file: train_config,
+        config.training.metrics_file: config.training,
+        config.testing.metrics_file: config.testing,
+        config.control.metrics_file: config.control,
     }
-    return [cfg.load_metrics() for cfg in deduplicated_metrics]
+
+    return [cfg.load_metrics() for cfg in deduplicated_metrics.values()]
 
 
 def loop(config_path="./config.yaml") -> Dict:
-    model_config, training_config, test_config, control_config, mlflow_config, dvc_config = get_configurations(
-        config_path
-    )
+    config = get_config(config_path)
 
-    tokenizer = model_config.create_tokenizer()
-    model = model_config.create_model()
+    tokenizer = config.model.create_tokenizer()
+    model = config.model.create_model()
 
-    if mlflow_config is not None:
-        mlflow_manager = MlflowManager(mlflow_config)
+    if config.mlflow:
+        mlflow_manager = MlflowManager(config.mlflow)
         experiment_id = mlflow_manager.mlflow_create_experiment()
         with mlflow.start_run(experiment_id=experiment_id) as run:
             train_results, test_results, control_results = train_and_test(
-                model, tokenizer, training_config, test_config, control_config, mlflow_manager
+                model, tokenizer, config.training, config.testing, config.control, mlflow_manager
             )
     else:
         train_results, test_results, control_results = train_and_test(
-            model, tokenizer, training_config, test_config, control_config
+            model, tokenizer, config.training, config.testing, config.control
         )
 
-    dvc_config.add(config_path, training_config, test_config, control_config, model_config)
+    config.dvc.add(config_path, config.training, config.testing, config.control, config.model)
 
     return {
         "train_results": train_results,
@@ -98,39 +103,85 @@ def train_and_test(
     return train_results.metrics, test_results.metrics, control_results.metrics
 
 
-def get_configurations(
-    path: str,
-) -> Tuple[ModelConfig, TrainingConfig, TestConfig, ControlConfig, MlFlowConfig, DvcConfig]:
+@dataclass
+class Config:
+    model: ModelConfig
+    metrics: List[Dict[str, Any]]
+    training: TrainingConfig
+    testing: TestConfig
+    control: ControlConfig
+    random_state: int = None
+    mlflow: MlFlowConfig = None
+    dvc: DvcConfig = None
+
+    def __post_init__(self):
+        self.metrics = [] if self.metrics is None else [MetricsConfig(**m) for m in self.metrics]
+        self._propagate_metrics()
+        self._propagate_random_state()
+
+        self.model = ModelConfig(**self.model)
+        self.training = TrainingConfig(**self.training)
+        self.control = ControlConfig(**self.control)
+        self.testing = TestConfig(**self.testing)
+        self.mlflow = MlFlowConfig(**self.mlflow) if self.mlflow else None
+        self.dvc = DvcConfig(**self.dvc) if self.dvc else DvcConfig()
+
+        self._verify()
+
+    def _verify(self):
+        metric_names = []
+
+        for metric in self.metrics:
+            check_metric(metric)
+            metric_names.append(metric.name)
+
+        assert self.training.metric_for_best_model in metric_names
+
+    def _propagate_metrics(self):
+        self.training["metrics"] = self.metrics
+        self.control["metrics"] = self.metrics
+        self.testing["metrics"] = self.metrics
+
+    def _propagate_random_state(self):
+        self.training["random_state"] = self.random_state
+        self.testing["random_state"] = self.random_state
+
+        if self.mlflow:
+            self.mlflow["random_state"] = self.random_state
+
+
+def check_metric(metric: MetricsConfig):
+    m_name = metric.name
+    try:
+        _ = get_metric(m_name)([0, 0], [0, 1], **metric.args)
+    except KeyError:
+        handle_wrong_metric_name(m_name)
+
+
+def handle_wrong_metric_name(metric_name: str):
+    if metric_name in dir(sklearn.metrics):
+        error_msg = f"metric {metric_name} not handled by T2R2"
+    else:
+        error_msg = f"metric {metric_name} does not exist"
+
+    raise ValueError(error_msg)
+
+
+def get_config(path: str) -> Config:
+    config_dict = load_config(path)
+    config = Config(**config_dict)
+
+    if config.random_state is not None:
+        set_seed(config.random_state)
+
+    return config
+
+
+def load_config(path: str) -> Dict:
     with open(path, "r") as stream:
-        configuration = yaml.safe_load(stream)
+        config_dict = yaml.safe_load(stream)
 
-    random_state = configuration.get("random_state", 123)
-    configuration["training"]["random_state"] = random_state
-    configuration["testing"]["random_state"] = random_state
-
-    set_seed(random_state)
-
-    metrics = configuration["metrics"]
-    for config in ["training", "testing", "control"]:
-        configuration[config]["metrics"] = metrics
-
-    model_config = ModelConfig(**configuration["model"])
-    training_config = TrainingConfig(**configuration["training"])
-    test_config = TestConfig(**configuration["testing"])
-    control_config = ControlConfig(**configuration["control"])
-
-    data_dir = configuration.get("data_dir", "./data/")
-    training_config.dataset_path = data_dir + training_config.dataset_path
-    test_config.dataset_path = data_dir + test_config.dataset_path
-    control_config.dataset_path = data_dir + control_config.dataset_path
-
-    mlflow_config = None
-    if "mlflow" in configuration:
-        configuration["mlflow"]["random_state"] = random_state
-        mlflow_config = MlFlowConfig(**configuration["mlflow"])
-    dvc_config = DvcConfig() if "dvc" not in configuration else DvcConfig(**configuration["dvc"])
-
-    return model_config, training_config, test_config, control_config, mlflow_config, dvc_config
+    return config_dict
 
 
 def set_seed(random_state: int):

@@ -1,7 +1,7 @@
 import os.path
 import pickle
 from dataclasses import dataclass, field
-from typing import Dict, List, MutableMapping, Union
+from typing import Dict, List, MutableMapping
 
 import pandas as pd
 import yaml

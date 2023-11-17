@@ -12,4 +12,3 @@ class TestConfig(DatasetConfigWithSelectors, WithMetrics):
     def __post_init__(self):
         self.stage = Stage.TESTING
         self.selectors = [] if self.selectors is None else [SelectorConfig(**t) for t in self.selectors]
-        self.metrics = [] if self.metrics is None else [MetricsConfig(**m) for m in self.metrics]
