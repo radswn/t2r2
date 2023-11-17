@@ -17,7 +17,7 @@ def ignore_unmatched_kwargs(f):
     """
     Make function ignore unmatched kwargs.
 
-    If the function already has the catch all **kwargs, do nothing.
+    If the function already has the catch-all **kwargs, do nothing.
     """
     if contains_var_kwarg(f):
         return f
@@ -65,6 +65,6 @@ class Stage(enum.Enum):
 
 def check_if_directory_exists(output_path: str):
     """Checks if directory exists, if not creates it"""
-    dirname = os.path.dirname(output_path)
-    if dirname:
-        os.makedirs(dirname, exist_ok=True)
+    dir_name = os.path.dirname(output_path)
+    if dir_name:
+        os.makedirs(dir_name, exist_ok=True)

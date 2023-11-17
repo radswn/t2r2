@@ -18,7 +18,6 @@ class TrainingConfig(DatasetConfigWithSelectors, WithMetrics):
     text_column_id: int = 0
     label_column_id: int = 1
     has_header: bool = True
-    output_dir: str = "./results/"
     results_file: str = "train_results.pickle"
     epochs: int = 1
     batch_size: int = 32
