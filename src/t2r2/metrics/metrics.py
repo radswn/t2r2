@@ -49,7 +49,7 @@ def get_metric(name: str):
         "slicing_scores": slicing_scores,
         "multilabel_confusion_matrix": multilabel_confusion_matrix,
     }
-    # I would keep unmatched kwargs and raise an exception instead
+    # I would keep unmatched kwargs and raise an exception instead -> more testable
     return ignore_unmatched_kwargs(metrics[name])
 
 

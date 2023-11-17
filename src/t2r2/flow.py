@@ -64,44 +64,18 @@ def loop(config_path="./config.yaml") -> Dict:
         experiment_id = mlflow_manager.mlflow_create_experiment()
         with mlflow.start_run(experiment_id=experiment_id) as run:
             train_results, test_results, control_results = train_and_test(
-                model, tokenizer, config.training, config.testing, config.control, mlflow_manager
+                model, tokenizer, config, mlflow_manager
             )
     else:
-        train_results, test_results, control_results = train_and_test(
-            model, tokenizer, config.training, config.testing, config.control
-        )
+        train_results, test_results, control_results = train_and_test(model, tokenizer, config)
 
-    config.dvc.add(config_path, config.training, config.testing, config.control, config.model)
+    config.dvc.add(config_path, config)
 
     return {
         "train_results": train_results,
         "test_results": test_results,
         "control_results": control_results,
     }
-
-
-def train_and_test(
-    model,
-    tokenizer,
-    training_config: TrainingConfig,
-    test_config: TestConfig,
-    control_config: ControlConfig,
-    mlflow_manager: MlflowManager = None,
-):
-    datasets = get_datasets(training_config, control_config, test_config, tokenizer, mlflow_manager)
-    trainer = get_trainer(training_config, datasets, model)
-
-    train_results = trainer.train()
-    training_config.save_results(train_results, mlflow_manager)
-
-    test_results = trainer.predict(datasets["test"])
-    test_config.save_results(test_results, mlflow_manager)
-
-    control_results = trainer.predict(datasets["control"])
-    control_config.save_results(control_results, mlflow_manager)
-
-    return train_results.metrics, test_results.metrics, control_results.metrics
-
 
 @dataclass
 class Config:
@@ -148,6 +122,22 @@ class Config:
 
         if self.mlflow:
             self.mlflow["random_state"] = self.random_state
+
+
+def train_and_test(model, tokenizer, config: Config, mlflow_manager: MlflowManager = None):
+    datasets = get_datasets(config, tokenizer, mlflow_manager)
+    trainer = get_trainer(config.training, datasets, model)
+
+    train_results = trainer.train()
+    config.training.save_results(train_results, mlflow_manager)
+
+    test_results = trainer.predict(datasets["test"])
+    config.testing.save_results(test_results, mlflow_manager)
+
+    control_results = trainer.predict(datasets["control"])
+    config.control.save_results(control_results, mlflow_manager)
+
+    return train_results.metrics, test_results.metrics, control_results.metrics
 
 
 def check_metric(metric: MetricsConfig):
@@ -210,18 +200,16 @@ class TextDataset(Dataset):
 
 
 def get_datasets(
-    training_config: TrainingConfig,
-    control_config: ControlConfig,
-    test_config: TestConfig,
+    config: Config,
     tokenizer,
     mlflow_manager: MlflowManager,
 ) -> Dict[str, TextDataset]:
-    training_dataset, validation_dataset = training_config.load_dataset()
+    training_dataset, validation_dataset = config.training.load_dataset()
     data = {
         "train": training_dataset,
         "validation": validation_dataset,
-        "test": test_config.load_dataset(),
-        "control": control_config.load_dataset(),
+        "test": config.testing.load_dataset(),
+        "control": config.control.load_dataset(),
     }
 
     if mlflow_manager is not None:
