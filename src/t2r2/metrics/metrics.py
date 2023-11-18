@@ -51,7 +51,7 @@ def get_metric(name: str):
         "slicing_scores": slicing_scores,
         "multilabel_confusion_matrix": multilabel_confusion_matrix,
     }
-    # I would keep unmatched kwargs and raise an exception instead -> more testable
+    # TODO?: leave unmatched kwargs and raise an exception instead -> more test coverage
     return ignore_unmatched_kwargs(metrics[name])
 
 
@@ -63,7 +63,7 @@ class MetricsConfig:
     def __post_init__(self):
         if self.args is None:
             self.args = dict()
-        
+
         self._verify()
 
     def _verify(self):
