@@ -83,6 +83,7 @@ class Config:
     training: TrainingConfig
     testing: TestConfig
     control: ControlConfig
+    data_dir: str = "./data/"
     random_state: int = None
     mlflow: MlFlowConfig = None
     dvc: DvcConfig = None
@@ -99,6 +100,8 @@ class Config:
         self.mlflow = MlFlowConfig(**self.mlflow) if self.mlflow else None
         self.dvc = DvcConfig(**self.dvc) if self.dvc else DvcConfig()
 
+        self._propagate_dataset_path()
+
     def _propagate_metrics(self):
         self.training["metrics"] = self.metrics
         self.control["metrics"] = self.metrics
@@ -110,6 +113,11 @@ class Config:
 
         if self.mlflow:
             self.mlflow["random_state"] = self.random_state
+
+    def _propagate_dataset_path(self):
+        self.training.dataset_path = self.data_dir + self.training.dataset_path
+        self.control.dataset_path = self.data_dir + self.control.dataset_path
+        self.testing.dataset_path = self.data_dir + self.testing.dataset_path
 
 
 def train_and_test(model, tokenizer, config: Config, mlflow_manager: MlflowManager = None):

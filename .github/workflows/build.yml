@@ -3,16 +3,39 @@ name: build
 on: pull_request
 
 jobs:
-  check-and-build:
+  format-check-and-tests:
+    name: Code check
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Check file formatting
-        uses: lgeiger/black-action@v1.0.1
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v4
         with:
-          args: -l 120 --check ./src
+          python-version: "3.9"
+
+      - name: Install the dependencies
+        run: |
+          pip install --upgrade pip pytest black
+          pip install -r requirements.txt
+
+      - name: Check formatting
+        run: black -l 120 --check ./src ./tests
+
+      - name: Set Python path 
+        run: echo "PYTHONPATH=$(pwd)/src" >> $GITHUB_ENV
+
+      - name: Run tests
+        run: pytest
+
+  build-container:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: format-check-and-tests
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v4
 
       - name: Prepare devcontainer.json from template
         run: mv ./.devcontainer/devcontainer.json.template ./.devcontainer/devcontainer.json
