@@ -67,7 +67,7 @@ def loop(config_path="./config.yaml") -> Dict:
     else:
         train_results, test_results, control_results = train_and_test(model, tokenizer, config)
 
-    config.dvc.add(config_path, config)
+    config.dvc.add(config_path, config.training, config.testing, config.control, config.model)
 
     return {
         "train_results": train_results,
