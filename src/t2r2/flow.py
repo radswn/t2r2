@@ -119,6 +119,11 @@ def get_configurations(
     test_config = TestConfig(**configuration["testing"])
     control_config = ControlConfig(**configuration["control"])
 
+    data_dir = configuration.get("data_dir", "./data/")
+    training_config.dataset_path = data_dir + training_config.dataset_path
+    test_config.dataset_path = data_dir + test_config.dataset_path
+    control_config.dataset_path = data_dir + control_config.dataset_path
+
     mlflow_config = None
     if "mlflow" in configuration:
         configuration["mlflow"]["random_state"] = random_state
