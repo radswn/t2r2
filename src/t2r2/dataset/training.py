@@ -102,4 +102,5 @@ class TrainingConfig(DatasetConfigWithSelectors, WithMetrics):
             metric_for_best_model=self.metric_for_best_model,
             num_train_epochs=self.epochs,
             report_to=None,
+            optim="adamw_torch",
         )
