@@ -1,4 +1,5 @@
 import torch
+import inspect
 from transformers import TrainerCallback, TrainerControl, TrainerState, TrainingArguments
 
 
@@ -12,7 +13,7 @@ class SavePredictionsCallback(TrainerCallback):
     def on_epoch_end(self, args: TrainingArguments, state: TrainerState, control: TrainerControl, **kwargs) -> None:
         self.epoch += 1
         kwargs["model"].eval()
-
+        
         predictions = []
         labels = []
         with torch.no_grad():
@@ -25,14 +26,29 @@ class SavePredictionsCallback(TrainerCallback):
                 input_id = input_id.unsqueeze(0).clone().detach()  # Add batch dimension
                 attention_mask = attention_mask.unsqueeze(0).clone().detach()  # Add batch dimension
                 token_type_id = token_type_id.unsqueeze(0).clone().detach()  # Add batch dimension
-
-                outputs = kwargs["model"](input_id, attention_mask=attention_mask, token_type_ids=token_type_id)
-                logits = outputs.logits
+                
+                # Create a dictionary with the arguments for the forward method
+                forward_args = {'input_ids': input_id, 
+                                'attention_mask': attention_mask}
+                
+                # Get the signature of the forward method
+                sig = inspect.signature(kwargs["model"].forward)
+                
+                # Check if 'token_type_ids' is in the parameters of the forward method
+                if 'token_type_ids' in sig.parameters:
+                    forward_args['token_type_ids'] = token_type_id
+                
+                # Call the forward method with the compiled arguments
+                outputs = kwargs["model"](**forward_args)
+                
+                logits = outputs.logits.detach()
                 probabilities = torch.softmax(logits, dim=1)
                 predictions.append(probabilities)
                 labels.append(int(label))
             self.predictions[self.epoch] = predictions
             self.labels[self.epoch] = labels
+            
+        kwargs["model"].train()
 
     def get_predictions(self):
         return self.predictions
