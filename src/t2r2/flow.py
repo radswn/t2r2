@@ -1,7 +1,6 @@
 from typing import Dict, List, Any
 from dataclasses import dataclass
 
-import sklearn
 import mlflow
 import torch
 import yaml
@@ -9,7 +8,7 @@ import yaml
 from torch.utils.data.dataset import Dataset
 from transformers import Trainer
 
-from t2r2.metrics import get_metric, MetricsConfig
+from t2r2.metrics import MetricsConfig
 from t2r2.dataset import ControlConfig, TestConfig, TrainingConfig
 from t2r2.model import ModelConfig
 from t2r2.utils import repo
@@ -62,6 +61,7 @@ def loop(config_path="./config.yaml") -> Dict:
     if config.mlflow:
         mlflow_manager = MlflowManager(config.mlflow)
         experiment_id = mlflow_manager.mlflow_create_experiment()
+
         with mlflow.start_run(experiment_id=experiment_id) as run:
             train_results, test_results, control_results = train_and_test(model, tokenizer, config, mlflow_manager)
     else:
@@ -99,18 +99,6 @@ class Config:
         self.mlflow = MlFlowConfig(**self.mlflow) if self.mlflow else None
         self.dvc = DvcConfig(**self.dvc) if self.dvc else DvcConfig()
 
-        self._verify()
-
-    def _verify(self):
-        metric_names = []
-
-        for metric in self.metrics:
-            check_metric(metric)
-            metric_names.append(metric.name)
-
-        if self.training.metric_for_best_model not in metric_names and self.training.metric_for_best_model != "loss":
-            raise ValueError(f"metric for best model is not defined in metrics")
-
     def _propagate_metrics(self):
         self.training["metrics"] = self.metrics
         self.control["metrics"] = self.metrics
@@ -138,23 +126,6 @@ def train_and_test(model, tokenizer, config: Config, mlflow_manager: MlflowManag
     config.control.save_results(control_results, mlflow_manager)
 
     return train_results.metrics, test_results.metrics, control_results.metrics
-
-
-def check_metric(metric: MetricsConfig):
-    m_name = metric.name
-    try:
-        _ = get_metric(m_name)([0, 0], [0, 1], **metric.args)
-    except KeyError:
-        handle_wrong_metric_name(m_name)
-
-
-def handle_wrong_metric_name(metric_name: str):
-    if metric_name in dir(sklearn.metrics):
-        error_msg = f"metric {metric_name} not handled by T2R2"
-    else:
-        error_msg = f"metric {metric_name} does not exist"
-
-    raise ValueError(error_msg)
 
 
 def get_config(path: str) -> Config:

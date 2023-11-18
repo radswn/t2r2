@@ -1,4 +1,5 @@
-from typing import Type
+from typing import Type, Dict, Any
+from dataclasses import dataclass
 
 from t2r2.selector.base import Selector
 from t2r2.selector.dummy import DummySelector
@@ -8,6 +9,26 @@ from t2r2.selector.data_cartography import DataCartographySelector
 
 from importlib import util
 from os import path
+
+
+@dataclass
+class SelectorConfig:
+    """Abstract class for selectorConfigs for training, testing and control"""
+
+    name: str
+    args: Dict[str, Any] = None
+
+    def __post_init__(self):
+        if self.args is None:
+            self.args = dict()
+
+        self._verify()
+
+    def _verify(self):
+        try:
+            _ = get_selector(self.name)
+        except KeyError:
+            raise ValueError(f"selector {self.name} does not exist")
 
 
 def get_selector(name: str) -> Type[Selector]:

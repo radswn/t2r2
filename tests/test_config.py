@@ -1,6 +1,7 @@
-from t2r2.flow import load_config, Config
-from pathlib import Path
 import pytest
+from pathlib import Path
+
+from t2r2.flow import load_config, Config
 
 
 @pytest.fixture
@@ -34,3 +35,24 @@ def test_metrics_propagation(test_config_dict):
 
     assert cfg.training.metrics == cfg.control.metrics == cfg.testing.metrics
     assert cfg.training.metrics[1].name == "accuracy_score"
+
+
+def test_unexpected_argument(test_config_dict):
+    test_config_dict["some_random_argument"] = "that should not be here"
+
+    with pytest.raises(TypeError):
+        cfg = Config(**test_config_dict)
+
+
+def test_wrong_argument_type(test_config_dict):
+    test_config_dict["model"]["max_length"] = "definitely_not_an_int"
+
+    with pytest.raises(ValueError, match="invalid literal"):
+        cfg = Config(**test_config_dict)
+
+
+def test_invalid_best_model_metric(test_config_dict):
+    test_config_dict["training"]["metric_for_best_model"] = "accuracy_score"
+
+    with pytest.raises(ValueError, match="not defined in metrics"):
+        cfg = Config(**test_config_dict)

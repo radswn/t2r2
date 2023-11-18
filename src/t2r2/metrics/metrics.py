@@ -1,3 +1,5 @@
+import sklearn
+
 from dataclasses import dataclass
 from typing import Dict, Any
 
@@ -61,3 +63,19 @@ class MetricsConfig:
     def __post_init__(self):
         if self.args is None:
             self.args = dict()
+        
+        self._verify()
+
+    def _verify(self):
+        try:
+            _ = get_metric(self.name)([0, 0], [0, 1], **self.args)
+        except KeyError:
+            self._handle_wrong_metric_name()
+
+    def _handle_wrong_metric_name(self):
+        if self.name in dir(sklearn.metrics):
+            error_msg = f"metric {self.name} not handled by T2R2"
+        else:
+            error_msg = f"metric {self.name} does not exist"
+
+        raise ValueError(error_msg)
