@@ -13,7 +13,7 @@ from t2r2.utils.save_predictions_callback import SavePredictionsCallback
 
 @dataclass
 class TrainingConfig(DatasetConfigWithSelectors, WithMetrics):
-    dataset_path: str = "./data/train.csv"
+    dataset_path: str = "train.csv"
     validation_dataset_path: str = None
     text_column_id: int = 0
     label_column_id: int = 1

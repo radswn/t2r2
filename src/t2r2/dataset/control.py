@@ -3,7 +3,7 @@ from t2r2.dataset.common import *
 
 @dataclass
 class ControlConfig(DatasetConfig, WithMetrics):
-    dataset_path: str = "./data/control.csv"
+    dataset_path: str = "control.csv"
     text_column_id: int = 0
     label_column_id: int = 1
     has_header: bool = True
