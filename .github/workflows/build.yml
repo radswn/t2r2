@@ -1,4 +1,4 @@
-name: build
+name: ci
 
 on: pull_request
 
@@ -15,13 +15,16 @@ jobs:
         with:
           python-version: "3.9"
 
-      - name: Install the dependencies
-        run: |
-          pip install --upgrade pip pytest black
-          pip install -r requirements.txt
+      - name: Install code formatting dependency
+        run: pip install --upgrade pip black
 
       - name: Check formatting
         run: black -l 120 --check ./src ./tests
+
+      - name: Install the rest of dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install pytest
 
       - name: Set Python path 
         run: echo "PYTHONPATH=$(pwd)/src" >> $GITHUB_ENV
