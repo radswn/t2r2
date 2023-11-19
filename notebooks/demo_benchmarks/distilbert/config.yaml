@@ -13,7 +13,6 @@ metrics:
 
 training:
   dataset_path: ../../../data/imdb/train.csv
-  output_dir: imdb_distilbert_results
   selectors:
     - args: { }
       name: dummy
