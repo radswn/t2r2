@@ -6,12 +6,12 @@ build-backend = "setuptools.build_meta"
 name = "t2r2"
 version = "0.0.1"
 authors = [
-    { name = "Radoslaw Winiecki", email = "radoslaw.winiecki@student.put.poznan.pl" },
-    { name = "Nina Zukowska", email = "nina.zukowska@student.put.poznan.pl" },
+    { name = "Radosław Winiecki", email = "radoslaw.winiecki@student.put.poznan.pl" },
+    { name = "Nina Żukowska", email = "nina.zukowska@student.put.poznan.pl" },
     { name = "Oskar Szudzik", email = "oskar.szudzik@student.put.poznan.pl" },
     { name = "Antoni Solarski", email = "antoni.solarski@student.put.poznan.pl" },
 ]
-description = "T2R2: train, test, record, repeat"
+description = "T2R2: train, test, record, repeat: incremental environment for AI model training"
 readme = "README.md"
 requires-python = ">=3.9"
 classifiers = [
