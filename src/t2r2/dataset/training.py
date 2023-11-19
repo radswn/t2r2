@@ -29,8 +29,6 @@ class TrainingConfig(DatasetConfigWithSelectors, WithMetrics):
     data_cartography_results: str = "./data_cartography_metrics.pickle"
 
     def load_validation_dataset(self) -> pd.DataFrame:
-        """Method for loading validation dataset if one exists"""
-        # NIT: assumption of same structure ...
         header = 0 if self.has_header else None
 
         df = pd.read_csv(self.validation_dataset_path, header=header)
