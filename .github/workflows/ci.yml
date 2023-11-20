@@ -1,0 +1,47 @@
+name: ci
+
+on: pull_request
+
+jobs:
+  format-check-and-tests:
+    name: Code check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.9"
+
+      - name: Install code formatting dependency
+        run: pip install --upgrade pip black
+
+      - name: Check formatting
+        run: black -l 120 --check ./src ./tests
+
+      - name: Install the rest of dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install pytest
+
+      - name: Set Python path 
+        run: echo "PYTHONPATH=$(pwd)/src" >> $GITHUB_ENV
+
+      - name: Run tests
+        run: pytest
+
+  build-container:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: format-check-and-tests
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+
+      - name: Prepare devcontainer.json from template
+        run: mv ./.devcontainer/devcontainer.json.template ./.devcontainer/devcontainer.json
+
+      - name: Build and run dev container
+        uses: devcontainers/ci@v0.3
