@@ -1,7 +1,7 @@
 import pytest
 from pathlib import Path
 
-from t2r2.flow import load_config, Config
+from t2r2.config import load_config, Config
 
 
 @pytest.fixture
