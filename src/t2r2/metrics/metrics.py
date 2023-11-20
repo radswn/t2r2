@@ -4,7 +4,6 @@ from dataclasses import dataclass
 from typing import Dict, Any
 
 from t2r2.metrics.slicing_scoring import slicing_scores
-from t2r2.utils.utils import ignore_unmatched_kwargs
 from sklearn.metrics import (
     accuracy_score,
     f1_score,
@@ -51,8 +50,8 @@ def get_metric(name: str):
         "slicing_scores": slicing_scores,
         "multilabel_confusion_matrix": multilabel_confusion_matrix,
     }
-    # TODO?: leave unmatched kwargs and raise an exception instead -> more test coverage
-    return ignore_unmatched_kwargs(metrics[name])
+
+    return metrics[name]
 
 
 @dataclass
