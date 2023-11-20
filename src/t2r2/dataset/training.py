@@ -29,10 +29,12 @@ class TrainingConfig(DatasetConfigWithSelectors, WithMetrics):
     data_cartography_results: str = "./data_cartography_metrics.pickle"
 
     def load_validation_dataset(self) -> pd.DataFrame:
-        """Method for loading validation dataset if one exists"""
-        # TODO: what columns should be accept as text/target (?)
-        # TODO: maybe create ids if not provided (?)
-        return pd.read_csv(self.validation_dataset_path, header=None, names=["text", "label"])
+        header = 0 if self.has_header else None
+
+        df = pd.read_csv(self.validation_dataset_path, header=header)
+        df = df.iloc[:, [self.text_column_id, self.label_column_id]]
+        df.columns = ["text", "label"]
+        return df
 
     def __post_init__(self):
         self.stage = Stage.TRAINING

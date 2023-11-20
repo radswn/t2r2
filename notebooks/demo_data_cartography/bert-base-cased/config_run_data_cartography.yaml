@@ -15,8 +15,8 @@ metrics:
       average: macro
 
 training:
-  dataset_path: ../../data/featuresets/thedeep.subset.train.txt
-  validation_dataset_path: ../../data/featuresets/thedeep.subset.validation.txt
+  dataset_path: ../../../data/featuresets/thedeep.subset.train.txt
+  validation_dataset_path: ../../../data/featuresets/thedeep.subset.validation.txt
   text_column_id: 1
   label_column_id: 2
   selectors:
@@ -30,14 +30,14 @@ training:
 
 
 testing:
-  dataset_path: ../../data/featuresets/thedeep.subset.test.txt
+  dataset_path: ../../../data/featuresets/thedeep.subset.test.txt
   text_column_id: 1
   label_column_id: 2
   selectors: [ ]
   results_file: ./file_test_results.pickle
 
 control:
-  dataset_path: ../../data/featuresets/thedeep.subset.control.txt
+  dataset_path: ../../../data/featuresets/thedeep.subset.control.txt
   text_column_id: 1
   label_column_id: 2
   results_file: ./file_control_results.pickle
