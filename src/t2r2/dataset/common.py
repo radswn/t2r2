@@ -1,7 +1,7 @@
 import os.path
 import pickle
 from dataclasses import dataclass, field
-from typing import Dict, List, MutableMapping, Union
+from typing import Dict, List, MutableMapping
 
 import pandas as pd
 import yaml
@@ -17,9 +17,9 @@ from t2r2.utils.utils import check_if_directory_exists
 @dataclass
 class DatasetConfig:
     dataset_path: str
-    text_column_id: int
-    label_column_id: int
-    has_header: bool
+    text_column_id: int = 0
+    label_column_id: int = 1
+    has_header: bool = True
 
     def load_dataset(self) -> pd.DataFrame:
         header = 0 if self.has_header else None

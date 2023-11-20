@@ -1,8 +1,9 @@
+import sklearn
+
 from dataclasses import dataclass
 from typing import Dict, Any
 
 from t2r2.metrics.slicing_scoring import slicing_scores
-from t2r2.utils.utils import ignore_unmatched_kwargs
 from sklearn.metrics import (
     accuracy_score,
     f1_score,
@@ -49,7 +50,8 @@ def get_metric(name: str):
         "slicing_scores": slicing_scores,
         "multilabel_confusion_matrix": multilabel_confusion_matrix,
     }
-    return ignore_unmatched_kwargs(metrics[name])
+
+    return metrics[name]
 
 
 @dataclass
@@ -60,3 +62,19 @@ class MetricsConfig:
     def __post_init__(self):
         if self.args is None:
             self.args = dict()
+
+        self._verify()
+
+    def _verify(self):
+        try:
+            _ = get_metric(self.name)([0, 0], [0, 1], **self.args)
+        except KeyError:
+            self._handle_wrong_metric_name()
+
+    def _handle_wrong_metric_name(self):
+        if self.name in dir(sklearn.metrics):
+            error_msg = f"metric {self.name} not handled by T2R2"
+        else:
+            error_msg = f"metric {self.name} does not exist"
+
+        raise ValueError(error_msg)

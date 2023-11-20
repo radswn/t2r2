@@ -15,15 +15,13 @@ from t2r2.utils.save_predictions_callback import SavePredictionsCallback
 class TrainingConfig(DatasetConfigWithSelectors, WithMetrics):
     dataset_path: str = "train.csv"
     validation_dataset_path: str = None
-    text_column_id: int = 0
-    label_column_id: int = 1
-    has_header: bool = True
+    output_dir: str = "./results/"
     results_file: str = "train_results.pickle"
     epochs: int = 1
     batch_size: int = 32
     learning_rate: float = 0.01
     validation_size: float = 0.2
-    metric_for_best_model: str = "accuracy_score"
+    metric_for_best_model: str = "loss"
     perform_data_cartography: bool = False
     data_cartography_results: str = "./data_cartography_metrics.pickle"
 
