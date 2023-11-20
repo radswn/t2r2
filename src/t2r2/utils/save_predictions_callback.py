@@ -1,4 +1,5 @@
 import torch
+import inspect
 from transformers import TrainerCallback, TrainerControl, TrainerState, TrainingArguments
 
 
@@ -22,17 +23,27 @@ class SavePredictionsCallback(TrainerCallback):
                 token_type_id = kwargs["train_dataloader"].dataset.token_type_ids[i]
                 label = kwargs["train_dataloader"].dataset.y[i]
 
-                input_id = input_id.unsqueeze(0).clone().detach()  # Add batch dimension
-                attention_mask = attention_mask.unsqueeze(0).clone().detach()  # Add batch dimension
-                token_type_id = token_type_id.unsqueeze(0).clone().detach()  # Add batch dimension
+                input_id = input_id.unsqueeze(0).clone().detach()
+                attention_mask = attention_mask.unsqueeze(0).clone().detach()
+                token_type_id = token_type_id.unsqueeze(0).clone().detach()
 
-                outputs = kwargs["model"](input_id, attention_mask=attention_mask, token_type_ids=token_type_id)
-                logits = outputs.logits
+                forward_args = {"input_ids": input_id, "attention_mask": attention_mask}
+
+                sig = inspect.signature(kwargs["model"].forward)
+
+                if "token_type_ids" in sig.parameters:
+                    forward_args["token_type_ids"] = token_type_id
+
+                outputs = kwargs["model"](**forward_args)
+
+                logits = outputs.logits.detach()
                 probabilities = torch.softmax(logits, dim=1)
                 predictions.append(probabilities)
                 labels.append(int(label))
             self.predictions[self.epoch] = predictions
             self.labels[self.epoch] = labels
+
+        kwargs["model"].train()
 
     def get_predictions(self):
         return self.predictions
