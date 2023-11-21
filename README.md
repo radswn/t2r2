@@ -6,7 +6,30 @@
 
 *TODO*
 
+---
+
 ## Quick start
+
+---
+
+### Basic training loop
+
+*TODO*
+
+---
+
+### Curriculum learning
+
+To force specific order in which examples will be passed during training:
+```yaml
+training:
+  curriculum_learning: True
+```
+Then you also need to provide the `order` column in your training data.
+
+Basically, the examples will be _sorted_ according to order column and won't be shuffled.
+
+---
 
 ### Implement your own selector
 
@@ -19,7 +42,7 @@ Below we present a simple example how to do it.
 
 `config.yaml` part
 
-```
+```yaml
   selectors:
     - name: UserSelector
       args: 
@@ -28,7 +51,7 @@ Below we present a simple example how to do it.
 
 `my_selector.py` code
 
-```
+```python
 import pandas as pd
 from t2r2.selector import Selector
 
