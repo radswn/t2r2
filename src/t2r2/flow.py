@@ -5,6 +5,7 @@ import torch
 
 from torch.utils.data.dataset import Dataset
 from transformers import Trainer
+from transformers.utils import logging
 
 from t2r2.dataset import TrainingConfig
 from t2r2.utils import repo
@@ -51,6 +52,7 @@ def get_metrics(config_path="./config.yaml") -> List[Dict]:
 def loop(config_path="./config.yaml") -> Dict:
     config = get_config(config_path)
 
+    logging.set_verbosity_error()
     tokenizer = config.model.create_tokenizer()
     model = config.model.create_model()
 
