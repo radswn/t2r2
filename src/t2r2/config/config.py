@@ -1,10 +1,11 @@
-from typing import Dict, List, Any
 from dataclasses import dataclass
+from typing import Any, Dict, List
 
+import torch
 import yaml
 
-from t2r2.metrics import MetricsConfig
 from t2r2.dataset import ControlConfig, TestConfig, TrainingConfig
+from t2r2.metrics import MetricsConfig
 from t2r2.model import ModelConfig
 from t2r2.utils.mlflow import MlFlowConfig
 from t2r2.utils.repo import DvcConfig
@@ -59,3 +60,19 @@ def load_config(path: str) -> Dict:
         config_dict = yaml.safe_load(stream)
 
     return config_dict
+
+
+def _set_seed(random_state: int):
+    torch.manual_seed(random_state)
+    torch.cuda.manual_seed_all(random_state)
+    torch.backends.cudnn.deterministic = True
+
+
+def get_config(path: str) -> Config:
+    config_dict = load_config(path)
+    config = Config(**config_dict)
+
+    if config.random_state is not None:
+        _set_seed(config.random_state)
+
+    return config
