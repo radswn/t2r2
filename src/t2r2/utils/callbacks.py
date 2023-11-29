@@ -1,5 +1,6 @@
-import torch
 import inspect
+
+import torch
 from transformers import TrainerCallback, TrainerControl, TrainerState, TrainingArguments
 
 
@@ -16,6 +17,7 @@ class SavePredictionsCallback(TrainerCallback):
 
         predictions = []
         labels = []
+
         with torch.no_grad():
             for i in range(len(kwargs["train_dataloader"].dataset.input_ids)):
                 input_id = kwargs["train_dataloader"].dataset.input_ids[i]
@@ -40,6 +42,7 @@ class SavePredictionsCallback(TrainerCallback):
                 probabilities = torch.softmax(logits, dim=1)
                 predictions.append(probabilities)
                 labels.append(int(label))
+
             self.predictions[self.epoch] = predictions
             self.labels[self.epoch] = labels
 

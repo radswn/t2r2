@@ -6,12 +6,10 @@ from typing import Dict, List, MutableMapping
 import pandas as pd
 import yaml
 
-from t2r2.metrics import get_metric, MetricsConfig
-from t2r2.selector import get_selector, get_custom_selector, SelectorConfig
+from t2r2.metrics import MetricsConfig, get_metric
+from t2r2.selector import SelectorConfig, get_custom_selector, get_selector
+from t2r2.utils import Stage, check_if_directory_exists, flatten_dict
 from t2r2.utils.mlflow import MlflowManager
-from t2r2.utils.utils import Stage
-from t2r2.utils.utils import flatten_dict
-from t2r2.utils.utils import check_if_directory_exists
 
 
 @dataclass
@@ -33,7 +31,7 @@ class DatasetConfig:
 
 @dataclass
 class DatasetConfigWithSelectors(DatasetConfig):
-    random_state: int = 123
+    random_state: int = None
     selectors: List[SelectorConfig] = None
 
     def load_dataset(self) -> pd.DataFrame:
