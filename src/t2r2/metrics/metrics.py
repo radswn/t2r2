@@ -1,30 +1,30 @@
-import sklearn
-
 from dataclasses import dataclass
-from typing import Dict, Any
+from typing import Any, Dict
 
-from t2r2.metrics.slicing_scoring import slicing_scores
+import sklearn
 from sklearn.metrics import (
     accuracy_score,
-    f1_score,
     balanced_accuracy_score,
+    brier_score_loss,
     class_likelihood_ratios,
     classification_report,
     cohen_kappa_score,
     confusion_matrix,
+    f1_score,
     fbeta_score,
     hamming_loss,
     hinge_loss,
     jaccard_score,
     log_loss,
     matthews_corrcoef,
+    multilabel_confusion_matrix,
     precision_recall_fscore_support,
     precision_score,
     recall_score,
     zero_one_loss,
-    brier_score_loss,
-    multilabel_confusion_matrix,
 )
+
+from t2r2.metrics.slicing_scoring import slicing_scores
 
 
 def get_metric(name: str):

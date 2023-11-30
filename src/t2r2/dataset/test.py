@@ -1,4 +1,8 @@
-from t2r2.dataset.common import *
+from dataclasses import dataclass
+
+from t2r2.dataset.common import DatasetConfigWithSelectors, WithMetrics
+from t2r2.selector import SelectorConfig
+from t2r2.utils import Stage
 
 
 @dataclass

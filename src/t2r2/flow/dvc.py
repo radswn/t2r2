@@ -1,5 +1,5 @@
 from t2r2.config import get_config
-from t2r2.utils.repo import repo
+from t2r2.utils import repo
 
 
 def init(config_path="./config.yaml"):
