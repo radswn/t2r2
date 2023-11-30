@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from transformers import AutoTokenizer, AutoModelForSequenceClassification
+from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
 
 @dataclass

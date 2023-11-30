@@ -1,7 +1,9 @@
-from t2r2.selector.base import *
 from typing import Union
 
 import numpy as np
+import pandas as pd
+
+from t2r2.selector.base import Selector
 
 
 class DataCartographySelector(Selector):

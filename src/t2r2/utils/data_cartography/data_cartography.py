@@ -2,17 +2,16 @@
  Code partly copied from the Data Cartography repo: https://github.com/allenai/cartography.git
  Based on: https://arxiv.org/abs/1812.05159
  """
-import os
 import logging
-import tqdm
+import os
+from collections import defaultdict
+from typing import List
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
-
-from typing import List
-from collections import defaultdict
+import tqdm
 
 logger = logging.getLogger()
 

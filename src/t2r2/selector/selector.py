@@ -1,14 +1,13 @@
-from typing import Type, Dict, Any
 from dataclasses import dataclass
+from importlib import util
+from os import path
+from typing import Any, Dict, Type
 
 from t2r2.selector.base import Selector
+from t2r2.selector.data_cartography import DataCartographySelector
 from t2r2.selector.dummy import DummySelector
 from t2r2.selector.slicing import SlicingSelector
 from t2r2.selector.undersampling import RandomUnderSamplerSelector
-from t2r2.selector.data_cartography import DataCartographySelector
-
-from importlib import util
-from os import path
 
 
 @dataclass

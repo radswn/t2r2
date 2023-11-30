@@ -1,17 +1,14 @@
 """
 Module for implementing slicing functions by snorkel.
 """
-# FIXME: is this really a good module tree?
-from t2r2.selector.base import *
-from snorkel.analysis import Scorer
-from snorkel.slicing import SlicingFunction, slicing_function
-from snorkel.slicing import PandasSFApplier
-from typing import Union, List, Callable
-import pandas as pd
-from t2r2.selector.slicing import default_slicing_functions
-from t2r2.selector.slicing.default_slicing_functions import short, textblob_polarity
+from typing import List, Union
 
-# default slicing functions for text
+import pandas as pd
+from snorkel.slicing import PandasSFApplier
+
+from t2r2.selector.base import Selector
+from t2r2.selector.slicing import default_slicing_functions
+from t2r2.selector.slicing.default_slicing_functions import short
 
 
 class SlicingSelector(Selector):
