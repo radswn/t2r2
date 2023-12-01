@@ -25,7 +25,8 @@ class SelectorConfig:
 
     def _verify(self):
         try:
-            _ = get_selector(self.name)
+            if "module_path" not in self.args:
+                _ = get_selector(self.name)
         except KeyError:
             raise ValueError(f"selector {self.name} does not exist")
 

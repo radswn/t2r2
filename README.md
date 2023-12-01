@@ -18,19 +18,6 @@
 
 ---
 
-### Curriculum learning
-
-To force specific order in which examples will be passed during training:
-```yaml
-training:
-  curriculum_learning: True
-```
-Then you also need to provide the `order` column in your training data.
-
-Basically, the examples will be _sorted_ according to order column and won't be shuffled.
-
----
-
 ### Implement your own selector
 
 We give you an opportunity to use your own selectors.
@@ -59,3 +46,25 @@ class UserSelector(Selector):
     def select(self, dataset: pd.DataFrame) -> pd.DataFrame:
         return dataset[:5]
 ```
+
+### Curriculum learning
+
+To force specific order in which examples will be passed during training:
+```yaml
+training:
+  curriculum_learning: True
+```
+Then you also need to provide the `order` column in your training data.
+
+Basically, the examples will be _sorted_ according to order column and won't be shuffled.
+
+You can also use the custom selector to dynamically provide the order of your training examples.
+For example, to pass examples in the order of increasing lenght of text:
+```python
+class ClSelector(Selector):
+    def select(self, dataset: pd.DataFrame) -> pd.DataFrame:
+        dataset["order"] = [len(i) for i in dataset["text"]]
+        return dataset
+```
+
+---
