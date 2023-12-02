@@ -1,0 +1,22 @@
+model:
+  model_name: bert-base-cased
+  num_labels: 12
+
+metrics:
+  - name: accuracy_score
+
+training:
+  epochs: 1
+  batch_size: 2
+  learning_rate: 1e-3
+  validation_size: 0.2
+  metric_for_best_model: accuracy_score
+  selectors:
+    - name: llm
+      args: 
+        prompt: Generate more synthetic examples
+
+
+testing: { }
+
+control: { }
