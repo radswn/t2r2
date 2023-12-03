@@ -80,6 +80,7 @@ class MetricsConfig:
             error_msg = f"metric {self.name} does not exist"
 
         raise ValueError(error_msg)
+
     def _handle_attribute_error(self, name, error):
         if name == "slicing_scores":
             pass

@@ -59,9 +59,9 @@ class WithMetrics:
 
     def compute_metrics(self, outputs) -> MutableMapping:
         proba_predictions, predictions, true_labels = outputs[0], outputs[0].argmax(1), outputs[1]
-        
-        self._modify_args_of_metrics( proba_predictions)
-        
+
+        self._modify_args_of_metrics(proba_predictions)
+
         return flatten_dict(
             {
                 metric.name: get_metric(metric.name)(
@@ -112,8 +112,8 @@ class WithMetrics:
             [(metric_name + "_" + self.stage.__str__(), metric_value) for metric_name, metric_value in metrics.items()]
         )
         mlflow_manager.log_metrics(metrics_name_with_stage)
-        
+
     def _modify_args_of_metrics(self, proba_predictions):
         for metric in self.metrics:
-            if metric.name == 'slicing_scores':
-                metric.args.update({'proba_predictions': proba_predictions, 'stage': self.stage})
+            if metric.name == "slicing_scores":
+                metric.args.update({"proba_predictions": proba_predictions, "stage": self.stage})

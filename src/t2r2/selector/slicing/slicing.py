@@ -11,6 +11,7 @@ from t2r2.selector.slicing import default_slicing_functions
 from t2r2.selector.slicing.default_slicing_functions import short, long
 from t2r2.utils.utils import check_if_directory_exists
 
+
 class SlicingSelector(Selector):
     def __init__(self, result_file: str, list_of_slicing_functions=None, **kwargs):
         super().__init__()
