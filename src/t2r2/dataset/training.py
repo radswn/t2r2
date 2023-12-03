@@ -44,6 +44,13 @@ class TrainingConfig(DatasetConfigWithSelectors, WithMetrics):
         self.learning_rate = float(self.learning_rate)
         self.validation_size = float(self.validation_size)
         self.callbacks = (SavePredictionsCallback(),) if self.perform_data_cartography else ()
+        self._verify()
+
+    def _verify(self):
+        metric_names = [m.name for m in self.metrics]
+
+        if self.metric_for_best_model not in metric_names and self.metric_for_best_model != "loss":
+            raise ValueError(f"metric for best model is not defined in metrics")
 
     def load_dataset(self) -> Tuple[pd.DataFrame, pd.DataFrame]:
         data = super().load_dataset()
