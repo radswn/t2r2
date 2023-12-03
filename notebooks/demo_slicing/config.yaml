@@ -1,4 +1,6 @@
 # demo configuration
+random_state: 123
+data_dir: "../../data/featuresets/"
 
 model:
   max_length: 256
@@ -14,20 +16,19 @@ metrics:
       average: macro
   - name: slicing_scores
     args: 
-      result_file: '../../data/slicing/slicing.pickle'
-      base_directory: "../../data/slicing/"
+      base_directory: 'slicing/'
       default_file_name: "slicing.pickle"
         
 
 training:
-  dataset_path: ../../data/featuresets/thedeep.subset.train.txt
+  dataset_path: 'thedeep.subset.train.txt'
   selectors:
     - name: dummy
       args: { }
     - name: slicing
       args: 
-        result_file: '../../data/slicing/train_slicing.pickle'
-        list_of_slicing_functions: [short, textblob_polarity]
+        result_file: 'slicing/train_slicing.pickle'
+        list_of_slicing_functions: [short, textblob_polarity, long]
       
   batch_size: 2
   epochs: 1
@@ -37,17 +38,17 @@ training:
   metric_for_best_model: f1_score
 
 testing:
-  dataset_path: ../../data/featuresets/thedeep.subset.test.txt
+  dataset_path: 'thedeep.subset.test.txt'
   selectors: 
     - name: slicing
       args: 
-        result_file: '../../data/slicing/test_slicing.pickle'
+        result_file: 'slicing/test_slicing.pickle'
       
-  results_file: ../../data/slicing/file_test_results.pickle
+  results_file: 'slicing/file_test_results.pickle'
 
 control:
-  dataset_path: ../../data/featuresets/thedeep.subset.control.txt
-  results_file: ../../data/slicing/file_control_results.pickle
+  dataset_path: 'thedeep.subset.control.txt'
+  results_file: 'slicing/file_control_results.pickle'
 
 mlflow:
   experiment_name: 'my_experiment_slicing'

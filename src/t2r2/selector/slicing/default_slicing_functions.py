@@ -7,6 +7,9 @@ from textblob import TextBlob
 def short(x):
     return len(x.text.split()) < 60
 
+@slicing_function()
+def long(x):
+    return len(x.text.split()) > 100
 
 @preprocessor(memoize=True)
 def textblob_sentiment(x):
