@@ -43,6 +43,7 @@ testing:
     - name: slicing
       args: 
         result_file: 'slicing/test_slicing.pickle'
+        list_of_slicing_functions: [short, textblob_polarity, long]
       
   results_file: 'results/file_test_results.pickle'
 
