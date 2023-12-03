@@ -26,7 +26,8 @@ def test_random_state_propagation(test_config_dict):
     cfg = Config(**test_config_dict)
 
     assert cfg.testing.random_state == cfg.training.random_state == random_state
-    
+
+
 def test_output_dir_propagation(test_config_dict):
     output_dir = 123
     test_config_dict["output_dir"] = output_dir
