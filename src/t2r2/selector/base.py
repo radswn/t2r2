@@ -1,6 +1,4 @@
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
-from typing import Dict
 
 import pandas as pd
 
@@ -14,11 +12,3 @@ class Selector(ABC):
     @abstractmethod
     def select(self, dataset: pd.DataFrame) -> pd.DataFrame:
         """Method to be overwritten by individual selectors"""
-
-
-@dataclass
-class SelectorConfig:
-    """Abstract class for selectorConfigs for training, testing and control"""
-
-    name: str
-    args: Dict

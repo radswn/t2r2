@@ -1,6 +1,6 @@
-from snorkel.slicing import SlicingFunction, slicing_function
-from textblob import TextBlob
 from snorkel.preprocess import preprocessor
+from snorkel.slicing import slicing_function
+from textblob import TextBlob
 
 
 @slicing_function()

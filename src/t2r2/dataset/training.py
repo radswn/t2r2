@@ -1,47 +1,56 @@
+import pickle
+from dataclasses import dataclass
 from typing import List, Tuple
 
+import pandas as pd
 from sklearn.model_selection import train_test_split
-from transformers import IntervalStrategy, TrainingArguments, TrainerCallback
+from transformers import IntervalStrategy, TrainerCallback, TrainingArguments
 
-from t2r2.dataset.common import *
-from t2r2.utils.data_cartography.data_cartography import (
-    compute_data_cartography_metrics,
-    visualize_data_cartography,
-)
-from t2r2.utils.save_predictions_callback import SavePredictionsCallback
+from t2r2.dataset.common import DatasetConfigWithSelectors, WithMetrics
+from t2r2.selector import SelectorConfig
+from t2r2.utils import Stage
+from t2r2.utils.callbacks import SavePredictionsCallback
+from t2r2.utils.data_cartography import compute_data_cartography_metrics, visualize_data_cartography
+from t2r2.utils.mlflow import MlflowManager
 
 
 @dataclass
 class TrainingConfig(DatasetConfigWithSelectors, WithMetrics):
-    dataset_path: str = "./data/train.csv"
+    dataset_path: str = "train.csv"
     validation_dataset_path: str = None
-    text_column_id: int = 0
-    label_column_id: int = 1
-    has_header: bool = True
+    output_dir: str = "./results/"
     results_file: str = "train_results.pickle"
     epochs: int = 1
     batch_size: int = 32
     learning_rate: float = 0.01
     validation_size: float = 0.2
-    metric_for_best_model: str = "accuracy_score"
+    metric_for_best_model: str = "loss"
     perform_data_cartography: bool = False
     data_cartography_results: str = "./data_cartography_metrics.pickle"
 
     def load_validation_dataset(self) -> pd.DataFrame:
-        """Method for loading validation dataset if one exists"""
-        # TODO: what columns should be accept as text/target (?)
-        # TODO: maybe create ids if not provided (?)
-        return pd.read_csv(self.validation_dataset_path, header=None, names=["text", "label"])
+        header = 0 if self.has_header else None
+
+        df = pd.read_csv(self.validation_dataset_path, header=header)
+        df = df.iloc[:, [self.text_column_id, self.label_column_id]]
+        df.columns = ["text", "label"]
+        return df
 
     def __post_init__(self):
         self.stage = Stage.TRAINING
         self.selectors = [] if self.selectors is None else [SelectorConfig(**t) for t in self.selectors]
-        self.metrics = [] if self.metrics is None else [MetricsConfig(**m) for m in self.metrics]
         self.batch_size = int(self.batch_size)
         self.epochs = int(self.epochs)
         self.learning_rate = float(self.learning_rate)
         self.validation_size = float(self.validation_size)
         self.callbacks = (SavePredictionsCallback(),) if self.perform_data_cartography else ()
+        self._verify()
+
+    def _verify(self):
+        metric_names = [m.name for m in self.metrics]
+
+        if self.metric_for_best_model not in metric_names and self.metric_for_best_model != "loss":
+            raise ValueError(f"metric for best model is not defined in metrics")
 
     def load_dataset(self) -> Tuple[pd.DataFrame, pd.DataFrame]:
         data = super().load_dataset()
@@ -101,5 +110,6 @@ class TrainingConfig(DatasetConfigWithSelectors, WithMetrics):
             load_best_model_at_end=True,
             metric_for_best_model=self.metric_for_best_model,
             num_train_epochs=self.epochs,
-            report_to=None,
+            report_to=[],
+            optim="adamw_torch",
         )

@@ -1,25 +1,23 @@
 import os.path
 import pickle
 from dataclasses import dataclass, field
-from typing import Dict, List, MutableMapping, Union
+from typing import Dict, List, MutableMapping
 
 import pandas as pd
 import yaml
 
-from t2r2.metrics import get_metric, MetricsConfig
-from t2r2.selector import get_selector, get_custom_selector, SelectorConfig
+from t2r2.metrics import MetricsConfig, get_metric
+from t2r2.selector import SelectorConfig, get_custom_selector, get_selector
+from t2r2.utils import Stage, check_if_directory_exists, flatten_dict
 from t2r2.utils.mlflow import MlflowManager
-from t2r2.utils.utils import Stage
-from t2r2.utils.utils import flatten_dict
-from t2r2.utils.utils import check_if_directory_exists
 
 
 @dataclass
 class DatasetConfig:
     dataset_path: str
-    text_column_id: int
-    label_column_id: int
-    has_header: bool
+    text_column_id: int = 0
+    label_column_id: int = 1
+    has_header: bool = True
 
     def load_dataset(self) -> pd.DataFrame:
         header = 0 if self.has_header else None
@@ -33,7 +31,7 @@ class DatasetConfig:
 
 @dataclass
 class DatasetConfigWithSelectors(DatasetConfig):
-    random_state: int = 123
+    random_state: int = None
     selectors: List[SelectorConfig] = None
 
     def load_dataset(self) -> pd.DataFrame:
@@ -66,7 +64,11 @@ class WithMetrics:
         return flatten_dict(
             {
                 metric.name: get_metric(metric.name)(
-                    true_labels, predictions, **metric.args, proba_predictions=proba_predictions, stage=self.stage
+                    true_labels,
+                    predictions,
+                    **metric.args,
+                    # FIXME: this doesn't work without ignore_unmatched_kwargs
+                    # proba_predictions=proba_predictions, stage=self.stage
                 )
                 for metric in self.metrics
             }
