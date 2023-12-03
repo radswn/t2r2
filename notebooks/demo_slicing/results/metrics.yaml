@@ -1,0 +1,26 @@
+control:
+  test_f1_score: 0.0
+  test_loss: 2.2905657291412354
+  test_runtime: 1.4715
+  test_samples_per_second: 6.116
+  test_slicing_scores_accuracy_long: 0.0
+  test_slicing_scores_accuracy_overall: 0.0
+  test_slicing_scores_accuracy_short: 0.0
+  test_slicing_scores_accuracy_textblob_polarity: 0.0
+  test_steps_per_second: 3.398
+test:
+  test_f1_score: 0.03977272727272728
+  test_loss: 2.0251612663269043
+  test_runtime: 15.1103
+  test_samples_per_second: 6.618
+  test_slicing_scores_accuracy_long: 0.23076923076923078
+  test_slicing_scores_accuracy_overall: 0.28
+  test_slicing_scores_accuracy_short: 0.2807017543859649
+  test_slicing_scores_accuracy_textblob_polarity: 0.4
+  test_steps_per_second: 3.309
+train:
+  epoch: 1.0
+  train_loss: 2.237875
+  train_runtime: 939.6518
+  train_samples_per_second: 1.064
+  train_steps_per_second: 0.532
