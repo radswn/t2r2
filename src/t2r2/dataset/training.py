@@ -16,9 +16,9 @@ from t2r2.utils.mlflow import MlflowManager
 
 @dataclass
 class TrainingConfig(DatasetConfigWithSelectors, WithMetrics):
+    output_dir: str
     dataset_path: str = "train.csv"
     validation_dataset_path: str = None
-    output_dir: str = "./results/"
     results_file: str = "train_results.pickle"
     epochs: int = 1
     batch_size: int = 32
@@ -39,7 +39,6 @@ class TrainingConfig(DatasetConfigWithSelectors, WithMetrics):
     def __post_init__(self):
         self.stage = Stage.TRAINING
         self.selectors = [] if self.selectors is None else [SelectorConfig(**t) for t in self.selectors]
-        self.metrics = [] if self.metrics is None else [MetricsConfig(**m) for m in self.metrics]
         self.batch_size = int(self.batch_size)
         self.epochs = int(self.epochs)
         self.learning_rate = float(self.learning_rate)

@@ -52,9 +52,9 @@ class DatasetConfigWithSelectors(DatasetConfig):
 
 @dataclass
 class WithMetrics:
+    output_dir: str
     results_file: str
     metrics_file: str = "metrics.yaml"
-    output_dir: str = "./results"
     metrics: List[MetricsConfig] = None
     stage: Stage = field(init=False)
 

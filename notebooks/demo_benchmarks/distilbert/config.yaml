@@ -1,4 +1,6 @@
 random_state: 123
+output_dir: imdb_distilbert
+data_dir: "../../../data/imdb/"
 
 model:
   max_length: 256
@@ -12,7 +14,6 @@ metrics:
   - name: balanced_accuracy_score
 
 training:
-  dataset_path: ../../../data/imdb/train.csv
   selectors:
     - args: { }
       name: dummy
@@ -20,16 +21,11 @@ training:
   epochs: 2
   learning_rate: 1e-4
   validation_size: 0.2
-  output_dir: imdb_distilbert
   metric_for_best_model: balanced_accuracy_score
 
 testing:
-  dataset_path: ../../../data/imdb/test.csv
-  output_dir: imdb_distilbert
   selectors: [ ]
-  results_file: ./file_test_results.pickle
+  results_file: file_test_results.pickle
 
 control:
-  dataset_path: ../../../data/imdb/control.csv
-  output_dir: imdb_distilbert
-  results_file: ./file_control_results.pickle
+  results_file: file_control_results.pickle
