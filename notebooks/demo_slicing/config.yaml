@@ -4,7 +4,7 @@ data_dir: "../../data/featuresets/"
 
 model:
   max_length: 256
-  model_name: bert-base-cased
+  model_name: distilbert-base-uncased
   num_labels: 12
   padding: max_length
   return_tensors: pt
@@ -29,7 +29,7 @@ training:
       args: 
         result_file: 'slicing/train_slicing.pickle'
         list_of_slicing_functions: [short, textblob_polarity, long]
-      
+  results_file: 'results/file_train_results.pickle'
   batch_size: 2
   epochs: 1
   learning_rate: 1e-3
@@ -44,11 +44,11 @@ testing:
       args: 
         result_file: 'slicing/test_slicing.pickle'
       
-  results_file: 'slicing/file_test_results.pickle'
+  results_file: 'results/file_test_results.pickle'
 
 control:
   dataset_path: 'thedeep.subset.control.txt'
-  results_file: 'slicing/file_control_results.pickle'
+  results_file: 'results/file_control_results.pickle'
 
 mlflow:
   experiment_name: 'my_experiment_slicing'
