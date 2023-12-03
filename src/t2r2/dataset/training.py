@@ -16,7 +16,6 @@ from t2r2.utils.mlflow import MlflowManager
 
 @dataclass
 class TrainingConfig(DatasetConfigWithSelectors, WithMetrics):
-    output_dir: str
     dataset_path: str = "train.csv"
     validation_dataset_path: str = None
     results_file: str = "train_results.pickle"
