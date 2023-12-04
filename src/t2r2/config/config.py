@@ -19,6 +19,7 @@ class Config:
     testing: TestConfig
     control: ControlConfig
     data_dir: str = "./data/"
+    output_dir: str = "./results/"
     random_state: int = None
     mlflow: MlFlowConfig = None
     dvc: DvcConfig = None
@@ -27,6 +28,7 @@ class Config:
         self.metrics = [] if self.metrics is None else [MetricsConfig(**m) for m in self.metrics]
         self._propagate_metrics()
         self._propagate_random_state()
+        self._propagate_output_path()
 
         self.model = ModelConfig(**self.model)
         self.training = TrainingConfig(**self.training)
@@ -48,6 +50,11 @@ class Config:
 
         if self.mlflow:
             self.mlflow["random_state"] = self.random_state
+
+    def _propagate_output_path(self):
+        self.training["output_dir"] = self.output_dir
+        self.control["output_dir"] = self.output_dir
+        self.testing["output_dir"] = self.output_dir
 
     def _propagate_dataset_path(self):
         self.training.dataset_path = self.data_dir + self.training.dataset_path

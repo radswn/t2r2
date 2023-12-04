@@ -1,0 +1,1 @@
+from t2r2.utils.curriculum_learning.curriculum_learning import OrderedTrainer

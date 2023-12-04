@@ -8,11 +8,12 @@ from t2r2.utils.mlflow import MlflowManager
 
 
 class TextDataset(Dataset):
-    def __init__(self, tokens, labels: torch.Tensor):
+    def __init__(self, tokens, labels: torch.Tensor, order=None):
         self.input_ids = tokens.input_ids
         self.attention_mask = tokens.attention_mask
         self.token_type_ids = tokens.token_type_ids
         self.y = labels
+        self.order = order
 
     def __len__(self):
         return len(self.y)
@@ -49,6 +50,7 @@ def get_datasets(
         dataset_type: TextDataset(
             tokens[dataset_type],
             labels[dataset_type],
+            training_dataset["order"].to_list() if dataset_type == "train" and "order" in training_dataset else None,
         )
         for dataset_type in data.keys()
     }
