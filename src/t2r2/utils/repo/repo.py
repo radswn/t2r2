@@ -34,7 +34,8 @@ class DvcConfig:
         if self.enabled:
             _add(config_path, training_config.metrics_file, test_config.metrics_file, control_config.metrics_file)
 
-            # TODO: model tracking (?)
+            if self.track_model:
+                _add(model_config.get_output_path())
 
             if self.training.track_dataset:
                 _add(training_config.dataset_path)

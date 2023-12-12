@@ -55,6 +55,7 @@ class Config:
         self.training["output_dir"] = self.output_dir
         self.control["output_dir"] = self.output_dir
         self.testing["output_dir"] = self.output_dir
+        self.model["output_dir"] = self.output_dir
 
     def _propagate_dataset_path(self):
         self.training.dataset_path = self.data_dir + self.training.dataset_path
