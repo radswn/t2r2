@@ -1,0 +1,18 @@
+model:
+  model_name: bert-base-cased
+  num_labels: 12
+
+metrics:
+  - name: accuracy_score
+
+training:
+  batch_size: 1
+  curriculum_learning: true
+  selectors:
+    - name: ClSelector
+      args:
+        module_path: ./cl_selector.py
+
+testing: { }
+
+control: { }

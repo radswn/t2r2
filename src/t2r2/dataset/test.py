@@ -8,7 +8,7 @@ from t2r2.utils import Stage
 @dataclass
 class TestConfig(DatasetConfigWithSelectors, WithMetrics):
     dataset_path: str = "test.csv"
-    results_file: str = "./results/test_results.pickle"
+    results_file: str = "test_results.pickle"
 
     def __post_init__(self):
         self.stage = Stage.TESTING

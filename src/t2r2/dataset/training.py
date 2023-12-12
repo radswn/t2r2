@@ -18,15 +18,15 @@ from t2r2.utils.mlflow import MlflowManager
 class TrainingConfig(DatasetConfigWithSelectors, WithMetrics):
     dataset_path: str = "train.csv"
     validation_dataset_path: str = None
-    output_dir: str = "./results/"
     results_file: str = "train_results.pickle"
     epochs: int = 1
     batch_size: int = 32
-    learning_rate: float = 0.01
+    learning_rate: float = 0.00001
     validation_size: float = 0.2
     metric_for_best_model: str = "loss"
     perform_data_cartography: bool = False
     data_cartography_results: str = "./data_cartography_metrics.pickle"
+    curriculum_learning: bool = False
 
     def load_validation_dataset(self) -> pd.DataFrame:
         header = 0 if self.has_header else None
@@ -54,7 +54,7 @@ class TrainingConfig(DatasetConfigWithSelectors, WithMetrics):
 
     def load_dataset(self) -> Tuple[pd.DataFrame, pd.DataFrame]:
         data = super().load_dataset()
-        X = data["text"]
+        X = data[["text", "order"]] if self.curriculum_learning else data["text"]
         y = data["label"]
 
         if self.validation_dataset_path is None:
