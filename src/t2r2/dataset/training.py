@@ -21,7 +21,7 @@ class TrainingConfig(DatasetConfigWithSelectors, WithMetrics):
     results_file: str = "train_results.pickle"
     epochs: int = 1
     batch_size: int = 32
-    learning_rate: float = 0.01
+    learning_rate: float = 0.00001
     validation_size: float = 0.2
     metric_for_best_model: str = "loss"
     perform_data_cartography: bool = False
