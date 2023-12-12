@@ -36,9 +36,9 @@ def loop(config_path="./config.yaml") -> Dict:
 
     # and repeat!
     return {
-        "train_results": train_results,
-        "test_results": test_results,
         "control_results": control_results,
+        "test_results": test_results,
+        "train_results": train_results,
     }
 
 
@@ -59,6 +59,7 @@ def _train_test(model, tokenizer, config: Config, mlflow_manager: MlflowManager 
     trainer = get_trainer(config.training, datasets, model)
 
     train_results = trainer.train()
+    train_results.metrics["history"] = trainer.state.log_history[:-1]  # last logs are already contained in metrics
     config.training.save_results(train_results, mlflow_manager)
 
     test_results = trainer.predict(datasets["test"])
@@ -66,5 +67,7 @@ def _train_test(model, tokenizer, config: Config, mlflow_manager: MlflowManager 
 
     control_results = trainer.predict(datasets["control"])
     config.control.save_results(control_results, mlflow_manager)
+
+    config.model.save_model(trainer)
 
     return train_results.metrics, test_results.metrics, control_results.metrics
