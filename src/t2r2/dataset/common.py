@@ -15,8 +15,8 @@ from t2r2.utils.mlflow import MlflowManager
 @dataclass
 class DatasetConfig:
     dataset_path: str
-    text_column_id: int = 1
-    label_column_id: int = 2
+    text_column_id: int = 0
+    label_column_id: int = 1
     has_header: bool = True
 
     def load_dataset(self) -> pd.DataFrame:
