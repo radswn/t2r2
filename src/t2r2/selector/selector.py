@@ -8,14 +8,7 @@ from t2r2.selector.data_cartography import DataCartographySelector
 from t2r2.selector.dummy import DummySelector
 from t2r2.selector.slicing import SlicingSelector
 from t2r2.selector.undersampling import RandomUnderSamplerSelector
-<<<<<<< HEAD
-=======
-from t2r2.selector.data_cartography import DataCartographySelector
-from t2r2.selector.llm import LLMSelector 
-
-from importlib import util
-from os import path
->>>>>>> b1ab519 (add llm selector with notebook - google colab)
+from t2r2.selector.llm import LLMSelector
 
 
 @dataclass
@@ -45,7 +38,7 @@ def get_selector(name: str) -> Type[Selector]:
         "slicing": SlicingSelector,
         "random_under_sampler": RandomUnderSamplerSelector,
         "data_cartography": DataCartographySelector,
-        "llm": LLMSelector
+        "llm": LLMSelector,
     }
     return selectors[name]
 
