@@ -10,14 +10,15 @@ from t2r2.metrics import MetricsConfig, get_metric
 from t2r2.selector import SelectorConfig, get_custom_selector, get_selector
 from t2r2.utils import Stage, check_if_directory_exists, flatten_dict
 from t2r2.utils.mlflow import MlflowManager
+from typing import Optional
 
 
 @dataclass
 class DatasetConfig:
     dataset_path: str
-    text_column_id: int = 0
-    label_column_id: int = 1
-    has_header: bool = True
+    text_column_id: Optional[int]
+    label_column_id: Optional[int]
+    has_header: Optional[bool]
 
     def load_dataset(self) -> pd.DataFrame:
         header = 0 if self.has_header else None
