@@ -8,7 +8,8 @@ from snorkel.slicing import PandasSFApplier
 
 from t2r2.selector.base import Selector
 from t2r2.selector.slicing import default_slicing_functions
-from t2r2.selector.slicing.default_slicing_functions import short
+from t2r2.selector.slicing.default_slicing_functions import short, long
+from t2r2.utils import check_if_directory_exists
 
 
 class SlicingSelector(Selector):
@@ -18,7 +19,7 @@ class SlicingSelector(Selector):
         self.result_file = result_file
 
     def select(self, dataset: pd.DataFrame) -> pd.DataFrame:
-        # NIT: thinking about slicing in general: I highly doubt that is is truly a selector...
+        check_if_directory_exists(self.result_file)
         if not len(self.sfs) == 0:
             res = self.create_slicing_functions(dataset)
             res.dump(self.result_file)
@@ -26,7 +27,7 @@ class SlicingSelector(Selector):
 
     def create_list_of_slicing_functions(self, list_of_slicing_functions: Union[List[str], None]):
         if list_of_slicing_functions is None:
-            sfs = [short]
+            sfs = [short, long]
         else:
             sfs = [getattr(default_slicing_functions, function_name) for function_name in list_of_slicing_functions]
         return sfs

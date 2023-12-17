@@ -70,6 +70,8 @@ class MetricsConfig:
             _ = get_metric(self.name)([0, 0], [0, 1], **self.args)
         except KeyError:
             self._handle_wrong_metric_name()
+        except AttributeError as attr_error:
+            self._handle_attribute_error(self.name, attr_error)
 
     def _handle_wrong_metric_name(self):
         if self.name in dir(sklearn.metrics):
@@ -78,3 +80,9 @@ class MetricsConfig:
             error_msg = f"metric {self.name} does not exist"
 
         raise ValueError(error_msg)
+
+    def _handle_attribute_error(self, name, error):
+        if name == "slicing_scores":
+            pass
+        else:
+            raise error
