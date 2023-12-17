@@ -19,7 +19,6 @@ class SlicingSelector(Selector):
         self.result_file = result_file
 
     def select(self, dataset: pd.DataFrame) -> pd.DataFrame:
-        # NIT: thinking about slicing in general: I highly doubt that is is truly a selector...
         check_if_directory_exists(self.result_file)
         if not len(self.sfs) == 0:
             res = self.create_slicing_functions(dataset)
