@@ -9,7 +9,7 @@ from snorkel.slicing import PandasSFApplier
 from t2r2.selector.base import Selector
 from t2r2.selector.slicing import default_slicing_functions
 from t2r2.selector.slicing.default_slicing_functions import short, long
-from t2r2.utils.utils import check_if_directory_exists
+from t2r2.utils import check_if_directory_exists
 
 
 class SlicingSelector(Selector):
