@@ -1,3 +1,9 @@
+data:
+  has_header: True
+  text_column_id: 0
+  label_column_id: 1
+  output_dir: imdb_distilbert
+  data_dir: "../../data/imdb/"
 
 model:
   model_name: bert-base-cased

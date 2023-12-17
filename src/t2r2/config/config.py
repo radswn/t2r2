@@ -19,47 +19,53 @@ class Config:
     testing: TestConfig
     control: ControlConfig
     data: DataConfig
+    random_state: int = None
     mlflow: MlFlowConfig = None
     dvc: DvcConfig = None
 
     def __post_init__(self):
         self.metrics = [] if self.metrics is None else [MetricsConfig(**m) for m in self.metrics]
-        self._propagate_metrics()
-
         self.data = DataConfig(**self.data)
+
+        self._propagate_defaults()
+
         self.model = ModelConfig(**self.model)
         self.training = TrainingConfig(**self.training)
         self.control = ControlConfig(**self.control)
         self.testing = TestConfig(**self.testing)
         self.mlflow = MlFlowConfig(**self.mlflow) if self.mlflow else None
+
+        self._propagate_to_non_defaults()
+
         self.dvc = DvcConfig(**self.dvc) if self.dvc else DvcConfig()
 
-        self.propagate_data_config()
-        
-    def propagate_data_config(self):
-        self._propagate_dataset_path()
+    def _propagate_defaults(self):
+        self._propagate_metrics()
         self._propagate_random_state()
         self._propagate_output_path()
+
+    def _propagate_to_non_defaults(self):
         self._propagate_data_columns()
-        
+        self._propagate_dataset_path()
+
     def _propagate_data_columns(self):
-        attributes = ['text_column_id', 'label_column_id', 'has_header']
+        attributes = ["text_column_id", "label_column_id", "has_header"]
         for attr in attributes:
             for section in [self.training, self.control, self.testing]:
                 if getattr(section, attr) is None:
                     setattr(section, attr, getattr(self.data, attr))
-        
+
     def _propagate_metrics(self):
         self.training["metrics"] = self.metrics
         self.control["metrics"] = self.metrics
         self.testing["metrics"] = self.metrics
 
     def _propagate_random_state(self):
-        self.training["random_state"] = self.data.random_state
-        self.testing["random_state"] = self.data.random_state
+        self.training["random_state"] = self.random_state
+        self.testing["random_state"] = self.random_state
 
         if self.mlflow:
-            self.mlflow["random_state"] = self.data.random_state
+            self.mlflow["random_state"] = self.random_state
 
     def _propagate_output_path(self):
         self.training["output_dir"] = self.data.output_dir

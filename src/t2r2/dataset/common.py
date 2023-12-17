@@ -16,9 +16,9 @@ from typing import Optional
 @dataclass
 class DatasetConfig:
     dataset_path: str
-    text_column_id: Optional[int]
-    label_column_id: Optional[int]
-    has_header: Optional[bool]
+    text_column_id: Optional[int] = None
+    label_column_id: Optional[int] = None
+    has_header: Optional[bool] = None
 
     def load_dataset(self) -> pd.DataFrame:
         header = 0 if self.has_header else None

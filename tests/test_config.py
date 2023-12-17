@@ -18,6 +18,24 @@ def test_valid_config(test_config_dict):
     assert cfg.random_state == None
     assert cfg.mlflow == None
     assert cfg.dvc != None and cfg.dvc.enabled == False
+    
+def test_column_propagation(test_config_dict):
+    test_config_dict["data"]["text_column_id"] = 1
+    test_config_dict["data"]["label_column_id"] = 2
+    
+    test_config_dict["testing"]["text_column_id"] = 0
+    test_config_dict["testing"]["label_column_id"] = 1
+                     
+    cfg = Config(**test_config_dict)
+
+    assert cfg.training.text_column_id == 1
+    assert cfg.training.label_column_id == 2
+    
+    assert cfg.testing.text_column_id == 0
+    assert cfg.testing.label_column_id == 1
+    
+    assert cfg.control.text_column_id == 1
+    assert cfg.control.label_column_id == 2
 
 
 def test_random_state_propagation(test_config_dict):
@@ -30,7 +48,7 @@ def test_random_state_propagation(test_config_dict):
 
 def test_output_dir_propagation(test_config_dict):
     output_dir = 123
-    test_config_dict["output_dir"] = output_dir
+    test_config_dict["data"]["output_dir"] = output_dir
     cfg = Config(**test_config_dict)
 
     assert cfg.testing.output_dir == cfg.training.output_dir == output_dir
