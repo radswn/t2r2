@@ -21,8 +21,8 @@ training:
   validation_dataset_path: validation.csv
   selectors:
     - args:
-        hard_to_learn: 0
-        easy_to_learn: 0.3
+        hard_to_learn: 0.3
+        easy_to_learn: 0
         ambiguous: 0.1
         random: 0.1
       name: data_cartography
