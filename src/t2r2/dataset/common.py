@@ -59,6 +59,9 @@ class WithMetrics:
     metrics: List[MetricsConfig] = None
     stage: Stage = field(init=False)
 
+    def __post_init__(self):
+        self._propagate_output_path()
+
     def compute_metrics(self, outputs) -> MutableMapping:
         proba_predictions, predictions, true_labels = outputs[0], outputs[0].argmax(1), outputs[1]
 
@@ -78,41 +81,34 @@ class WithMetrics:
         )
 
     def save_results(self, results, mlflow_manager: MlflowManager):
-        results_path = os.path.join(self.output_dir, self.results_file)
-        check_if_directory_exists(results_path)
+        check_if_directory_exists(self.results_file)
 
-        with open(results_path, "wb") as file:
-            pickle.dump(results_path, file)
+        with open(self.results_file, "wb") as file:
+            pickle.dump(self.results_file, file)
 
         self._dump_metrics(results.metrics)
         if mlflow_manager is not None:
             self._log_metrics_to_mlflow(results.metrics, mlflow_manager)
 
     def load_results(self):
-        results_path = os.path.join(self.output_dir, self.results_file)
-        with open(results_path, "rb") as file:
+        with open(self.results_file, "rb") as file:
             return pickle.load(file)
 
-    def _get_metrics_path(self):
-        return os.path.join(self.output_dir, self.metrics_file)
-
     def load_metrics(self) -> Dict:
-        metrics_path = self._get_metrics_path()
-        with open(metrics_path, "r") as file:
+        with open(self.metrics_file, "r") as file:
             return yaml.safe_load(file)
 
     def _dump_metrics(self, metrics):
         file_content = {}
-        metrics_path = self._get_metrics_path()
-        check_if_directory_exists(metrics_path)
+        check_if_directory_exists(self.metrics_file)
 
-        if os.path.exists(metrics_path):
-            with open(metrics_path, "r") as file:
+        if os.path.exists(self.metrics_file):
+            with open(self.metrics_file, "r") as file:
                 file_content = yaml.safe_load(file)
 
         file_content[self.stage.value] = metrics
 
-        with open(metrics_path, "w") as file:
+        with open(self.metrics_file, "w") as file:
             yaml.dump(file_content, file)
 
     def _log_metrics_to_mlflow(self, metrics, mlflow_manager: MlflowManager):
@@ -126,3 +122,7 @@ class WithMetrics:
         for metric in self.metrics:
             if metric.name == "slicing_scores":
                 metric.args.update({"proba_predictions": proba_predictions, "stage": self.stage})
+
+    def _propagate_output_path(self):
+        self.results_file = os.path.join(self.output_dir, self.results_file)
+        self.metrics_file = os.path.join(self.output_dir, self.metrics_file)

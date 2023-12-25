@@ -33,9 +33,9 @@ class DvcConfig:
         if self.enabled:
             _add(
                 config_path,
-                training_config._get_metrics_path(),
-                test_config._get_metrics_path(),
-                control_config._get_metrics_path(),
+                training_config.metrics_file,
+                test_config.metrics_file,
+                control_config.metrics_file,
             )
 
             if self.track_model:

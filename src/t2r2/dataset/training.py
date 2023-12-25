@@ -37,6 +37,8 @@ class TrainingConfig(DatasetConfigWithSelectors, WithMetrics):
         return df
 
     def __post_init__(self):
+        super().__post_init__()
+
         self.stage = Stage.TRAINING
         self.selectors = [] if self.selectors is None else [SelectorConfig(**t) for t in self.selectors]
         self.batch_size = int(self.batch_size)
