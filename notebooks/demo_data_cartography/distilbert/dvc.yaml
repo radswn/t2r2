@@ -1,4 +1,0 @@
-metrics:
-- metrics.yaml
-params:
-- ./config_experiments_from_data_cartography_results.yaml
