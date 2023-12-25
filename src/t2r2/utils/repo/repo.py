@@ -2,7 +2,6 @@ import logging
 import subprocess
 from dataclasses import dataclass
 from typing import Dict, List
-
 import yaml
 
 from t2r2.dataset import ControlConfig, TestConfig, TrainingConfig
@@ -32,7 +31,12 @@ class DvcConfig:
         model_config: ModelConfig,
     ):
         if self.enabled:
-            _add(config_path, training_config.metrics_file, test_config.metrics_file, control_config.metrics_file)
+            _add(
+                config_path,
+                training_config._get_metrics_path(),
+                test_config._get_metrics_path(),
+                control_config._get_metrics_path(),
+            )
 
             if self.track_model:
                 _add(model_config.get_output_path())

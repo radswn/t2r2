@@ -37,20 +37,16 @@ class DataCartographySelector(Selector):
         hard_sample_size = int(self.hard_to_learn * size_of_new_dataset)
         ambiguous_sample_size = int(self.ambiguous * size_of_new_dataset)
 
-        # Sort the DataFrame by "variability" and "correctness" in descending order
         df_sorted_variability = df.sort_values(by="variability", ascending=False)
         df_sorted_correctness = df.sort_values(by="correctness", ascending=False)
 
-        easy_indices = df_sorted_variability.index[:ambiguous_sample_size] if easy_sample_size else []
-
+        ambiguous_indices = df_sorted_variability.index[:ambiguous_sample_size] if ambiguous_sample_size else []
         hard_indices = df_sorted_correctness.index[-hard_sample_size:] if hard_sample_size else []
-
-        ambiguous_indices = df_sorted_correctness.index[:easy_sample_size] if ambiguous_sample_size else []
-
+        easy_indices = df_sorted_correctness.index[:easy_sample_size] if easy_sample_size else []
         random_indices = (
             df.sample(frac=self.random, replace=False, random_state=self.random_state).index if self.random > 0 else []
         )
-        # Combine the selected indices into a set (without duplicates)
+
         selected_indices = list(set(easy_indices) | set(hard_indices) | set(ambiguous_indices) | set(random_indices))
         return selected_indices
 

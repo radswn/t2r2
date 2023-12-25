@@ -93,14 +93,17 @@ class WithMetrics:
         with open(results_path, "rb") as file:
             return pickle.load(file)
 
+    def _get_metrics_path(self):
+        return os.path.join(self.output_dir, self.metrics_file)
+
     def load_metrics(self) -> Dict:
-        metrics_path = os.path.join(self.output_dir, self.metrics_file)
+        metrics_path = self._get_metrics_path()
         with open(metrics_path, "r") as file:
             return yaml.safe_load(file)
 
     def _dump_metrics(self, metrics):
         file_content = {}
-        metrics_path = os.path.join(self.output_dir, self.metrics_file)
+        metrics_path = self._get_metrics_path()
         check_if_directory_exists(metrics_path)
 
         if os.path.exists(metrics_path):

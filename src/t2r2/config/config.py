@@ -77,6 +77,8 @@ class Config:
         self.training.dataset_path = self.data.data_dir + self.training.dataset_path
         self.control.dataset_path = self.data.data_dir + self.control.dataset_path
         self.testing.dataset_path = self.data.data_dir + self.testing.dataset_path
+        if self.training.validation_dataset_path is not None:
+            self.training.validation_dataset_path = self.data.data_dir + self.training.validation_dataset_path
 
 
 def load_config(path: str) -> Dict:

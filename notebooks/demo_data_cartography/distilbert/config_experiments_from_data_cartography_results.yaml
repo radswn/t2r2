@@ -27,7 +27,7 @@ training:
         random: 0.1
       name: data_cartography
   batch_size: 16
-  epochs: 5
+  epochs: 1
   learning_rate: 1e-5
   validation_size: 0.2
   metric_for_best_model: balanced_accuracy_score
