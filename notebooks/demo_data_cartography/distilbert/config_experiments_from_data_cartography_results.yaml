@@ -1,6 +1,9 @@
 # demo configuration
 random_state: 123
 
+data:
+  data_dir: ../../../data/imdb/
+
 model:
   max_length: 256
   model_name: distilbert-base-uncased
@@ -14,8 +17,8 @@ metrics:
 
 
 training:
-  dataset_path: ../../../data/imdb/train.csv
-  validation_dataset_path: ../../../data/imdb/validation.csv
+  dataset_path: train.csv
+  validation_dataset_path: validation.csv
   selectors:
     - args:
         hard_to_learn: 0
@@ -31,10 +34,13 @@ training:
 
 
 testing:
-  dataset_path: ../../../data/imdb/test.csv
+  dataset_path: test.csv
   selectors: [ ]
-  results_file: ./file_test_results_experiment.pickle
+  results_file: file_test_results_experiment.pickle
 
 control:
-  dataset_path: ../../../data/imdb/control.csv
-  results_file: ./file_control_results_experiment.pickle
+  dataset_path: control.csv
+  results_file: file_control_results_experiment.pickle
+
+dvc:
+  enabled: true
