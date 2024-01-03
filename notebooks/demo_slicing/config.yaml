@@ -1,6 +1,11 @@
 random_state: 123
-data_dir: "../../data/featuresets/"
-output_dir: "results/"
+data:
+  data_dir: "../../data/featuresets/"
+  output_dir: "results/"
+  has_header: False
+  text_column_id: 1
+  label_column_id: 2
+
 
 model:
   max_length: 256
