@@ -1,6 +1,9 @@
 # demo configuration
 random_state: 123
 
+data:
+  data_dir: ../../../data/imdb/
+
 model:
   max_length: 256
   model_name: distilbert-base-uncased
@@ -14,27 +17,27 @@ metrics:
 
 
 training:
-  dataset_path: ../../../data/imdb/train.csv
-  validation_dataset_path: ../../../data/imdb/validation.csv
+  validation_dataset_path: validation.csv
   selectors:
     - args:
-        hard_to_learn: 0
-        easy_to_learn: 0.3
+        hard_to_learn: 0.3
+        easy_to_learn: 0
         ambiguous: 0.1
         random: 0.1
       name: data_cartography
   batch_size: 16
-  epochs: 5
+  epochs: 1
   learning_rate: 1e-5
   validation_size: 0.2
   metric_for_best_model: balanced_accuracy_score
 
 
 testing:
-  dataset_path: ../../../data/imdb/test.csv
   selectors: [ ]
-  results_file: ./file_test_results_experiment.pickle
+  results_file: file_test_results_experiment.pickle
 
 control:
-  dataset_path: ../../../data/imdb/control.csv
-  results_file: ./file_control_results_experiment.pickle
+  results_file: file_control_results_experiment.pickle
+
+dvc:
+  enabled: true
