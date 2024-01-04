@@ -17,7 +17,6 @@ metrics:
 
 
 training:
-  dataset_path: train.csv
   validation_dataset_path: validation.csv
   selectors:
     - args:
@@ -34,12 +33,10 @@ training:
 
 
 testing:
-  dataset_path: test.csv
   selectors: [ ]
   results_file: file_test_results_experiment.pickle
 
 control:
-  dataset_path: control.csv
   results_file: file_control_results_experiment.pickle
 
 dvc:
