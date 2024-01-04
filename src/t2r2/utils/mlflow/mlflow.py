@@ -32,9 +32,9 @@ class MlflowManager(metaclass=Singleton):
         self.logger = logging.getLogger(__name__)
         self.random_state = mlflow_config.random_state
         self.set_tracking_uri()
-        
+
     @staticmethod
-    def flatten_dict(d, parent_key='', sep='_'):
+    def flatten_dict(d, parent_key="", sep="_"):
         items = []
         for k, v in d.items():
             new_key = f"{parent_key}{sep}{k}" if parent_key else k
@@ -69,7 +69,6 @@ class MlflowManager(metaclass=Singleton):
         flattened_metrics = MlflowManager.flatten_dict(metrics)
         self.logger.info("mlflow: logging metrics :" + " ".join(list(flattened_metrics.keys())))
         mlflow.log_metrics(flattened_metrics)
-        
 
     def log_data(self, data: Dict[str, pd.DataFrame]):
         for key, value in data.items():
@@ -92,5 +91,3 @@ class MlflowManager(metaclass=Singleton):
             mlflow.log_artifact(f"dataset_{dataset_name}.html", f"stat_descriptive_{dataset_name}")
             os.remove(f"dataset_{dataset_name}.html")
         self.logger.info("mlflow: Dataset synopsis logged")
-        
-
