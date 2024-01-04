@@ -1,6 +1,10 @@
 # demo configuration
 random_state: 123
 
+data:
+  data_dir: ../../../data/imdb/
+
+
 model:
   max_length: 256
   model_name: distilbert-base-uncased
@@ -13,8 +17,7 @@ metrics:
   - name: balanced_accuracy_score
 
 training:
-  dataset_path: ../../../data/imdb/train.csv
-  validation_dataset_path: ../../../data/imdb/validation.csv
+  validation_dataset_path: validation.csv
   selectors:
     - args: { }
       name: dummy
@@ -26,10 +29,8 @@ training:
 
 
 testing:
-  dataset_path: ../../../data/imdb/test.csv
   selectors: [ ]
-  results_file: ./file_test_results.pickle
+  results_file: file_test_results.pickle
 
 control:
-  dataset_path: ../../../data/imdb/control.csv
-  results_file: ./file_control_results.pickle
+  results_file: file_control_results.pickle

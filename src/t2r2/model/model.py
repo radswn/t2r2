@@ -36,7 +36,7 @@ class ModelConfig:
         return AutoModelForSequenceClassification.from_pretrained(self.model_name, num_labels=self.num_labels)
 
     def get_output_path(self):
-        return Path(self.output_dir) / self.output_path
+        return str(Path(self.output_dir) / self.output_path)
 
     def save_model(self, trainer):
         trainer.save_model(self.get_output_path())

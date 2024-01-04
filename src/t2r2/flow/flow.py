@@ -154,7 +154,11 @@ class T2R2:
         if config.dvc:
             repo.init(
                 self.config_path,
-                [config.training.metrics_file, config.testing.metrics_file, config.control.metrics_file],
+                [
+                    config.training.metrics_file,
+                    config.testing.metrics_file,
+                    config.control.metrics_file,
+                ],
             )
 
     def dvc_checkout(self):

@@ -48,7 +48,7 @@ def test_random_state_propagation(test_config_dict):
 
 
 def test_output_dir_propagation(test_config_dict):
-    output_dir = 123
+    output_dir = "123"
     test_config_dict["data"]["output_dir"] = output_dir
     cfg = Config(**test_config_dict)
 
