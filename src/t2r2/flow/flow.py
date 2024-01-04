@@ -106,10 +106,10 @@ class T2R2:
     ) -> Dict[str, TextDataset]:
         training_dataset, validation_dataset = config.training.load_dataset()
         data = {
-            "train": training_dataset[:100],
-            "validation": validation_dataset[:20],
-            "test": config.testing.load_dataset()[:20],
-            "control": config.control.load_dataset()[:20],
+            "train": training_dataset,
+            "validation": validation_dataset,
+            "test": config.testing.load_dataset(),
+            "control": config.control.load_dataset(),
         }
 
         if mlflow_manager is not None:
