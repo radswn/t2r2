@@ -21,7 +21,7 @@ In T2R2 we use configuration files in `yaml` format to specify our needs. Below 
 
 Exemplary config of Model
 
-```
+```yaml
 model:
   model_name: bert-base-cased
   num_labels: 12
@@ -29,13 +29,13 @@ model:
 
 ## Metrics
 
-Pick metrics that you need as arguments for this section. Complete list of metrics we handle is available [here](src\t2r2\metrics\metrics.py)
+Pick metrics that you need as arguments for this section. Complete list of metrics we handle is available [here](/src/t2r2/metrics/metrics.py).
 
-To ommit redundant descriptions - you may find metrics explained under this [link] (https://scikit-learn.org/stable/modules/model_evaluation.html)
+To ommit redundant descriptions - you may find metrics explained under this [link](https://scikit-learn.org/stable/modules/model_evaluation.html).
 
 Exemplary config of Metrics
 
-```
+```yaml
 metrics:
   - name: accuracy_score
 ```
@@ -52,18 +52,77 @@ Also you may enrich training and testing sections with `selectors` subsection.
 
 ### Selectors
 
+The following paragraphs briefly describes selectors that we provide
+
 #### Data Cartography
+
+Implementation of the concept of data cartography as outlined in the paper: https://aclanthology.org/2020.emnlp-main.746/.
+
+To fully understand how it works - check this [notebook](/notebooks/demo_data_cartography/bert-base-cased/demo_data_cartography.ipynb)
 
 #### LLM selector
 
-#### Slicing
+TODO - PR to be accepted
+
+#### Slicing functions
+
+Check our notebook that explains slicing functions [here](/notebooks/demo_slicing/demo_slicing.ipynb).
 
 #### Undersampling
 
-Undersampling performed randomly with [RandomUnderSampler] (https://imbalanced-learn.org/stable/references/generated/imblearn.under_sampling.RandomUnderSampler.html) from imblearn
+Undersampling performed randomly with [RandomUnderSampler](https://imbalanced-learn.org/stable/references/generated/imblearn.under_sampling.RandomUnderSampler.html) from imblearn
 
-Exemplary selectors config:
+#### User Selector
+
+We give you an opportunity to use your own selectors.
+
+1. Prepare a class you want to use - it should inherit from `Selector` class from `t2r2.selector`. Implement its `select` method.
+2. When declarating your own selector - provide `module_path` as one of the arguments.
+
+Below we present a simple example how to do it.
+
+`config.yaml` part
+
+```yaml
+  selectors:
+    - name: UserSelector
+      args: 
+        module_path: ./my_selector.py
 ```
+
+`my_selector.py` code
+
+```python
+import pandas as pd
+from t2r2.selector import Selector
+
+class UserSelector(Selector):
+    def select(self, dataset: pd.DataFrame) -> pd.DataFrame:
+        return dataset[:5]
+```
+
+#### Curriculum Learning
+
+To force specific order in which examples will be passed during training:
+```yaml
+training:
+  curriculum_learning: True
+```
+Then you also need to provide the `order` column in your training data.
+
+Basically, the examples will be _sorted_ according to order column and won't be shuffled.
+
+You can also use the custom selector to dynamically provide the order of your training examples.
+For example, to pass examples in the order of increasing lenght of text:
+```python
+class ClSelector(Selector):
+    def select(self, dataset: pd.DataFrame) -> pd.DataFrame:
+        dataset["order"] = [len(i) for i in dataset["text"]]
+        return dataset
+```
+
+#### Exemplary selectors config:
+```yaml
   selectors:
     - name: random_under_sampler
       args: { }
@@ -99,34 +158,39 @@ Exemplary selectors config:
 
 ## MLFlow
 
+Enables tracking an experiment (datasets, model and metrics) with the use of MLflow tools. 
+
 1. `experiment_name` - [str] the experiment name
 2. `tags` - [args] additional tags such as `version`
 3. `tracking_uri`: [str] the endpoint of your server
 
-###### TODO
-
 Exemplary config of MLFlow:
 
-```
+```yaml
 mlflow:
-  experiment_name: 'my_experiment_3'
+  experiment_name: 'my_experiment_1'
   tags:
       version: 'v1'
   tracking_uri: "http://localhost:5000"
 ```
 
+Check our notebook with MLflow enabled [here](/notebooks/demo_slicing/demo_slicing.ipynb).
+
 ## DVC
-###### TODO
-If you want to switch it on - add the following lines to your config
-```
+
+Enables versioning of an experiment (datasets, model and metrics), showing differences in parameters as well as in metrics, easy checkouts. If you want to switch it on - add the following lines to your config
+
+```yaml
 dvc:
   enabled: true
 ```
 [default: off]
 
+For more tips check our notebook that presents a workflow with DVC enabled [here](/notebooks/demo_dvc/demo.ipynb).
+
 ## Exemplary config:
 
-```
+```yaml
 model:
   model_name: bert-base-cased
   num_labels: 12
