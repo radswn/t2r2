@@ -1,6 +1,11 @@
-# demo configuration
 random_state: 123
-data_dir: "../../data/featuresets/"
+data:
+  data_dir: "../../data/featuresets/"
+  output_dir: "results/"
+  has_header: False
+  text_column_id: 1
+  label_column_id: 2
+
 
 model:
   max_length: 256
@@ -29,10 +34,10 @@ training:
       args: 
         result_file: 'slicing/train_slicing.pickle'
         list_of_slicing_functions: [short, textblob_polarity, long]
-  results_file: 'results/file_train_results.pickle'
+  results_file: 'file_train_results.pickle'
   batch_size: 2
-  epochs: 1
-  learning_rate: 1e-3
+  epochs: 2
+  learning_rate: 1e-5
   validation_size: 0.2
   output_dir: ClassificationBERT
   metric_for_best_model: f1_score
@@ -45,11 +50,11 @@ testing:
         result_file: 'slicing/test_slicing.pickle'
         list_of_slicing_functions: [short, textblob_polarity, long]
       
-  results_file: 'results/file_test_results.pickle'
+  results_file: 'file_test_results.pickle'
 
 control:
   dataset_path: 'thedeep.subset.control.txt'
-  results_file: 'results/file_control_results.pickle'
+  results_file: 'file_control_results.pickle'
 
 mlflow:
   experiment_name: 'my_experiment_slicing'

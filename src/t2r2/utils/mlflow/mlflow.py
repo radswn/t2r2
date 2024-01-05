@@ -33,6 +33,23 @@ class MlflowManager(metaclass=Singleton):
         self.random_state = mlflow_config.random_state
         self.set_tracking_uri()
 
+    @staticmethod
+    def flatten_dict(d, parent_key="", sep="_"):
+        items = []
+        for k, v in d.items():
+            new_key = f"{parent_key}{sep}{k}" if parent_key else k
+            if isinstance(v, dict):
+                items.extend(MlflowManager.flatten_dict(v, new_key, sep=sep).items())
+            elif isinstance(v, list):
+                for i, item in enumerate(v):
+                    if isinstance(item, dict):
+                        items.extend(MlflowManager.flatten_dict(item, f"{new_key}{sep}{i}", sep=sep).items())
+                    else:
+                        items.append((f"{new_key}{sep}{i}", item))
+            else:
+                items.append((new_key, v))
+        return dict(items)
+
     def mlflow_create_experiment(self) -> str:
         experiment = mlflow.set_experiment(self.experiment_name)
         mlflow.set_experiment_tags(self.tags)
@@ -48,8 +65,10 @@ class MlflowManager(metaclass=Singleton):
         return experiment.experiment_id
 
     def log_metrics(self, metrics: dict):
-        mlflow.log_metrics(metrics)
-        self.logger.info("mlflow: logging metrics :" + " ".join(list(metrics.keys())))
+        self.logger.info("mlflow: flattening :" + " ".join(list(metrics.keys())))
+        flattened_metrics = MlflowManager.flatten_dict(metrics)
+        self.logger.info("mlflow: logging metrics :" + " ".join(list(flattened_metrics.keys())))
+        mlflow.log_metrics(flattened_metrics)
 
     def log_data(self, data: Dict[str, pd.DataFrame]):
         for key, value in data.items():
