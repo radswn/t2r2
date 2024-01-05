@@ -4,20 +4,20 @@ In T2R2 we use configuration files in `yaml` format to specify our needs. Below 
 
 ## Global
 
-1. `random_state` - [int] sets seed for random operations [default: None]
-2. `data_dir` - [str - path] sets data_dir to the given path [default: ./data/]
-3. `output_dir` - [str - path] sets output_dir to the given path [default: ./results/]
+1. `random_state` - [int] the seed for random operations [default: None]
+2. `data_dir` - [str - path] the path of a directory with the data [default: ./data/]
+3. `output_dir` - [str - path] the path of a directory for the output [default: ./results/]
 
 ## Model 
 
-1. `model_name` - [str] HF name of the model you need. 
-2. `output_dir` - [str] you may set an output_dir for your model [default: ./results/]
-3. `num_labels` - [int] [default: 2] 
-4. `max_length` - [int] [default: 256]
-5. `padding` - [str] [default: max_length]
-6. `truncation` - [bool] [default: True]
-7. `return_tensors` - [str] [default: pt]
-8. `output_path` - [str] [default: best_model]
+1. `model_name` - [str] HF name of the model you need 
+2. `output_dir` - [str] the path of an output dir of your model [default: ./results/]
+3. `num_labels` - [int] the number of used labels [default: 2]
+4. `max_length` - [int] the maximal sequence length [default: 256] 
+5. `padding` - [str] pad up to the given length parameter [default: max_length]
+6. `truncation` - [bool] controls wether to use truncation [default: True]
+7. `return_tensors` - [str] returns tensors of a particular framework [default: pt]
+8. `output_path` - [str] name for a model file [default: best_model]
 
 Exemplary config of Model
 
@@ -29,8 +29,10 @@ model:
 
 ## Metrics
 
-Pick metrics that you need as arguments for this section. Complete list is of metrics is available [here](src\t2r2\metrics\metrics.py)
-###### TODO
+Pick metrics that you need as arguments for this section. Complete list of metrics we handle is available [here](src\t2r2\metrics\metrics.py)
+
+To ommit redundant descriptions - you may find metrics explained under this [link] (https://scikit-learn.org/stable/modules/model_evaluation.html)
+
 Exemplary config of Metrics
 
 ```
@@ -46,9 +48,19 @@ For each of the 3 following sections (Training, Testing and Control) you may add
 2. `label_column_id`: [int] [default: 1]
 3. `has_header`: [bool] [default: True]
 
-Also you may enrich those sections with `selectors` subsection.
+Also you may enrich training and testing sections with `selectors` subsection.
 
-###### TODO
+### Selectors
+
+#### Data Cartography
+
+#### LLM selector
+
+#### Slicing
+
+#### Undersampling
+
+Undersampling performed randomly with [RandomUnderSampler] (https://imbalanced-learn.org/stable/references/generated/imblearn.under_sampling.RandomUnderSampler.html) from imblearn
 
 Exemplary selectors config:
 ```
@@ -62,34 +74,37 @@ Exemplary selectors config:
 ```
 
 ## Training
-1. `dataset_path`: [str] name of the file with data [default: train.csv]
+
+1. `dataset_path`: [str] the name of the file with data [default: train.csv]
 2. `validation_dataset_path`: [str - path] if you want to additionally provide validation dataset - you may do it here [default: None]
-3. `results_file`: [str] name of the file with results [default: train_results.pickle]
-4. `epochs`: [int] [default: 1]
-5. `batch_size`: [int] [default: 32]
-6. `learning_rate`: [float] [default: 0.00001]
-7. `validation_size`: [float] [default: 0.2]
-8. `metric_for_best_model` [str]  [default: loss]
-9. `perform_data_cartography` [bool] [default: False]
-10. `data_cartography_results` [str] [default: ./data_cartography_metrics.pickle]
-11. `curriculum_learning` [bool] [default: False]
+3. `results_file`: [str] the name of the file with results [default: train_results.pickle]
+4. `epochs`: [int] the number of epochs [default: 1]
+5. `batch_size`: [int] the batch size [default: 32]
+6. `learning_rate`: [float] learning rate parameter [default: 0.00001]
+7. `validation_size`: [float] validation size (between 0 and 1) [default: 0.2]
+8. `metric_for_best_model` [str] the metric that characterizes the best model [default: loss]
+9. `perform_data_cartography` [bool] the switch for performing a data cartography [default: False]
+10. `data_cartography_results` [str] the name of a result file with data cartography metrics  [default: ./data_cartography_metrics.pickle]
+11. `curriculum_learning` [bool] the switch for performing a curriculum learning [default: False]
 
 ## Testing
 
-1. `dataset_path`: [str] name of the file with data [default: test.csv]
-2. `results_file`: [str] name of the file with results [default: test_results.pickle]
+1. `dataset_path`: [str] the name of the file with data [default: test.csv]
+2. `results_file`: [str] the name of the file with results [default: test_results.pickle]
 
 ## Control 
 
-1. `dataset_path`: [str] name of the file with data [default: control.csv]
-2. `results_file`: [str] name of the file with results [default: control_results.pickle]
+1. `dataset_path`: [str] the name of the file with data [default: control.csv]
+2. `results_file`: [str] the name of the file with results [default: control_results.pickle]
 
 ## MLFlow
 
-1. `experiment_name` - [str] experiment name
+1. `experiment_name` - [str] the experiment name
 2. `tags` - [args] additional tags such as `version`
-3. `tracking_uri`: [str] endpoint of your server
+3. `tracking_uri`: [str] the endpoint of your server
+
 ###### TODO
+
 Exemplary config of MLFlow:
 
 ```
