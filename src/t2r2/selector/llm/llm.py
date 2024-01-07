@@ -6,13 +6,11 @@ class LLMSelector(Selector):
     def __init__(self, prompt: str, **kwargs):
         super().__init__()
         self.prompt = prompt
+        self.model = AutoModelForCausalLM.from_pretrained("TheBloke/Mistral-7B-v0.1-AWQ", device_map="cuda:0")
+        self.tokenizer = AutoTokenizer.from_pretrained("TheBloke/Mistral-7B-v0.1-AWQ", trust_remote_code=False)
 
     def select(self, dataset: pd.DataFrame) -> pd.DataFrame:
-        model = "TheBloke/Mistral-7B-v0.1-AWQ"
-        m = AutoModelForCausalLM.from_pretrained(model, device_map="cuda:0")
-        tokenizer = AutoTokenizer.from_pretrained(model, trust_remote_code=False)
-
-        pipe = pipeline("text-generation", model=m, max_length=3000, tokenizer=tokenizer)
+        pipe = pipeline("text-generation", model=self.model, max_length=3000, tokenizer=self.tokenizer)
         prompt_with_data = self.prompt + ":\n" + self.df_to_str(dataset)
         prompt_template = f"{prompt_with_data}"
         return self.output_to_df(pipe(prompt_template)[0]["generated_text"])

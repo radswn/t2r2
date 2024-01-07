@@ -1,3 +1,8 @@
+data:
+  has_header: False
+  text_column_id: 0
+  label_column_id: 1
+
 model:
   model_name: bert-base-cased
   num_labels: 12
