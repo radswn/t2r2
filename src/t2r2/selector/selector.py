@@ -8,6 +8,7 @@ from t2r2.selector.data_cartography import DataCartographySelector
 from t2r2.selector.dummy import DummySelector
 from t2r2.selector.slicing import SlicingSelector
 from t2r2.selector.undersampling import RandomUnderSamplerSelector
+from t2r2.selector.llm import LLMSelector
 
 
 @dataclass
@@ -37,6 +38,7 @@ def get_selector(name: str) -> Type[Selector]:
         "slicing": SlicingSelector,
         "random_under_sampler": RandomUnderSamplerSelector,
         "data_cartography": DataCartographySelector,
+        "llm": LLMSelector,
     }
     return selectors[name]
 

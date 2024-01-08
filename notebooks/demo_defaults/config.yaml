@@ -1,9 +1,0 @@
-model:
-  model_name: bert-base-cased
-
-metrics:
-  - name: accuracy_score
-
-training: { }
-testing: { }
-control: { }
