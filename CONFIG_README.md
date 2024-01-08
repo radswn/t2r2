@@ -1,12 +1,12 @@
 # T2R2 - Config Description
 
-In T2R2 we use configuration files in `yaml` format to specify our needs. Below we describe sections that you may include in your config. We left some fields undescribed to ommit redundancy. You may find an exemplary configuration at the bottom.
+In T2R2 we use configuration files in `yaml` format to specify our needs. Below we describe sections that you may include in your config. We left some fields undescribed to omit redundancy. You may find an exemplary configuration at the bottom.
 
 ## Global
 
 1. `random_state` - [int] the seed for random operations [default: None]
-2. `data_dir` - [str - path] the path of a directory with the data [default: ./data/]
-3. `output_dir` - [str - path] the path of a directory for the output [default: ./results/]
+2. `data_dir` - [str] the path of a directory with the data [default: ./data/]
+3. `output_dir` - [str] the path of a directory for the output [default: ./results/]
 
 ## Model 
 
@@ -40,13 +40,13 @@ metrics:
   - name: accuracy_score
 ```
 
-## Dataset Vaults
+## Dataset
 
 For each of the 3 following sections (Training, Testing and Control) you may additionally provide the following arguments:
 
-1. `text_column_id`: [int] [default: 0]
-2. `label_column_id`: [int] [default: 1]
-3. `has_header`: [bool] [default: True]
+1. `text_column_id`: [int] the index of the text column [default: 0]
+2. `label_column_id`: [int] the index of the label column [default: 1]
+3. `has_header`: [bool] the variable that describes wether the dataset contain the header [default: True]
 
 Also you may enrich training and testing sections with `selectors` subsection.
 
@@ -58,7 +58,7 @@ The following paragraphs briefly describes selectors that we provide
 
 Implementation of the concept of data cartography as outlined in the paper: https://aclanthology.org/2020.emnlp-main.746/.
 
-To fully understand how it works - check this [notebook](/notebooks/demo_data_cartography/bert-base-cased/demo_data_cartography.ipynb)
+To fully understand how it works - check this [notebook](/notebooks/demo_data_cartography/distilbert/demo_data_cartography.ipynb)
 
 #### LLM selector
 
@@ -125,7 +125,6 @@ class ClSelector(Selector):
 ```yaml
   selectors:
     - name: random_under_sampler
-      args: { }
     - name: slicing
       args: 
         result_file: '../../data/slicing/train_slicing.pickle'
@@ -135,12 +134,12 @@ class ClSelector(Selector):
 ## Training
 
 1. `dataset_path`: [str] the name of the file with data [default: train.csv]
-2. `validation_dataset_path`: [str - path] if you want to additionally provide validation dataset - you may do it here [default: None]
+2. `validation_dataset_path`: [str] the validation dataset path [default: None]
 3. `results_file`: [str] the name of the file with results [default: train_results.pickle]
 4. `epochs`: [int] the number of epochs [default: 1]
 5. `batch_size`: [int] the batch size [default: 32]
-6. `learning_rate`: [float] learning rate parameter [default: 0.00001]
-7. `validation_size`: [float] validation size (between 0 and 1) [default: 0.2]
+6. `learning_rate`: [float] the learning rate parameter [default: 0.00001]
+7. `validation_size`: [float] the validation size (between 0 and 1) [default: 0.2]
 8. `metric_for_best_model` [str] the metric that characterizes the best model [default: loss]
 9. `perform_data_cartography` [bool] the switch for performing a data cartography [default: False]
 10. `data_cartography_results` [str] the name of a result file with data cartography metrics  [default: ./data_cartography_metrics.pickle]
@@ -161,7 +160,7 @@ class ClSelector(Selector):
 Enables tracking an experiment (datasets, model and metrics) with the use of MLflow tools. 
 
 1. `experiment_name` - [str] the experiment name
-2. `tags` - [args] additional tags such as `version`
+2. `tags` - [dict[str, str]] additional tags such as `version`
 3. `tracking_uri`: [str] the endpoint of your server
 
 Exemplary config of MLFlow:
@@ -186,7 +185,7 @@ dvc:
 ```
 [default: off]
 
-For more tips check our notebook that presents a workflow with DVC enabled [here](/notebooks/demo_dvc/demo.ipynb).
+For more tips check our notebook that presents a workflow with DVC enabled [here](/notebooks/demo_data_cartography/distilbert/demo_data_cartography.ipynb).
 
 ## Exemplary config:
 
@@ -201,7 +200,7 @@ metrics:
 training:
   epochs: 1
   batch_size: 2
-  learning_rate: 1e-3
+  learning_rate: 1e-5
   validation_size: 0.2
   metric_for_best_model: accuracy_score
 
