@@ -4,27 +4,31 @@ In T2R2 we use configuration files in `yaml` format to specify our needs. Below 
 
 ## Global
 
-1. `random_state` - [int] the seed for random operations [default: None]
-2. `data_dir` - [str] the path of a directory with the data [default: ./data/]
-3. `output_dir` - [str] the path of a directory for the output [default: ./results/]
+1. `random_state (int, default: None)` the seed for random operations 
 
 ## Model 
 
-1. `model_name` - [str] HF name of the model you need 
-2. `output_dir` - [str] the path of an output dir of your model [default: ./results/]
-3. `num_labels` - [int] the number of used labels [default: 2]
-4. `max_length` - [int] the maximal sequence length [default: 256] 
-5. `padding` - [str] pad up to the given length parameter [default: max_length]
-6. `truncation` - [bool] controls wether to use truncation [default: True]
-7. `return_tensors` - [str] returns tensors of a particular framework [default: pt]
-8. `output_path` - [str] name for a model file [default: best_model]
+1. `model_name (str)` HF name of the model you need 
+2. `output_dir (str, default: ./results/)` the path of an output dir of your model
+3. `num_labels (int, default: 2)` the number of used labels
+4. `max_length (int, default: 256)` the maximal sequence length 
+5. `padding (str, default: max_length)` pad up to the given length parameter
+6. `truncation (bool, default: True)` controls wether to use truncation
+7. `return_tensors (str, default: pt)` returns tensors of a particular framework
+8. `output_path (str, default: best_model)` name for a model file
 
-Exemplary config of Model
+Exemplary config of `model`:
 
 ```yaml
 model:
-  model_name: bert-base-cased
+  max_length: 128
+  output_dir: ../../results/
+  model_name: distilbert-base-uncased
   num_labels: 12
+  padding: max_length
+  return_tensors: pt
+  truncation: False
+  output_path: ../../output_model/
 ```
 
 ## Metrics
@@ -33,32 +37,60 @@ Pick metrics that you need as arguments for this section. Complete list of metri
 
 To ommit redundant descriptions - you may find metrics explained under this [link](https://scikit-learn.org/stable/modules/model_evaluation.html).
 
-Exemplary config of Metrics
+1. `name (str)` the name of the metric
+2. `args (dict[str, Any], default: None)` the dictionary of pairs where keys are metrics' names and values are argument for those metrics
+
+Exemplary config of `metrics`:
 
 ```yaml
 metrics:
-  - name: accuracy_score
+  - name: f1_score
+    args:
+      average: macro
+  - name: slicing_scores
+    args: 
+      base_directory: 'slicing/'
+      default_file_name: "slicing.pickle"
 ```
 
 ## Dataset
 
-For each of the 3 following sections (Training, Testing and Control) you may additionally provide the following arguments:
+For each of the 3 following subsections (Training, Testing and Control) you may additionally provide the following arguments or have them in the additional section `data` to omit unnecessary repetitions:
 
-1. `text_column_id`: [int] the index of the text column [default: 0]
-2. `label_column_id`: [int] the index of the label column [default: 1]
-3. `has_header`: [bool] the variable that describes wether the dataset contain the header [default: True]
+1. `data_dir (str, default: ./data/)` the path of a directory with the data
+2. `output_dir (str, default: ./results/)` the path of a directory for the output
+3. `text_column_id (int, default: 0)` the index of the text column
+4. `label_column_id (int, default: 1)` the index of the label column
+5. `has_header (bool, default: True)` the variable that describes wether the dataset contain the header
+
+Exemplary config of `data`:
+
+```yaml
+data:
+  data_dir: "../../data/featuresets/"
+  output_dir: "../../results/"
+  has_header: False
+  text_column_id: 1
+  label_column_id: 2
+```
 
 Also you may enrich training and testing sections with `selectors` subsection.
 
 ### Selectors
 
-The following paragraphs briefly describes selectors that we provide
+The following paragraphs briefly describe selectors that we provide.
 
 #### Data Cartography
 
 Implementation of the concept of data cartography as outlined in the paper: https://aclanthology.org/2020.emnlp-main.746/.
 
-To fully understand how it works - check this [notebook](/notebooks/demo_data_cartography/distilbert/demo_data_cartography.ipynb)
+To fully understand how it works - check this [notebook](https://github.com/radswn/t2r2/blob/master/notebooks/demo_data_cartography/distilbert/demo_data_cartography.ipynb)
+
+Example of data cartography yaml snippet:
+
+```yaml
+perform_data_cartography: True
+```
 
 #### LLM selector
 
@@ -66,11 +98,28 @@ TODO - PR to be accepted
 
 #### Slicing functions
 
-Check our notebook that explains slicing functions [here](/notebooks/demo_slicing/demo_slicing.ipynb).
+Check our notebook that explains slicing functions [here](https://github.com/radswn/t2r2/blob/master/notebooks/demo_slicing/demo_slicing.ipynb).
+
+Example of slicing functions yaml snippet:
+
+```yaml
+  selectors:
+    - name: slicing
+      args: 
+        result_file: '../../data/slicing/train_slicing.pickle'
+        list_of_slicing_functions: [short, textblob_polarity]
+```
 
 #### Undersampling
 
-Undersampling performed randomly with [RandomUnderSampler](https://imbalanced-learn.org/stable/references/generated/imblearn.under_sampling.RandomUnderSampler.html) from imblearn
+Undersampling performed randomly with [RandomUnderSampler](https://imbalanced-learn.org/stable/references/generated/imblearn.under_sampling.RandomUnderSampler.html) from imblearn.
+
+Example of undersampling yaml snippet:
+
+```yaml
+  selectors:
+    - name: random_under_sampler
+```
 
 #### User Selector
 
@@ -81,7 +130,7 @@ We give you an opportunity to use your own selectors.
 
 Below we present a simple example how to do it.
 
-`config.yaml` part
+Example of user selector yaml snippet:
 
 ```yaml
   selectors:
@@ -121,49 +170,39 @@ class ClSelector(Selector):
         return dataset
 ```
 
-#### Exemplary selectors config:
-```yaml
-  selectors:
-    - name: random_under_sampler
-    - name: slicing
-      args: 
-        result_file: '../../data/slicing/train_slicing.pickle'
-        list_of_slicing_functions: [short, textblob_polarity]
-```
-
 ## Training
 
-1. `dataset_path`: [str] the name of the file with data [default: train.csv]
-2. `validation_dataset_path`: [str] the validation dataset path [default: None]
-3. `results_file`: [str] the name of the file with results [default: train_results.pickle]
-4. `epochs`: [int] the number of epochs [default: 1]
-5. `batch_size`: [int] the batch size [default: 32]
-6. `learning_rate`: [float] the learning rate parameter [default: 0.00001]
-7. `validation_size`: [float] the validation size (between 0 and 1) [default: 0.2]
-8. `metric_for_best_model` [str] the metric that characterizes the best model [default: loss]
-9. `perform_data_cartography` [bool] the switch for performing a data cartography [default: False]
-10. `data_cartography_results` [str] the name of a result file with data cartography metrics  [default: ./data_cartography_metrics.pickle]
-11. `curriculum_learning` [bool] the switch for performing a curriculum learning [default: False]
+1. `dataset_path (str, default: train.csv)` the name of the file with data
+2. `validation_dataset_path (str, default: None)` the validation dataset path
+3. `results_file (str, default: train_results.pickle)` the name of the file with results
+4. `epochs (int, default: 1)` the number of epochs
+5. `batch_size (int, default: 32)` the batch size
+6. `learning_rate (float, default: 0.00001)` the learning rate parameter
+7. `validation_size (float, default: 0.2)` the validation size (between 0 and 1)
+8. `metric_for_best_model (str, default: loss)` the metric that characterizes the best model
+9. `perform_data_cartography (bool, default: False)` the switch for performing a data cartography
+10. `data_cartography_results (str, default: ./data_cartography_metrics.pickle)` the name of a result file with data cartography metrics
+11. `curriculum_learning (bool, default: False)` the switch for performing a curriculum learning
 
 ## Testing
 
-1. `dataset_path`: [str] the name of the file with data [default: test.csv]
-2. `results_file`: [str] the name of the file with results [default: test_results.pickle]
+1. `dataset_path (str, default: test.csv)` the name of the file with data
+2. `results_file (str, default: test_results.pickle)` the name of the file with results
 
 ## Control 
 
-1. `dataset_path`: [str] the name of the file with data [default: control.csv]
-2. `results_file`: [str] the name of the file with results [default: control_results.pickle]
+1. `dataset_path (str, default: control.csv)` the name of the file with data
+2. `results_file (str, default: control_results.pickle)` the name of the file with results
 
 ## MLFlow
 
 Enables tracking an experiment (datasets, model and metrics) with the use of MLflow tools. 
 
-1. `experiment_name` - [str] the experiment name
-2. `tags` - [dict[str, str]] additional tags such as `version`
-3. `tracking_uri`: [str] the endpoint of your server
+1. `experiment_name (str)` the experiment name
+2. `tags (dict[str, str])` additional tags such as `version`
+3. `tracking_uri (str)` the endpoint of your server
 
-Exemplary config of MLFlow:
+Exemplary config of `mlflow`:
 
 ```yaml
 mlflow:
@@ -173,38 +212,22 @@ mlflow:
   tracking_uri: "http://localhost:5000"
 ```
 
-Check our notebook with MLflow enabled [here](/notebooks/demo_slicing/demo_slicing.ipynb).
+Check our notebook with MLflow enabled [here](https://github.com/radswn/t2r2/blob/master/notebooks/demo_slicing/demo_slicing.ipynb).
 
 ## DVC
 
-Enables versioning of an experiment (datasets, model and metrics), showing differences in parameters as well as in metrics, easy checkouts. If you want to switch it on - add the following lines to your config
+Enables versioning of an experiment (datasets, model and metrics), showing differences in parameters as well as in metrics, easy checkouts. 
+
+If you want to switch it on - add the following lines to your config
 
 ```yaml
 dvc:
   enabled: true
 ```
-[default: off]
+(default: off)
 
-For more tips check our notebook that presents a workflow with DVC enabled [here](/notebooks/demo_data_cartography/distilbert/demo_data_cartography.ipynb).
+For more tips check our notebook that presents a workflow with DVC enabled [here](https://github.com/radswn/t2r2/blob/master/notebooks/demo_data_cartography/distilbert/demo_data_cartography.ipynb).
 
-## Exemplary config:
+## Exemplary configs
 
-```yaml
-model:
-  model_name: bert-base-cased
-  num_labels: 12
-
-metrics:
-  - name: accuracy_score
-
-training:
-  epochs: 1
-  batch_size: 2
-  learning_rate: 1e-5
-  validation_size: 0.2
-  metric_for_best_model: accuracy_score
-
-testing: { }
-
-control: { }
-```
+You may find exemplary `config.yaml` files with their notebooks in this [directory](https://github.com/radswn/t2r2/tree/master/notebooks).
