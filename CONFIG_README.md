@@ -94,7 +94,20 @@ perform_data_cartography: True
 
 #### LLM selector
 
-TODO - PR to be accepted
+LLM selector was prepared with intention of running on high-performance machines with GPU / Google Colab. To provide you with LLM that is small enought to run it on your own we used `TheBloke/Mistral-7B-v0.1-AWQ`.
+
+For this selector you need to provide a `prompt` argument in the config. Bear in mind that LLM is not perfect, and sometimes you might work on your prompt. On our side - we feed the model with your prompt and the data converted to string.
+
+The exemplary snippet in yaml:
+
+```yaml
+  selectors:
+    - name: llm
+      args: 
+        prompt: Generate more synthetic examples
+```
+
+A notebook that covers an installation of additional libraries needed to run LLM selector is [here](https://github.com/radswn/t2r2/blob/master/notebooks/demo_llm/demo.ipynb)
 
 #### Slicing functions
 
