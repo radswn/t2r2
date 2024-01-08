@@ -10,10 +10,9 @@ class LLMSelector(Selector):
         self.tokenizer = AutoTokenizer.from_pretrained("TheBloke/Mistral-7B-v0.1-AWQ", trust_remote_code=False)
 
     def select(self, dataset: pd.DataFrame) -> pd.DataFrame:
-        pipe = pipeline("text-generation", model=self.model, max_length=3000, tokenizer=self.tokenizer)
         prompt_with_data = self.prompt + ":\n" + self.df_to_str(dataset)
-        prompt_template = f"{prompt_with_data}"
-        return self.output_to_df(pipe(prompt_template)[0]["generated_text"])
+        pipe = pipeline("text-generation", model=self.model, max_length=len(prompt_with_data), tokenizer=self.tokenizer)
+        return self.output_to_df(pipe(prompt_with_data)[0]["generated_text"])
 
     def df_to_str(self, dataset: pd.DataFrame) -> str:
         return dataset.apply(lambda x: f'{x["text"]},{x["label"]}', axis=1).str.cat(sep="\n")
