@@ -4,67 +4,44 @@
 
 ## Description
 
-*TODO*
+The aim of the project is to build an environment for iterative training and evaluation of machine learning models using a wide range of modern data analysis techniques. 
+The main emphasis is on the speed of moving in the space of possible solutions for the selection of training sets, hyperparameter optimization, and model evaluation. 
+In particular, the system being built has the following functionalities: 
+- automatic versioning of all configuration settings of the model training process and configuration of training sets, 
+- use of the curriculum learning technique to construct the training set, 
+- use of the data set cartography technique, 
+- the ability to easily connect external libraries for testing data and models.
+
+---
+
+## [Config Description](https://github.com/radswn/t2r2/wiki/Configuration-Explained)
+
+## Environment Setup
+
+[Dev Setup](https://github.com/radswn/t2r2/wiki/Dev-setup) wiki for devcontainer.
+
+To install our package use the following command pip install `pip install t2r2`.
+You also need to have libraries with versions specified in `requirements.txt` - use command `pip install -r requirements.txt`.
 
 ---
 
 ## Quick start
 
----
+(TODO - enhance later?)
 
-### Basic training loop
-
-*TODO*
-
----
-
-### Implement your own selector
-
-We give you an opportunity to use your own selectors.
-
-1. Prepare a class you want to use - it should inherit from `Selector` class from `t2r2.selector`. Implement its `select` method.
-2. When declarating your own selector - provide `module_path` as one of the arguments.
-
-Below we present a simple example how to do it.
-
-`config.yaml` part
-
-```yaml
-  selectors:
-    - name: UserSelector
-      args: 
-        module_path: ./my_selector.py
-```
-
-`my_selector.py` code
+Import t2r2 library
 
 ```python
-import pandas as pd
-from t2r2.selector import Selector
-
-class UserSelector(Selector):
-    def select(self, dataset: pd.DataFrame) -> pd.DataFrame:
-        return dataset[:5]
+from t2r2 import T2R2
 ```
 
-### Curriculum learning
+Provide a `config.yaml` and data and run your loop
 
-To force specific order in which examples will be passed during training:
-```yaml
-training:
-  curriculum_learning: True
-```
-Then you also need to provide the `order` column in your training data.
-
-Basically, the examples will be _sorted_ according to order column and won't be shuffled.
-
-You can also use the custom selector to dynamically provide the order of your training examples.
-For example, to pass examples in the order of increasing lenght of text:
 ```python
-class ClSelector(Selector):
-    def select(self, dataset: pd.DataFrame) -> pd.DataFrame:
-        dataset["order"] = [len(i) for i in dataset["text"]]
-        return dataset
+ttrr = T2R2()
+ttrr.loop()
 ```
+
+After Training, Testing and Recording examine your experiment performance and Repeat!
 
 ---
