@@ -16,21 +16,23 @@ In particular, the system being built has the following functionalities:
 
 ## [Config Description](https://github.com/radswn/t2r2/wiki/Configuration-Explained)
 
-## [Dev Setup](https://github.com/radswn/t2r2/wiki/Dev-setup)
+## Environment Setup
+
+[Dev Setup](https://github.com/radswn/t2r2/wiki/Dev-setup) wiki for devcontainer.
+
+To install our package use the following command pip install `pip install t2r2`.
+You also need to have libraries with versions specified in `requirements.txt` - use command `pip install -r requirements.txt`.
+
+---
 
 ## Quick start
 
 (TODO - enhance later?)
 
-Import libraries
+Import t2r2 library
 
 ```python
-import os
 from t2r2 import T2R2
-
-import logging
-logging.basicConfig(format="[%(filename)s:%(lineno)s - %(funcName)20s() ] %(message)s", level=logging.INFO)
-os.environ['WANDB_DISABLED'] = 'true'
 ```
 
 Provide a `config.yaml` and data and run your loop
@@ -40,11 +42,6 @@ ttrr = T2R2()
 ttrr.loop()
 ```
 
-
----
-
-### Basic training loop
-
-*TODO*
+After Training, Testing and Recording examine your experiment performance and Repeat!
 
 ---
