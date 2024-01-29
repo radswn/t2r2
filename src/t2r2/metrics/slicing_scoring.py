@@ -1,8 +1,6 @@
 """
 Metrics file
 for slicing, needs input from slicing selector 
-#FIXME: get config of overarching mechanisms needing both 
-selectors and metrics (slicing) or metrics and training (data cartography)
 """
 import os
 from typing import Union
@@ -11,8 +9,6 @@ import pandas as pd
 from snorkel.analysis import Scorer
 
 from t2r2.utils import Stage, construct_results_file
-
-# FIXME: later add config instead of passing all of those things
 
 
 def slicing_scores(
