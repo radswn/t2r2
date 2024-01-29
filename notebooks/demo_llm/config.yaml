@@ -1,9 +1,7 @@
 data:
-  has_header: True
+  has_header: False
   text_column_id: 0
   label_column_id: 1
-  output_dir: imdb_distilbert
-  data_dir: "../../data/imdb/"
 
 model:
   model_name: bert-base-cased
@@ -15,9 +13,14 @@ metrics:
 training:
   epochs: 1
   batch_size: 2
-  learning_rate: 1e-5
+  learning_rate: 1e-3
   validation_size: 0.2
   metric_for_best_model: accuracy_score
+  selectors:
+    - name: llm
+      args: 
+        prompt: Generate more synthetic examples
+
 
 testing: { }
 
