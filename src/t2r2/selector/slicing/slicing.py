@@ -1,6 +1,7 @@
 """
 Module for implementing slicing functions by snorkel.
 """
+
 from typing import List, Union
 
 import pandas as pd

@@ -73,8 +73,6 @@ class WithMetrics:
                     true_labels,
                     predictions,
                     **metric.args,
-                    # FIXME: this doesn't work without ignore_unmatched_kwargs
-                    # proba_predictions=proba_predictions, stage=self.stage
                 )
                 for metric in self.metrics
             }
